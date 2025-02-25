@@ -25,9 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiase bg-neutral-100`}
       >
-        <nav className="flex justify-around bg-neutral-200 text-neutral-900 align-middle py-2">
+        <nav className="flex justify-around bg-neutral-200 text-neutral-900 align-middle py-2 ">
           <a className="" href="/">
             <img src="https://place-hold.it/80x80&text=logo&fontsize=18" alt="logo" />
           </a>
@@ -47,7 +47,11 @@ export default function RootLayout({
           </div>
 
         </nav>
-        {children}
+
+        <section className="bg-neutral-100 flex justify-center w-full h-full">
+
+          {children}
+        </section>
       </body>
     </html>
   );
