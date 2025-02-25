@@ -1,6 +1,5 @@
+import ClientTickets from "./page-client";
+
 export default async function Tickets() {
-  return <>
-  
-    <h1>Tickets</h1>
-  </>
+  return <ClientTickets />
 }
