@@ -27,6 +27,26 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <nav className="flex justify-around bg-neutral-200 text-neutral-900 align-middle py-2">
+          <a className="" href="/">
+            <img src="https://place-hold.it/80x80&text=logo&fontsize=18" alt="logo" />
+          </a>
+       
+          <ul className="flex justify-center flex-col">
+            <a className="" href="/tickets">
+              <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                  Notas
+                {/* <button className="font-bold bg-neutral-400 py-2 px-6 flex">
+                </button> */}
+              </li>
+            </a>
+          </ul>
+          <div>
+            {/* login */}
+            <img src="https://place-hold.it/80x80&text=user&fontsize=18" alt="logo" />
+          </div>
+
+        </nav>
         {children}
       </body>
     </html>
