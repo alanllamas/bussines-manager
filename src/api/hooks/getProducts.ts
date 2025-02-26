@@ -1,13 +1,11 @@
 'use-client'
-import { fetcher } from '../../api/fetcher';
+import { fetcher } from '../fetcher';
 import useSWR from 'swr';
 
-const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=*`;
+const WEBHOOK_PRODUCTS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/products?populate=*`;
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 
-
-
-async function GetTickets(
+async function GetProducts(
   [url, token]: [string, string]
 ) {
   return await fetcher<any>(
@@ -21,18 +19,18 @@ async function GetTickets(
   );
 }
 
-export default function useGetTickets() {
+export default function useGetProducts() {
   const { data, isLoading, error } = useSWR(
-    [WEBHOOK_TICKETS_API, token],
-    GetTickets,
+    [WEBHOOK_PRODUCTS_API, token],
+    GetProducts,
        {
       revalidateOnFocus: false,
     }
   );
-   const tickets = data ?? [];
+   const products = data ?? [];
 
   return {
-    tickets,
+    products,
     error,
     isLoading,
   };
