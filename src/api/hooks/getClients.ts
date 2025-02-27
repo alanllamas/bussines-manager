@@ -1,6 +1,11 @@
 'use-client'
 import { fetcher } from '../fetcher';
 import useSWR from 'swr';
+export type Client = {
+  id: number;
+  name: string;
+}
+
 
 const WEBHOOK_CLIENTS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/clients?populate=*`;
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`

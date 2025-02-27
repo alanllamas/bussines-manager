@@ -2,6 +2,20 @@
 import { fetcher } from '../fetcher';
 import useSWR from 'swr';
 
+export type Product = {
+  id: number;
+  name: string;
+  price: number;
+  product_variants: {
+    name: string;
+    id: number;
+    type: string;
+  }[]
+  total: number
+  quantity: number
+  measurement_unit: string;
+}
+
 const WEBHOOK_PRODUCTS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/products?populate=*`;
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 

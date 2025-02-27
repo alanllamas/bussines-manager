@@ -1,17 +1,245 @@
 'use client'
-import useGetTickets from "@/api/hooks/getTickets";
-import React, { FormEvent, useEffect, useState } from "react";
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
-import useGetProducts from "@/api/hooks/getProducts";
-import useGetClients from "@/api/hooks/getClients";
+import useGetTickets, { Ticket } from "@/api/hooks/getTickets";
+import React, { FormEvent, SyntheticEvent, useEffect, useState } from "react";
+import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Select } from '@headlessui/react';
+import useGetProducts, { Product } from "@/api/hooks/getProducts";
+import useGetClients, { Client } from "@/api/hooks/getClients";
+import { Formik, Field, Form, FieldArray, useFormikContext, FormikProps, useField } from "formik";
+import Image from "next/image";
 
-const ClientTickets: React.FC<any> = () => {
 
-  const [clients, setClients] = useState([])
-  const [products, setProducts] = useState([])
-  const [tickets, setTickets] = useState([])
+type EVariant = {
+  name: string;
+  type: string;
+  id: number
+}
+type EProduct = {
+  name: string;
+  product: number;
+  price: number;
+  quantity: number;
+  total: number
+  product_variants: EVariant[]
+  unit: string;
+}
+type InitialValues = {
+  date: Date;
+  client: string;
+  ticket_number: number;
+  products: [EProduct];
+  shipping: number,
+  subtotal: number,
+  total: number
+}
+const emptyProduct: EProduct = {
+  name: '',
+  product: 0,
+  price: 0,
+  product_variants: [],
+  quantity: 0,
+  total: 0,
+  unit: ''
+}
+const emptyVariant: EVariant = {
+  name: "",
+  type: "",
+  id: 0
+}
+
+
+const SubtotalField = (props: any) => {
+  const {
+    // @ts-ignore
+    values: { products },
+    touched,
+    setFieldValue,
+  } = useFormikContext();
+  const [field, meta] = useField(props);
+
+  React.useEffect(() => {
+    // set the value of textC, based on textA and textB
+    if (
+      // @ts-ignore
+      products && touched.products
+    ) {
+      const subtotal = products.reduce((acc: number, product: Product) => {
+        return acc + Number(product.total)
+      }, 0)
+      setFieldValue('subtotal', subtotal);
+    }
+    // @ts-ignore
+  }, [ products, touched.products,  setFieldValue]);
+
+  return (
+    <>
+      <input {...props} {...field} />
+      {!!meta.touched && !!meta.error && <div>{meta.error}</div>}
+    </>
+  );
+};
+const TotalField = (props: any) => {
+  const {
+    // @ts-ignore
+    values: { subtotal, shipping },
+    touched,
+    setFieldValue,
+  } = useFormikContext();
+  const [field, meta] = useField(props);
+
+  React.useEffect(() => {
+    // set the value of textC, based on textA and textB
+    if (
+      // @ts-ignore
+      subtotal && shipping && touched.shipping
+    ) {
+      const total = Number(subtotal) + Number(shipping)
+      setFieldValue('total', total);
+      // @ts-ignore
+    } else if (subtotal ) {
+      setFieldValue('total', Number(subtotal));
+
+    }
+    // @ts-ignore
+  }, [ subtotal, touched.subtotal, shipping, touched.shipping,  setFieldValue, props.name]);
+
+  return (
+    <>
+      <input {...props} {...field} />
+      {!!meta.touched && !!meta.error && <div>{meta.error}</div>}
+    </>
+  );
+};
+const VariantsField = (props: any) => {
+  const {
+    values,
+    touched,
+    setFieldValue,
+  } = useFormikContext<InitialValues>();
+  const [field, meta] = useField(props);
+
+  // React.useEffect(() => {
+  //   // set the value of textC, based on textA and textB
+  //   if (
+  //     // @ts-ignore
+  //     subtotal && touched.subtotal && shipping && touched.shipping
+  //   ) {
+  //     // const total = Number(subtotal) + Number(shipping)
+  //     // setFieldValue('total', total);
+  //     // @ts-ignore
+  //   } else if (subtotal && touched.subtotal) {
+  //     // setFieldValue('total', subtotal);
+
+  //   }
+  // }, [ values.products, touched.products, setFieldValue, props.name]);
+    const [variants, setVariants] = useState<Product["product_variants"]>([])
+    const [prod, setProd] = useState<Product>()
+  // if (values.products[0] && props.products[0]) {
+  // let prod: Product[] = [];
+    
+    useEffect(() => {
+      console.log('values.products[index].product: ', values.products[props.index]?.product);
+      console.log('products: ', props.products);
+      
+      const product = props.products?.filter((prod: Product)=> {
+        return prod.id === values.products[props.index]?.product
+      })[0]
+      setProd(product)
+    }, [values.products])
+    useEffect(() => {
+      if (prod) {
+        
+        console.log('prod: ', prod);
+        setVariants(prod?.product_variants)
+      }
+    }, [prod])
+    useEffect(() => {
+      console.log('variants: ', variants);
+      
+    }, [variants])
+    
+
+    // console.log('variants: ', variants);
+  // }
+  return (
+    <>
+      <FieldArray {...props} {...field} name={`products.${props.index}.product_variants`}>
+        {({ insert, remove: variantRemove, push: variantpush }) => {
+          
+          // if (values.products[0] && props.products[0]) {
+
+            return <div>
+              <div className="flex justify-between">
+
+                <label htmlFor="`products.${index}.product`">Variantes</label>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => {
+
+                    variantpush(emptyVariant)
+                  }}
+                >
+                 Agregar +
+                </button>
+              </div>
+              { values.products[props.index]?.product_variants.map((variant_value, variant_index) => {
+                  return (<div className="flex px-2 border border-neutral-400 rounded-sm" key={variant_index}>
+                    <Field as='select' className=" px-2 w-full" name={`products.${props.index}.product_variants.${variant_index}.id`}
+                      onChange={(e: any) => {
+                        if (e.target.value) {
+                          setFieldValue(`products.${props.index}.product_variants.${variant_index}.id`, e.target.value || '')
+                          const variant = variants.filter((variant) => variant.id === Number(e.target.value))[0]
+                          // console.log('variant: ', variant);
+                          // console.log('variant.type: ', variant.type);
+                          // console.log('values.products[props.index]: ', values.products[props.index]);
+                          // // const selectedTypes = values.products[props.index].product_variants.map(variant => variant.type)
+                          // // console.log('selectedTypes: ', selectedTypes);
+                          // const filteredVariants = variants.filter((vari) => vari.type !== variant.type)
+                          // // console.log(filteredVariants);
+                          // console.log('filteredVariants: ', filteredVariants);
+                          // setVariants(filteredVariants)
+                          // const quantity = Number(e.target.value)
+                          // const price = Number(values.products[index].price)
+                          if (variant.name) setFieldValue(`products.${props.index}.product_variants.${variant_index}.name`, variant.name || '')
+                          if (variant.type) setFieldValue(`products.${props.index}.product_variants.${variant_index}.type`, variant.type || '')
+                          
+                        } else {
+
+                          setFieldValue(`products.${props.index}.product_variants.${variant_index}.id`, '')
+                        }
+                        
+                      }}
+                    >
+                        <option value="">Variante</option>
+                        {
+                          variants.map((variant: any, index: number) => {
+                            return <option key={`variant-${index}`} value={variant.id || ''}>{variant.name}</option>
+                          })
+                        }
+                    </Field>
+                    <Field className="border border-neutral-400 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.name`} type="text" />
+                    <Field className="border border-neutral-400 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.type`} type="text" />
+                    <button className="flex justify-end ml-2" onClick={() => variantRemove(variant_index)}>x</button>
+
+                  </div>)
+                })
+              }
+            </div>
+        }}
+      </FieldArray>
+      {!!meta.touched && !!meta.error && <div>{meta.error}</div>}
+    </>
+  );
+}
+
+const ClientTickets: React.FC = () => {
+
+  const [clients, setClients] = useState<Client[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
+  const [tickets, setTickets] = useState<Ticket[]>([])
   const [isOpen, setIsOpen] = useState(false)
-  const [ticket, setTicket] = useState(null)
+  const [ticket, setTicket] = useState<number>()
   const {
     tickets: ticketsData,
     error: ticketsError,
@@ -33,9 +261,9 @@ const ClientTickets: React.FC<any> = () => {
       
       console.log('ticketsData.data: ', ticketsData.data);
       console.log('meta.pagination.total: ', ticketsData.meta.pagination.total);
-      const data = ticketsData.data.sort(function(a: any,b: any){
-        const dateA: any = new Date(a.sale_date);
-        const dateB: any = new Date(b.sale_date);
+      const data = ticketsData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
+        const dateA: number = new Date(a.sale_date).valueOf();
+        const dateB: number = new Date(b.sale_date).valueOf()
         return dateB - dateA;
       });
       setTickets(data)
@@ -64,19 +292,54 @@ const ClientTickets: React.FC<any> = () => {
     console.log('ticket: ', ticket);
     
   }, [ticket])
-  const handleSubmit = (event: FormEvent) => {
-    console.log(event);
+  useEffect(() => {
+    console.log('selectedProducts: ', selectedProducts);
+    
+  }, [selectedProducts])
+  const handleSubmit = (values: any) => {
+    setIsOpen(false)
+    console.log(values);
     
   }
+  const addProduct = (e: SyntheticEvent<HTMLSelectElement, Event>) => {
+    // @ts-ignore
+    const product = products.filter((product) => product.id === Number(e.target.value))[0]
+    if(product) setSelectedProducts([...selectedProducts, product])
+  }
+  const removeProduct = (index: number) => {
+    const products = selectedProducts.splice(index, 1)
+    setSelectedProducts(products)
+  }
 
-  
+
+  // const onProductChange = (prod: number) => {
+  //   const product = products.filter((product: Product) => {
+  //     // console.log(product);
+      
+  //     return Number(prod) === product.id
+  //   })[0] || null
+  //   console.log(product);
+
+    
+  // }
+  const today: number = new Date().valueOf()
+
+
+  const initialFormValues = {
+    date: today,
+    client: "",
+    ticket_number: ticketsData.meta?.pagination?.total + 1 || null,
+    products: [emptyProduct],
+    shipping: 0,
+    subtotal: 0,
+    total: 0
+  }
   return<>
     {
       ticketsIsLoading
         ? <p>Loading</p>
         : <section className="w-9/12 py-12 px-8 bg-neutral-100 text-neutral-900">
-          <div className="flex justify-between">
-            <h1>Notas</h1>
+          <div className="flex justify-end">
             <button className="px-6 py-2 bg-neutral-400" onClick={() => setIsOpen(true)}>Crear nota</button>
           </div>
           <table className="w-full p-4 text-center mt-8">
@@ -91,7 +354,7 @@ const ClientTickets: React.FC<any> = () => {
             </thead>
             <tbody>
               {
-                tickets?.map((ticket: any, index: number) => {
+                tickets?.map((ticket: Ticket, index: number) => {
                   // console.log('ticket: ', ticket);
                   return <tr className="border-b border-neutral-300" key={`ticket-${index}`}>
                     <td className="py-2"><a href={`/tickets/${ticket.id}`}>{ticket.ticket_number}</a></td>
@@ -107,58 +370,176 @@ const ClientTickets: React.FC<any> = () => {
           {/* <button >Open dialog</button> */}
           <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
             <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-              <DialogPanel className="max-w-lg space-y-4 border bg-neutral-100 p-12 shadow-2xl text-neutral-900">
-                <DialogTitle className="font-bold">Nota {ticketsData.meta.pagination.total + 1}</DialogTitle>
-                {/* form for tickets */}
-                <form onSubmit={(e: FormEvent) => handleSubmit(e)}>
-                  <input className="border border-neutral-400 rounded-sm px-2 hidden" name="ticket_number" type="number" value={ticketsData.meta.pagination.total + 1}  disabled/>
-                  <div>
-                    <div className="py-1 w-full flex ">
-                      {/* <label className="px-3" htmlFor="product">producto</label> */}
-                      <select className="border border-neutral-400 rounded-sm px-2 w-full" name="product" >
-                        <option value="">Cliente</option>
-                        {
-                          clients.map((client: any) => {
-                            return <option value={client.id}>{client.name}</option>
-                          })
-                        }
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="py-1 w-full flex ">
-                      {/* <label className="px-3" htmlFor="product">producto</label> */}
-                      <select className="border border-neutral-400 rounded-sm px-2 w-full" name="product" >
-                        <option value="">Producto</option>
-                        {
-                          products.map((product: any) => {
-                            return <option value={product.id}>{product.name}</option>
-                          })
-                        }
-                      </select>
-                    </div>
-                  <div className="py-1 w-full flex ">
-                    {/* <label className="px-3" htmlFor="product-quantity">Variante</label> */}
-                    <select className="border border-neutral-400 rounded-sm px-2 w-full" name="product" >
-                      <option value="">Variante</option>
-                      {
-                        products.map((product: any) => {
-                          return <option value={product.id}>{product.name}</option>
-                        })
-                      }
-                    </select>
-                  </div>
-                    <div className="py-1 w-full flex ">
-                      {/* <label className="px-3" htmlFor="product-quantity">Cantidad</label> */}
-                      <input className="border border-neutral-400 rounded-sm px-2" type="number" name="product-quantity" placeholder="Cantidad"/>
-                    </div>
+              <DialogPanel className="max-w-3xl space-y-4 border bg-neutral-100 p-12 shadow-2xl text-neutral-900">
+                
+                <div className="flex justify-between gap-2">
+                  <img className="w-52 " src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" />
 
-                  </div>
-                </form>
-                <div className="flex gap-4">
-                  <button onClick={() => setIsOpen(false)}>Cancel</button>
-                  <button onClick={() => setIsOpen(false)}>Deactivate</button>
+                  <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {ticketsData.meta.pagination.total + 1}</span><span>Fecha: {new Date(today).toLocaleDateString() }</span></DialogTitle>
                 </div>
+                {/* form for tickets */}
+                <Formik
+                  initialValues={initialFormValues}
+                  onSubmit={async (values) => handleSubmit(values)}
+                >
+                  {
+                    ({values, setFieldValue}) => (
+                      <Form>
+                        <Field className="border border-neutral-400 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled />
+                        <Field className="border border-neutral-400 rounded-sm px-2 w-full hidden" id="date" name="date" type="datetime-locale" value={values.date} />
+                        <div className="flex align-baseline">
+
+                          <label htmlFor="client" className="p-2">Cliente: </label>
+                          <Field required as="select" className="border-b border-neutral-400 rounded-sm p-2 w-full" id="client" name="client" value={values.client}>
+                            <option value="">Cliente</option>
+                            {
+                              clients.map((client: any, index: number) => {
+                                return <option key={`client-${index}`} value={client.id}>{client.name}</option>
+                              })
+                            }
+                          </Field>
+                        </div>
+                      
+                        <FieldArray name="products">
+                          {({ insert, remove, push }) => (
+                            <div>
+                              <div className="flex justify-between p-2">
+                                <h4>Productos</h4>
+                                <button
+                                  type="button"
+                                  className="secondary"
+                                  onClick={() => push(emptyProduct)}
+                                >
+                                  Agregar +
+                                </button>
+                                {/* <div className="w-full border border-neutral-300">
+
+                                    </div> */}
+                              </div>
+                              { values.products.map((product_value, index) => {
+                                  return (
+                                      <Disclosure>
+                                        {({ open }) => (
+                                          <>
+                                            <div className="flex justify-between items-center">
+
+                                              <DisclosureButton className="py-2 px-2 w-full flex bg-neutral-200 justify-between">
+                                                <p className="mx-1 self-start">{ open ? 'A' : 'V' }</p>
+                                                <p className="mx-1">{values.products[index].name ? values.products[index].name : ''}</p>
+                                                <p className="mx-1">{
+                                                  values.products[index].product_variants[0]
+                                                    ? values.products[index].product_variants.reduce((acc, variant) => {
+                                                      return `${acc} ${variant.name}`
+                                                    }, '')
+                                                    : ''
+                                                }</p>
+                                                <div className="flex">
+
+                                                  <p className="mx-1">{values.products[index].quantity ? values.products[index].quantity : ''}</p>
+                                                  <p className="mx-1">{values.products[index].unit ? values.products[index].unit : ''}</p>
+                                                </div>
+                                                <p className="mx-1">{values.products[index].total ? `$ ${values.products[index].total}` : ''}</p>
+
+                                              </DisclosureButton>
+                                              <button className="flex justify-end px-3 py-2 bg-red-800 text-white" onClick={() => remove(index)}>X</button>
+                                            </div>
+                                            <DisclosurePanel className="text-gray-500">
+                                              <div className="p-2 pt-0 border border-neutral-300 w-full" key={index}>
+                                                <div className="flex flex-col">
+                                                  <div className="flex  w-full">
+                                                    <div className="flex flex-col w-full">
+
+                                                      <label htmlFor="`products.${index}.product`">Producto</label>
+                                                      <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" onChange={(e: any) => {
+                                                        // onProductChange(e.target.value)
+                                                          const product = products.filter((product: Product) => {
+                                                            // console.log(product);
+                                                            
+                                                            return Number(e.target.value) === product.id
+                                                          })[0] || null
+                                                          console.log(product);
+                                                          setFieldValue(`products.${index}.unit`, product.measurement_unit)
+                                                          setFieldValue(`products.${index}.name`, product.name)
+                                                          setFieldValue(`products.${index}.product`, product.id)
+                                                          setFieldValue(`products.${index}.price`, product.price)
+                                                        }} name={`products.${index}.product`}
+                                                      >
+                                                        <option value="">Producto</option>
+                                                        {
+                                                          products.map((product: any, index: number) => {
+                                                            return <option key={`product-${index}`} value={product.id}>{product.name}</option>
+                                                          })
+                                                        }
+                                                      </Field>
+                                                    </div>
+                                                  </div>
+                                                  <div className="w-fullflex flex-col">
+
+                                                    <VariantsField products={products} index={index} className="border border-neutral-400 rounded-sm px-2" name={`products.${index}.product_variants`} placeholder="variantes"/>
+                                                  </div>
+                                                  <div className="w-full flex">
+                                                    <div className="flex flex-col w-full px-1">
+                                                      <label htmlFor={`products.${index}.quantity`}>Cantidad {values.products[index].unit ? `(${values.products[index].unit})` : ''}</label>
+                                                      <Field className="border border-neutral-400 rounded-sm px-2 w-full" name={`products.${index}.quantity`} type="number" placeholder="cantidad"
+                                                        onChange={(e: any) => {
+                                                          const quantity = Number(e.target.value)
+                                                          const price = Number(values.products[index].price)
+                                                          setFieldValue(`products.${index}.quantity`, quantity)
+                                                          setFieldValue(`products.${index}.total`, price * quantity)
+                                                        }}
+                                                      />
+                                                    </div>
+                                                    <div className="flex flex-col w-full px-1">
+                                                      <label htmlFor="">Precio</label>
+                                                      <Field className="border border-neutral-400 rounded-sm bg-neutral-300 px-2 w-full" name={`products.${index}.price`} disabled type="number" placeholder="precio" />
+                                                    </div>
+                                                    <div className="flex flex-col w-full px-1">
+                                                      <label htmlFor="">Monto</label>
+                                                      <Field className="border border-neutral-400 rounded-sm bg-neutral-300 px-2 w-full" name={`products.${index}.total`} disabled type="number" placeholder="total" />
+                                                    </div>
+                                                  </div>
+                                                  
+
+                                                </div>
+                                              </div>
+                                            </DisclosurePanel>
+                                          </>
+                                        )}
+                                    </Disclosure>
+                                  )
+                                })
+                              }
+                            </div>
+                          )}
+                        </FieldArray>
+                        <div className="flex justify-end">
+
+                          <div className="my-4 w-1/2">
+                            <div className="flex justify-between gap-x-4 my-2">
+                              <label htmlFor="subtotal">Sub total</label>
+                              <SubtotalField className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="subtotal" name="subtotal" type="number" placeholder="sub total" />
+                            </div>
+                            <div className="flex justify-between gap-x-4 my-2">
+                              <label htmlFor="shipping">Envío</label>
+                              <Field className="border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" name="shipping" type="number" placeholder="Envio" />
+                            </div>
+                            <div className="flex justify-between gap-x-4 my-2">
+                              <label htmlFor="total">Total</label>
+                              <TotalField required className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="total" name="total" type="number" placeholder="total" />
+                            </div>
+                          </div>
+                        </div>
+
+                        
+                        <div className="flex gap-4 justify-end">
+                          <button className="bg-red-800 px-4 py-2 rounded-sm text-white" onClick={() => setIsOpen(false)}>Cancelar</button>
+                          <button className="bg-green-700 px-4 py-2 text-white" type="submit">Guardar</button>
+                          {/* <button onClick={() => setIsOpen(false)}>Deactivate</button> */}
+                        </div>
+                      </Form>
+                    )
+                  }
+                </Formik>
               </DialogPanel>
             </div>
           </Dialog>
