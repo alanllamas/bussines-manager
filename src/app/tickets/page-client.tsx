@@ -370,7 +370,7 @@ const ClientTickets: React.FC = () => {
           {/* <button >Open dialog</button> */}
           <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
             <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-              <DialogPanel className="max-w-3xl space-y-4 border bg-neutral-100 p-12 shadow-2xl text-neutral-900">
+              <DialogPanel className="max-w-lg space-y-4 border bg-neutral-100 p-12 shadow-2xl text-neutral-900">
                 
                 <div className="flex justify-between gap-2">
                   <img className="w-52 " src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" />
@@ -420,7 +420,7 @@ const ClientTickets: React.FC = () => {
                                   return (
                                       <Disclosure>
                                         {({ open }) => (
-                                          <>
+                                          <div key={`product=${index}`}>
                                             <div className="flex justify-between items-center">
 
                                               <DisclosureButton className="py-2 px-2 w-full flex bg-neutral-200 justify-between">
@@ -450,7 +450,7 @@ const ClientTickets: React.FC = () => {
                                                     <div className="flex flex-col w-full">
 
                                                       <label htmlFor="`products.${index}.product`">Producto</label>
-                                                      <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" onChange={(e: any) => {
+                                                      <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" onChange={(e: Event) => {
                                                         // onProductChange(e.target.value)
                                                           const product = products.filter((product: Product) => {
                                                             // console.log(product);
@@ -503,7 +503,7 @@ const ClientTickets: React.FC = () => {
                                                 </div>
                                               </div>
                                             </DisclosurePanel>
-                                          </>
+                                          </div>
                                         )}
                                     </Disclosure>
                                   )
