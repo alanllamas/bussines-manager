@@ -46,7 +46,7 @@ const emptyVariant: EVariant = {
 }
 
 
-const SubtotalField = (props: FormikProps<InitialValues>) => {
+const SubtotalField = (props: { className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
   const {
     // @ts-ignore
     values: { products },
@@ -76,7 +76,7 @@ const SubtotalField = (props: FormikProps<InitialValues>) => {
     </>
   );
 };
-const TotalField = (props: FormikProps<InitialValues>) => {
+const TotalField = (props: { required:boolean, className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
   const {
     // @ts-ignore
     values: { subtotal, shipping },
@@ -108,7 +108,7 @@ const TotalField = (props: FormikProps<InitialValues>) => {
     </>
   );
 };
-const VariantsField = (props: FormikProps<InitialValues> & {products: Product[], index: number, className: string, name: string}) => {
+const VariantsField = (props: {products: Product[], index: number, className: string, name: string, placeholder: string, disabled?: boolean}) => {
   const {
     values,
     touched,
