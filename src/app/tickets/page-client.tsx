@@ -1,11 +1,10 @@
 'use client'
 import useGetTickets, { Ticket } from "@/api/hooks/getTickets";
-import React, { FormEvent, SyntheticEvent, useEffect, useState } from "react";
-import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Select } from '@headlessui/react';
+import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
+import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import useGetProducts, { Product } from "@/api/hooks/getProducts";
 import useGetClients, { Client } from "@/api/hooks/getClients";
-import { Formik, Field, Form, FieldArray, useFormikContext, FormikProps, useField } from "formik";
-import Image from "next/image";
+import { Formik, Field, Form, FieldArray, useFormikContext, useField, FormikProps } from "formik";
 
 
 type EVariant = {
@@ -23,7 +22,7 @@ type EProduct = {
   unit: string;
 }
 type InitialValues = {
-  date: Date;
+  date: number;
   client: string;
   ticket_number: number;
   products: [EProduct];
@@ -47,7 +46,7 @@ const emptyVariant: EVariant = {
 }
 
 
-const SubtotalField = (props: any) => {
+const SubtotalField = (props: FormikProps<InitialValues>) => {
   const {
     // @ts-ignore
     values: { products },
@@ -77,7 +76,7 @@ const SubtotalField = (props: any) => {
     </>
   );
 };
-const TotalField = (props: any) => {
+const TotalField = (props: FormikProps<InitialValues>) => {
   const {
     // @ts-ignore
     values: { subtotal, shipping },
@@ -109,7 +108,7 @@ const TotalField = (props: any) => {
     </>
   );
 };
-const VariantsField = (props: any) => {
+const VariantsField = (props: FormikProps<InitialValues> & {products: Product[], index: number, className: string, name: string}) => {
   const {
     values,
     touched,
@@ -185,7 +184,7 @@ const VariantsField = (props: any) => {
               { values.products[props.index]?.product_variants.map((variant_value, variant_index) => {
                   return (<div className="flex px-2 border border-neutral-400 rounded-sm" key={variant_index}>
                     <Field as='select' className=" px-2 w-full" name={`products.${props.index}.product_variants.${variant_index}.id`}
-                      onChange={(e: any) => {
+                      onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                         if (e.target.value) {
                           setFieldValue(`products.${props.index}.product_variants.${variant_index}.id`, e.target.value || '')
                           const variant = variants.filter((variant) => variant.id === Number(e.target.value))[0]
@@ -212,7 +211,7 @@ const VariantsField = (props: any) => {
                     >
                         <option value="">Variante</option>
                         {
-                          variants.map((variant: any, index: number) => {
+                          variants.map((variant, index: number) => {
                             return <option key={`variant-${index}`} value={variant.id || ''}>{variant.name}</option>
                           })
                         }
@@ -296,7 +295,7 @@ const ClientTickets: React.FC = () => {
     console.log('selectedProducts: ', selectedProducts);
     
   }, [selectedProducts])
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: InitialValues) => {
     setIsOpen(false)
     console.log(values);
     
@@ -325,7 +324,7 @@ const ClientTickets: React.FC = () => {
   const today: number = new Date().valueOf()
 
 
-  const initialFormValues = {
+  const initialFormValues: InitialValues = {
     date: today,
     client: "",
     ticket_number: ticketsData.meta?.pagination?.total + 1 || null,
@@ -393,7 +392,7 @@ const ClientTickets: React.FC = () => {
                           <Field required as="select" className="border-b border-neutral-400 rounded-sm p-2 w-full" id="client" name="client" value={values.client}>
                             <option value="">Cliente</option>
                             {
-                              clients.map((client: any, index: number) => {
+                              clients.map((client, index: number) => {
                                 return <option key={`client-${index}`} value={client.id}>{client.name}</option>
                               })
                             }
@@ -450,7 +449,7 @@ const ClientTickets: React.FC = () => {
                                                     <div className="flex flex-col w-full">
 
                                                       <label htmlFor="`products.${index}.product`">Producto</label>
-                                                      <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" onChange={(e: Event) => {
+                                                      <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                         // onProductChange(e.target.value)
                                                           const product = products.filter((product: Product) => {
                                                             // console.log(product);
@@ -466,7 +465,7 @@ const ClientTickets: React.FC = () => {
                                                       >
                                                         <option value="">Producto</option>
                                                         {
-                                                          products.map((product: any, index: number) => {
+                                                          products.map((product: Product, index: number) => {
                                                             return <option key={`product-${index}`} value={product.id}>{product.name}</option>
                                                           })
                                                         }
@@ -481,7 +480,7 @@ const ClientTickets: React.FC = () => {
                                                     <div className="flex flex-col w-full px-1">
                                                       <label htmlFor={`products.${index}.quantity`}>Cantidad {values.products[index].unit ? `(${values.products[index].unit})` : ''}</label>
                                                       <Field className="border border-neutral-400 rounded-sm px-2 w-full" name={`products.${index}.quantity`} type="number" placeholder="cantidad"
-                                                        onChange={(e: any) => {
+                                                        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                           const quantity = Number(e.target.value)
                                                           const price = Number(values.products[index].price)
                                                           setFieldValue(`products.${index}.quantity`, quantity)
