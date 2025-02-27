@@ -30,19 +30,19 @@ type InitialValues = {
   subtotal: number,
   total: number
 }
-const emptyProduct: EProduct = {
-  name: '',
-  product: 0,
-  price: 0,
-  product_variants: [],
-  quantity: 0,
-  total: 0,
-  unit: ''
-}
 const emptyVariant: EVariant = {
   name: "",
   type: "",
   id: 0
+}
+const emptyProduct: EProduct = {
+  name: '',
+  product: 0,
+  price: 0,
+  product_variants: [emptyVariant],
+  quantity: 0,
+  total: 0,
+  unit: ''
 }
 
 
