@@ -1,10 +1,10 @@
 'use client'
 import useGetTickets, { Ticket } from "@/api/hooks/getTickets";
-import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import useGetProducts, { Product } from "@/api/hooks/getProducts";
 import useGetClients, { Client } from "@/api/hooks/getClients";
-import { Formik, Field, Form, FieldArray, useFormikContext, useField, FormikProps } from "formik";
+import { Formik, Field, Form, FieldArray, useFormikContext, useField } from "formik";
 
 
 type EVariant = {
@@ -48,7 +48,7 @@ const emptyVariant: EVariant = {
 
 const SubtotalField = (props: { className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
   const {
-    // @ts-ignore
+    // @ts-expect-error missing type
     values: { products },
     touched,
     setFieldValue,
@@ -58,7 +58,7 @@ const SubtotalField = (props: { className: string, placeholder: string, disabled
   React.useEffect(() => {
     // set the value of textC, based on textA and textB
     if (
-      // @ts-ignore
+      // @ts-expect-error missing type
       products && touched.products
     ) {
       const subtotal = products.reduce((acc: number, product: Product) => {
@@ -66,7 +66,7 @@ const SubtotalField = (props: { className: string, placeholder: string, disabled
       }, 0)
       setFieldValue('subtotal', subtotal);
     }
-    // @ts-ignore
+    // @ts-expect-error missing type
   }, [ products, touched.products,  setFieldValue]);
 
   return (
@@ -78,7 +78,7 @@ const SubtotalField = (props: { className: string, placeholder: string, disabled
 };
 const TotalField = (props: { required:boolean, className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
   const {
-    // @ts-ignore
+    // @ts-expect-error missing type
     values: { subtotal, shipping },
     touched,
     setFieldValue,
@@ -88,17 +88,16 @@ const TotalField = (props: { required:boolean, className: string, placeholder: s
   React.useEffect(() => {
     // set the value of textC, based on textA and textB
     if (
-      // @ts-ignore
+      // @ts-expect-error missing type
       subtotal && shipping && touched.shipping
     ) {
       const total = Number(subtotal) + Number(shipping)
       setFieldValue('total', total);
-      // @ts-ignore
-    } else if (subtotal ) {
+    } else if (subtotal) {
       setFieldValue('total', Number(subtotal));
 
     }
-    // @ts-ignore
+    // @ts-expect-error missing type
   }, [ subtotal, touched.subtotal, shipping, touched.shipping,  setFieldValue, props.name]);
 
   return (
@@ -111,50 +110,32 @@ const TotalField = (props: { required:boolean, className: string, placeholder: s
 const VariantsField = (props: {products: Product[], index: number, className: string, name: string, placeholder: string, disabled?: boolean}) => {
   const {
     values,
-    touched,
     setFieldValue,
   } = useFormikContext<InitialValues>();
   const [field, meta] = useField(props);
+  const [variants, setVariants] = useState<Product["product_variants"]>([])
+  const [prod, setProd] = useState<Product>()
 
-  // React.useEffect(() => {
-  //   // set the value of textC, based on textA and textB
-  //   if (
-  //     // @ts-ignore
-  //     subtotal && touched.subtotal && shipping && touched.shipping
-  //   ) {
-  //     // const total = Number(subtotal) + Number(shipping)
-  //     // setFieldValue('total', total);
-  //     // @ts-ignore
-  //   } else if (subtotal && touched.subtotal) {
-  //     // setFieldValue('total', subtotal);
-
-  //   }
-  // }, [ values.products, touched.products, setFieldValue, props.name]);
-    const [variants, setVariants] = useState<Product["product_variants"]>([])
-    const [prod, setProd] = useState<Product>()
-  // if (values.products[0] && props.products[0]) {
-  // let prod: Product[] = [];
+  useEffect(() => {
+    console.log('values.products[index].product: ', values.products[props.index]?.product);
+    console.log('products: ', props.products);
     
-    useEffect(() => {
-      console.log('values.products[index].product: ', values.products[props.index]?.product);
-      console.log('products: ', props.products);
+    const product = props.products?.filter((prod: Product)=> {
+      return prod.id === values.products[props.index]?.product
+    })[0]
+    setProd(product)
+  }, [values.products, props.index, props.products])
+  useEffect(() => {
+    if (prod) {
       
-      const product = props.products?.filter((prod: Product)=> {
-        return prod.id === values.products[props.index]?.product
-      })[0]
-      setProd(product)
-    }, [values.products])
-    useEffect(() => {
-      if (prod) {
-        
-        console.log('prod: ', prod);
-        setVariants(prod?.product_variants)
-      }
-    }, [prod])
-    useEffect(() => {
-      console.log('variants: ', variants);
-      
-    }, [variants])
+      console.log('prod: ', prod);
+      setVariants(prod?.product_variants)
+    }
+  }, [prod])
+  useEffect(() => {
+    console.log('variants: ', variants);
+    
+  }, [variants])
     
 
     // console.log('variants: ', variants);
@@ -162,7 +143,7 @@ const VariantsField = (props: {products: Product[], index: number, className: st
   return (
     <>
       <FieldArray {...props} {...field} name={`products.${props.index}.product_variants`}>
-        {({ insert, remove: variantRemove, push: variantpush }) => {
+        {({ remove: variantRemove, push: variantpush }) => {
           
           // if (values.products[0] && props.products[0]) {
 
@@ -235,7 +216,6 @@ const ClientTickets: React.FC = () => {
 
   const [clients, setClients] = useState<Client[]>([])
   const [products, setProducts] = useState<Product[]>([])
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [ticket, setTicket] = useState<number>()
@@ -258,8 +238,9 @@ const ClientTickets: React.FC = () => {
   useEffect(() => {
     if (!ticketsError && !ticketsIsLoading) {
       
-      console.log('ticketsData.data: ', ticketsData.data);
-      console.log('meta.pagination.total: ', ticketsData.meta.pagination.total);
+      // console.log('ticketsData.data: ', ticketsData.data);
+      // console.log('meta.pagination.total: ', ticketsData.meta.pagination.total);
+      // @ts-expect-error missing type
       const data = ticketsData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
         const dateA: number = new Date(a.sale_date).valueOf();
         const dateB: number = new Date(b.sale_date).valueOf()
@@ -267,66 +248,48 @@ const ClientTickets: React.FC = () => {
       });
       setTickets(data)
     }
-  }, [ticketsIsLoading])
+      // @ts-expect-error missing type
+  }, [ticketsIsLoading, ticketsData.data, ticketsError])
   useEffect(() => {
     if (!productsError && !productsIsLoading) {
       
-      console.log('productsData.data: ', productsData.data);
-      console.log('meta.pagination.total: ', productsData.meta.pagination.total);
+      // console.log('productsData.data: ', productsData.data);
+      // console.log('meta.pagination.total: ', productsData.meta.pagination.total);
+      // @ts-expect-error missing type
 
       setProducts(productsData.data)
     }
-  }, [productsIsLoading])
+      // @ts-expect-error missing type
+  }, [productsIsLoading, productsData.data, productsError])
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
       
       // console.log('clientsData.data: ', clientsData.data);
       // console.log('meta.pagination.total: ', clientsData.meta.pagination.total);
+      // @ts-expect-error missing type
 
       setClients(clientsData.data)
     }
-  }, [clientsIsLoading])
+      // @ts-expect-error missing type
+  }, [clientsIsLoading, clientsData.data, clientsError])
 
   useEffect(() => {
     console.log('ticket: ', ticket);
     
   }, [ticket])
-  useEffect(() => {
-    console.log('selectedProducts: ', selectedProducts);
-    
-  }, [selectedProducts])
   const handleSubmit = (values: InitialValues) => {
     setIsOpen(false)
     console.log(values);
     
   }
-  const addProduct = (e: SyntheticEvent<HTMLSelectElement, Event>) => {
-    // @ts-ignore
-    const product = products.filter((product) => product.id === Number(e.target.value))[0]
-    if(product) setSelectedProducts([...selectedProducts, product])
-  }
-  const removeProduct = (index: number) => {
-    const products = selectedProducts.splice(index, 1)
-    setSelectedProducts(products)
-  }
 
-
-  // const onProductChange = (prod: number) => {
-  //   const product = products.filter((product: Product) => {
-  //     // console.log(product);
-      
-  //     return Number(prod) === product.id
-  //   })[0] || null
-  //   console.log(product);
-
-    
-  // }
   const today: number = new Date().valueOf()
 
 
   const initialFormValues: InitialValues = {
     date: today,
     client: "",
+    // @ts-expect-error missing type
     ticket_number: ticketsData.meta?.pagination?.total + 1 || null,
     products: [emptyProduct],
     shipping: 0,
@@ -374,6 +337,7 @@ const ClientTickets: React.FC = () => {
                 <div className="flex justify-between gap-2">
                   <img className="w-52 " src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" />
 
+                 {/* @ts-expect-error missing type */}
                   <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {ticketsData.meta.pagination.total + 1}</span><span>Fecha: {new Date(today).toLocaleDateString() }</span></DialogTitle>
                 </div>
                 {/* form for tickets */}
@@ -400,7 +364,7 @@ const ClientTickets: React.FC = () => {
                         </div>
                       
                         <FieldArray name="products">
-                          {({ insert, remove, push }) => (
+                          {({ remove, push }) => (
                             <div>
                               <div className="flex justify-between p-2">
                                 <h4>Productos</h4>
@@ -417,7 +381,7 @@ const ClientTickets: React.FC = () => {
                               </div>
                               { values.products.map((product_value, index) => {
                                   return (
-                                      <Disclosure>
+                                      <Disclosure key={index}>
                                         {({ open }) => (
                                           <div key={`product=${index}`}>
                                             <div className="flex justify-between items-center">

@@ -11,7 +11,9 @@ export async function fileToB64(f: File, standard = false): Promise<string> {
       const base64String = reader.result;
       resolve(
         !standard
+      // @ts-expect-error missing type
           ? base64String.toString()
+      // @ts-expect-error missing type
           : base64String.toString().split(',')[1]
       );
     };

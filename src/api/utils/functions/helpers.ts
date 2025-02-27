@@ -2,9 +2,12 @@ const YEAR_BASE = 2000;
 
 export const deepMerge = (target: object, source: object) => {
   for (const key in source) {
+      // @ts-expect-error missing type
     if (source[key] instanceof Object && key in target) {
+      // @ts-expect-error missing type
       target[key] = deepMerge(target[key], source[key]);
     } else {
+      // @ts-expect-error missing type
       target[key] = source[key];
     }
   }

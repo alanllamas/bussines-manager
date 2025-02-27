@@ -3,14 +3,16 @@ export type ErrorProps = {
 } & ({ message: string } | { message?: never });
 
 export class ApiError extends Error {
+      // @ts-expect-error missing type
   code: string;
   message: string;
-
   constructor({ code, message }: ErrorProps) {
     super(message);
+      // @ts-expect-error missing type
     this.message = message;
     if (code) this.code = code;
   }
+
 }
 
 export class FetcherError extends ApiError {

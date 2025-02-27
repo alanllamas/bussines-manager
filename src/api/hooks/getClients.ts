@@ -13,7 +13,7 @@ const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 async function GetClients(
   [url, token]: [string, string]
 ) {
-  return await fetcher<any>(
+  return await fetcher(
     url,
     {
       method: 'GET',

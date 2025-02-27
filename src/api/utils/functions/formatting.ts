@@ -16,7 +16,8 @@ const formatter = Intl.NumberFormat('es-MX', {
  */
 export const formatPrice = (price: string | number): string => {
   if (typeof price === 'string') {
-    const extractedValue = price.match(REGEX_MATCH_ONLY_NUMBERS)[0];
+    const match = price.match(REGEX_MATCH_ONLY_NUMBERS);
+    const extractedValue = match ? match[0] : '';
     return formatter.format(Number(extractedValue));
   }
   return formatter.format(price);
@@ -28,6 +29,7 @@ export const formatPrice = (price: string | number): string => {
  * @returns { number | [number, number] | null } - The extracted price
  */
 export const gettingPriceValue = (price: string): number | Array<number> => {
+      // @ts-expect-error missing type
   if (!price) return null;
   if (/sin costo/i.test(price)) return 0;
 

@@ -8,6 +8,7 @@ export const createPromise = async () => {
     new Promise((resolve) => {
       resolver = resolve;
     }),
+      // @ts-expect-error missing type
     resolver,
   ];
 };
