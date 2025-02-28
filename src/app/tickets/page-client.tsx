@@ -5,6 +5,7 @@ import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, Disclos
 import useGetProducts, { Product } from "@/api/hooks/getProducts";
 import useGetClients, { Client } from "@/api/hooks/getClients";
 import { Formik, Field, Form, FieldArray, useFormikContext, useField } from "formik";
+import useCreateTicket from "@/api/hooks/useCreateTicket";
 
 
 type EVariant = {
@@ -21,7 +22,7 @@ type EProduct = {
   product_variants: EVariant[]
   unit: string;
 }
-type InitialValues = {
+export type InitialValues = {
   date: number;
   client: string;
   ticket_number: number;
@@ -29,6 +30,21 @@ type InitialValues = {
   shipping: number,
   subtotal: number,
   total: number
+}
+export type createTicketReq = {
+  sale_date: Date
+  client: number[]
+  shipping_price: number
+  subtotal?: number
+  total: number
+  ticket_number: number
+  products: {
+    product: number[]
+    quantity: number
+    product_total: number
+    product_variants: number[]
+    price: number
+  }[]
 }
 const emptyVariant: EVariant = {
   name: "",
@@ -219,6 +235,8 @@ const ClientTickets: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [ticket, setTicket] = useState<number>()
+  const [newTicket, setNewTicket] = useState<createTicketReq>()
+  const [ShouldRefetch, setRefetch] = useState<number>(0);
   const {
     tickets: ticketsData,
     error: ticketsError,
@@ -234,9 +252,14 @@ const ClientTickets: React.FC = () => {
     error: clientsError,
     isLoading: clientsIsLoading
   } = useGetClients()
+  const {
+    ticket: TicketData,
+    error: TicketError,
+    isLoading: TicketIsLoading
+  } = useCreateTicket(newTicket)
 
   useEffect(() => {
-    if (!ticketsError && !ticketsIsLoading) {
+    if ((!ticketsError && !ticketsIsLoading) || ShouldRefetch) {
       
       // console.log('ticketsData.data: ', ticketsData.data);
       // console.log('meta.pagination.total: ', ticketsData.meta.pagination.total);
@@ -249,7 +272,7 @@ const ClientTickets: React.FC = () => {
       setTickets(data)
     }
       // @ts-expect-error missing type
-  }, [ticketsIsLoading, ticketsData.data, ticketsError])
+  }, [ticketsIsLoading, ticketsData.data, ticketsError, ShouldRefetch])
   useEffect(() => {
     if (!productsError && !productsIsLoading) {
       
@@ -272,14 +295,54 @@ const ClientTickets: React.FC = () => {
     }
       // @ts-expect-error missing type
   }, [clientsIsLoading, clientsData.data, clientsError])
+  useEffect(() => {
+      setRefetch(1)
+      setRefetch(0)
+    if (!TicketError && !TicketIsLoading) {
+      console.log('TicketData: ', TicketData);
+      // console.log('meta.pagination.total: ', TicketData.meta.pagination.total);
+      
 
+      // setTicket(TicketData.data)
+    }
+  }, [TicketIsLoading, TicketData, TicketError])
+
+  useEffect(() => {
+    console.log('ShouldRefetch: ', ShouldRefetch);
+    
+  }, [ShouldRefetch])
   useEffect(() => {
     console.log('ticket: ', ticket);
     
   }, [ticket])
-  const handleSubmit = (values: InitialValues) => {
+  useEffect(() => {
+    console.log('tickets: ', tickets);
+    
+  }, [tickets])
+  const handleSubmit = async (values: InitialValues) => {
     setIsOpen(false)
     console.log(values);
+
+    const { date, client, shipping, subtotal, products, ticket_number, total } = values
+    const data = {
+      sale_date: new Date(date),
+      client: [Number(client)],
+      shipping_price: shipping,
+      sub_total: subtotal,
+      total,
+      ticket_number,
+      products: products.map((product: EProduct) => {
+        return {
+          product: [product.product],
+          quantity: product.quantity,
+          product_total: product.total,
+          product_variants: product.product_variants.map(variant => { return Number(variant.id) }),
+          price: product.price
+        }
+      })
+    } 
+    setNewTicket(data)
+    
     
   }
 
@@ -299,6 +362,9 @@ const ClientTickets: React.FC = () => {
   return<>
     {
       ticketsIsLoading
+       || productsIsLoading
+       || clientsIsLoading
+       || TicketIsLoading
         ? <p>Loading</p>
         : <section className="w-9/12 py-12 px-8 bg-neutral-100 text-neutral-900">
           <div className="flex justify-end">
@@ -338,7 +404,7 @@ const ClientTickets: React.FC = () => {
                   <img className="w-52 " src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" />
 
                  {/* @ts-expect-error missing type */}
-                  <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {ticketsData.meta.pagination.total + 1}</span><span>Fecha: {new Date(today).toLocaleDateString() }</span></DialogTitle>
+                  <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {ticketsData?.meta?.pagination?.total + 1}</span><span>Fecha: {new Date(today).toLocaleDateString() }</span></DialogTitle>
                 </div>
                 {/* form for tickets */}
                 <Formik

@@ -18,7 +18,8 @@ export type Meta = {
   }
 }
 
-const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=*`;
+// &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
+const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants`;
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 
 
@@ -41,9 +42,9 @@ export default function useGetTickets() {
   const { data, isLoading, error } = useSWR(
     [WEBHOOK_TICKETS_API, token],
     GetTickets,
-       {
-      revalidateOnFocus: false,
-    }
+    //    {
+    //   revalidateOnFocus: false,
+    // }
   );
    const tickets = data ?? {data: [], meta:{}};
 
