@@ -236,11 +236,10 @@ const ClientTickets: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [ticket, setTicket] = useState<number>()
   const [newTicket, setNewTicket] = useState<createTicketReq>()
-  const [ShouldRefetch, setRefetch] = useState<number>(0);
   const {
     tickets: ticketsData,
     error: ticketsError,
-    isLoading: ticketsIsLoading
+    isLoading: ticketsIsLoading,
   } = useGetTickets()
   const {
     products: productsData,
@@ -259,11 +258,10 @@ const ClientTickets: React.FC = () => {
   } = useCreateTicket(newTicket)
 
   useEffect(() => {
-    if ((!ticketsError && !ticketsIsLoading) || ShouldRefetch) {
+    if ((!ticketsError && !ticketsIsLoading && ticketsData.data)) {
       
       // console.log('ticketsData.data: ', ticketsData.data);
-      // console.log('meta.pagination.total: ', ticketsData.meta.pagination.total);
-      // @ts-expect-error missing type
+      console.log('meta.pagination.total: ', ticketsData.meta.pagination.total);
       const data = ticketsData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
         const dateA: number = new Date(a.sale_date).valueOf();
         const dateB: number = new Date(b.sale_date).valueOf()
@@ -271,8 +269,7 @@ const ClientTickets: React.FC = () => {
       });
       setTickets(data)
     }
-      // @ts-expect-error missing type
-  }, [ticketsIsLoading, ticketsData.data, ticketsError, ShouldRefetch])
+  }, [ticketsIsLoading, ticketsData.data, ticketsError])
   useEffect(() => {
     if (!productsError && !productsIsLoading) {
       
@@ -296,10 +293,14 @@ const ClientTickets: React.FC = () => {
       // @ts-expect-error missing type
   }, [clientsIsLoading, clientsData.data, clientsError])
   useEffect(() => {
-      setRefetch(1)
-      setRefetch(0)
-    if (!TicketError && !TicketIsLoading) {
+    // make refresh
+
+    if (!TicketError && !TicketIsLoading && TicketData) {
       console.log('TicketData: ', TicketData);
+      setTimeout(() => {
+        
+      window.location.reload()
+      }, 500);
       // console.log('meta.pagination.total: ', TicketData.meta.pagination.total);
       
 
@@ -307,10 +308,6 @@ const ClientTickets: React.FC = () => {
     }
   }, [TicketIsLoading, TicketData, TicketError])
 
-  useEffect(() => {
-    console.log('ShouldRefetch: ', ShouldRefetch);
-    
-  }, [ShouldRefetch])
   useEffect(() => {
     console.log('ticket: ', ticket);
     
@@ -342,8 +339,6 @@ const ClientTickets: React.FC = () => {
       })
     } 
     setNewTicket(data)
-    
-    
   }
 
   const today: number = new Date().valueOf()
@@ -364,7 +359,6 @@ const ClientTickets: React.FC = () => {
       ticketsIsLoading
        || productsIsLoading
        || clientsIsLoading
-       || TicketIsLoading
         ? <p>Loading</p>
         : <section className="w-9/12 py-12 px-8 bg-neutral-100 text-neutral-900">
           <div className="flex justify-end">
@@ -385,7 +379,7 @@ const ClientTickets: React.FC = () => {
                 tickets?.map((ticket: Ticket, index: number) => {
                   // console.log('ticket: ', ticket);
                   return <tr className="border-b border-neutral-300" key={`ticket-${index}`}>
-                    <td className="py-2"><a href={`/tickets/${ticket.id}`}>{ticket.ticket_number}</a></td>
+                    <td className="py-2"><a href={`/tickets/${ticket.documentId}`}>{ticket.ticket_number}</a></td>
                     <td className="py-2">{ticket.client?.name}</td>
                     <td className="py-2">{new Date(ticket.sale_date).toLocaleDateString()}</td>
                     <td className="py-2">$ {ticket.total}</td>
@@ -403,7 +397,6 @@ const ClientTickets: React.FC = () => {
                 <div className="flex justify-between gap-2">
                   <img className="w-52 " src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" />
 
-                 {/* @ts-expect-error missing type */}
                   <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {ticketsData?.meta?.pagination?.total + 1}</span><span>Fecha: {new Date(today).toLocaleDateString() }</span></DialogTitle>
                 </div>
                 {/* form for tickets */}

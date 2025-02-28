@@ -2,6 +2,23 @@
 import { fetcher } from '../../api/fetcher';
 import useSWR from 'swr';
 import { Client } from './getClients';
+import { Product } from './getProducts';
+export type ProductVariant = {
+  name: string;
+  id: number;
+  type: string;
+}
+
+export type TicketProduct = {
+  id?: number;
+  name?: string;
+  price?: number;
+  product_variants?: ProductVariant[]
+  product_total?: number
+  quantity?: number
+  measurement_unit?: string;
+  product?: Product
+} 
 export type Ticket = {
   id: number;
   name: string;
@@ -9,6 +26,10 @@ export type Ticket = {
   client: Client
   sale_date: Date
   total: number
+  documentId: string
+  products: TicketProduct[]
+  sub_total:number
+  shipping_price: number
 }
 export type Meta = {
   pagination: {
@@ -19,7 +40,7 @@ export type Meta = {
 }
 
 // &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
-const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants`;
+const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants&sort=id:desc`;
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 
 
@@ -27,7 +48,7 @@ const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 async function GetTickets(
   [url, token]: [string, string]
 ) {
-  return await fetcher(
+  return await fetcher<{ data:Ticket[], meta: Meta}>(
     url,
     {
       method: 'GET',
@@ -46,7 +67,7 @@ export default function useGetTickets() {
     //   revalidateOnFocus: false,
     // }
   );
-   const tickets = data ?? {data: [], meta:{}};
+   const tickets = data ?? {data: [], meta:{ pagination: { total: 0, page: 0, count: 0 }}};
 
   return {
     tickets,

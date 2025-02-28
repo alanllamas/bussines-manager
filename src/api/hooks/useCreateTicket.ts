@@ -41,7 +41,7 @@ export default function useCreateTicket(
     }
   );
 
-  const ticketDetail = ticket ?? [];
+  const ticketDetail = ticket ?? null;
 
   return {
     ticket: ticketDetail,
