@@ -51,7 +51,7 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
     <button className="bg-neutral-400 px-3 py-2" onClick={() => Print()}>imprimir</button>
   </div>
 
-    <section ref={contentRef} className="w-1/3 print:w-full print:shadow-none print:border-none shadow-xl my-2 px-12 pt-2 text-base text-neutral-900 border border-neutral-200">
+    <section ref={contentRef} className="xl:w-1/3 print:w-full lg:w-1/2 md:w-3/4 print:shadow-none print:border-none shadow-xl my-2 px-12 pt-2 text-base text-neutral-900 border border-neutral-200">
       <div className="flex justify-between my-3 items-center">
         <img className="w-64" src={logo.src} alt="" />
         <div className="font-bold flex flex-col mt-6 gap-4 w-1/4">
