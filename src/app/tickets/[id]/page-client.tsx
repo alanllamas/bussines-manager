@@ -2,6 +2,10 @@
 import useGetTicket from "@/api/hooks/getTicket"
 import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/getTickets"
 import React, { useEffect, useState } from "react"
+import { useReactToPrint } from "react-to-print";
+import { useRef } from "react";
+import logo from "@/public/logo.png"
+import Image from "next/image";
 
 const emptyTicket: TicketProduct = {
   id: 0
@@ -37,11 +41,21 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
 
 
   const date = new Date(ticket?.sale_date || '').toLocaleDateString()
-  return <>
+
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const Print = useReactToPrint({ contentRef });
+  return <section className="flex flex-col w-full justify-center items-center">
+  <div className="text-neutral-900">
+
     <h1>Client Ticket</h1>
-    <section className="w-1/3 shadow-xl my-8 p-4 text-neutral-900 border border-neutral-200">
+    <button onClick={() => Print()}>imprimir</button>
+  </div>
+
+    <section ref={contentRef} className="w-1/3 print:w-full print:shadow-none print:border-none shadow-xl my-8 p-4 text-neutral-900 border border-neutral-200">
       <div className="flex justify-between my-3">
-        <img className="w-60 h-20" src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" />
+        {/* <img className="w-60 h-20" src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" /> */}
+        <Image width={240} height={80} src={logo} alt="logo" />
         <div className="font-bold flex flex-col mt-6"><span>Folio: {ticket?.ticket_number}</span><span>Fecha: {date }</span></div>
       </div>
       <div className="flex my-3">
@@ -103,6 +117,6 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
         </div>
       </div>
     </section>
-  </>
+  </section>
 }
 export default ClientTicket
