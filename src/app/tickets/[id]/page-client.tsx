@@ -13,8 +13,6 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
 
   const [ticket, setTicket] = useState<Ticket>()
   
-  // console.log('id: ', id);
-  
   const {
     ticket: ticketData,
     error: ticketError,
@@ -27,25 +25,17 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
       while (data.products.length < 10) {
         data.products.push(emptyTicket)
       }
-      // data.products = data.products.fill({}, data.products.length, 10)
       setTicket(data)
       
     }
   },[ticketData, ticketError, ticketIsLoading])
-
-  
-  // useEffect(() => {
-  //   console.log('ticket: ', ticket);
-    
-  // },[ticket])
-  
-
 
   const date = new Date(ticket?.sale_date || '').toLocaleDateString()
 
 
   const contentRef = useRef<HTMLDivElement>(null);
   const Print = useReactToPrint({ contentRef, documentTitle: `Nota-${ticket?.ticket_number}-${ticket?.client?.name?.toLocaleUpperCase()}-${new Date(ticket?.sale_date || '').toLocaleDateString()}` });
+
   return <section className="flex flex-col w-full justify-center items-center">
   <div className="text-neutral-900 flex justify-end w-1/2 py-4">
     <button className="bg-neutral-400 px-3 py-2" onClick={() => Print()}>imprimir</button>
@@ -86,8 +76,6 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
                   <td className="px-2 border  border-neutral-300 print:border-neutral-100">{ product?.product?.name|| ''}</td>
                   <td className="px-2 border  border-neutral-300 print:border-neutral-100">{ product?.product_variants?.map((variant: ProductVariant) => variant.name ).join(' | ') || ''}</td>
                   <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right">{ product?.quantity } {product?.product?.measurement_unit|| ''}</td>
-                  {/* <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right">$ { product?.price || ''}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right">$ { product?.product_total || ''}</td> */}
                   <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right h-8">{ product?.price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
                   <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right h-8">{ product?.product_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
                 </tr>
@@ -102,9 +90,6 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
             <p className="mb-2">Tu compra ayuda a la conservación de nuestros maíces nativos. Gracias!</p>
             <p><span className="font-bold">Email: </span>itacatedemaiz@gmail.com</p>
             <p><span className="font-bold">Telefono: </span>322-294-7798</p>
-
-
-
           </div>
           <div className=" flex  flex-col w-1/2 gap-y-2 mt-2">
             <div className="flex w-full">

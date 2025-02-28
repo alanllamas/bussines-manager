@@ -40,7 +40,7 @@ export type Meta = {
 }
 
 // &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
-const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants&sort=id:desc`;
+const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000`;
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 
 

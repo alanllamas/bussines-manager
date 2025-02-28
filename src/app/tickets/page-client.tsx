@@ -9,7 +9,7 @@ import useCreateTicket from "@/api/hooks/useCreateTicket";
 import logo from "@/public/logo.png"
 import { useReactToPrint } from "react-to-print";
 import useEditTicket, { EditTicketReq } from "@/api/hooks/useEditTicket";
-
+import ReactPaginate from 'react-paginate';
 
 type EVariant = {
   name: string;
@@ -421,6 +421,76 @@ const ClientTickets: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const Print = useReactToPrint({ contentRef, documentTitle: `Nota-${printTicket?.ticket_number}-${printTicket?.client?.name?.toLocaleUpperCase()}-${new Date(printTicket?.sale_date || '')?.toLocaleDateString()}` });
+  function Items({ currentItems }: {currentItems: Ticket[]}) {
+  return (
+    <>
+      {currentItems &&
+        currentItems?.map((ticket: Ticket, index: number) => {
+        // console.log('ticket: ', ticket);
+        return <tr className="border-b border-neutral-300" key={`ticket-${index}`}>
+          <td className="py-2"><a href={`/tickets/${ticket.documentId}`}>{ticket.ticket_number}</a></td>
+          <td className="py-2">{ticket.client?.name}</td>
+          <td className="py-2">{new Date(ticket.sale_date).toLocaleDateString()}</td>
+          <td className="py-2">$ {ticket.total}</td>
+          <td className="py-2"><button onClick={() => setEditTicket(ticket)}><span>edit</span></button> | <button onClick={() => sendPrint(ticket)}><span>print</span></button></td>
+        </tr>
+      })}
+    </>
+  );
+}
+
+function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
+  // Here we use item offsets; we could also use page offsets
+  // following the API or data you're working with.
+  const [itemOffset, setItemOffset] = useState(0);
+
+  // Simulate fetching items from another resources.
+  // (This could be items from props; or items loaded in a local state
+  // from an API endpoint with useEffect and useState)
+  const endOffset = itemOffset + itemsPerPage;
+  console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+  const currentItems = ticketsData.data.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(ticketsData.data.length / itemsPerPage);
+
+  // Invoke when user click to request another page.
+  const handlePageChange = (event: { selected: number }) => {
+    const newOffset = (event.selected * itemsPerPage) % ticketsData.data.length;
+    console.log(
+      `User requested page number ${event.selected}, which is offset ${newOffset}`
+    );
+    setItemOffset(newOffset);
+  };
+    return (
+    <section className="w-full flex flex-col items-center">
+      <table className="w-full p-4 text-center mt-8">
+        <thead>
+          <tr className="border-b border-neutral-500">
+            <th>Folio</th>
+            <th>cliente</th>
+            <th>fecha de venta</th>
+            <th>monto</th>
+            <th>acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <Items currentItems={currentItems} />
+        </tbody>
+      </table>
+      <ReactPaginate
+        className="flex gap-3 p-4 w-1/4 self-center items-center"
+        breakLabel="..."
+        pageClassName="bg-neutral-300 px-2 py-1"
+        activeClassName="bg-neutral-500 text-white"
+        nextLabel="next >"
+        onPageChange={handlePageChange}
+        pageRangeDisplayed={5}
+        pageCount={pageCount}
+        previousLabel="< previous"
+        renderOnZeroPageCount={null}
+      />
+    </section>
+  );
+}
 
 
   return<section className="w-full flex flex-col items-center">
@@ -433,32 +503,7 @@ const ClientTickets: React.FC = () => {
           <div className="flex justify-end">
             <button className="px-6 py-2 bg-neutral-400" onClick={() => sendCreate()}>Crear nota</button>
           </div>
-          <table className="w-full p-4 text-center mt-8">
-            <thead>
-              <tr className="border-b border-neutral-500">
-                <th>Folio</th>
-                <th>cliente</th>
-                <th>fecha de venta</th>
-                <th>monto</th>
-                <th>acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                tickets?.map((ticket: Ticket, index: number) => {
-                  // console.log('ticket: ', ticket);
-                  return <tr className="border-b border-neutral-300" key={`ticket-${index}`}>
-                    <td className="py-2"><a href={`/tickets/${ticket.documentId}`}>{ticket.ticket_number}</a></td>
-                    <td className="py-2">{ticket.client?.name}</td>
-                    <td className="py-2">{new Date(ticket.sale_date).toLocaleDateString()}</td>
-                    <td className="py-2">$ {ticket.total}</td>
-                    <td className="py-2"><button onClick={() => setEditTicket(ticket)}><span>edit</span></button> | <button onClick={() => sendPrint(ticket)}><span>print</span></button></td>
-                  </tr>
-                })
-              }
-            </tbody>
-          </table>
-          {/* <button >Open dialog</button> */}
+          <PaginatedItems itemsPerPage={10}/>
           {
             initialFormValues && <Formik
               initialValues={initialFormValues || null}
