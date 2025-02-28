@@ -471,7 +471,7 @@ const ClientTickets: React.FC = () => {
                       <DialogPanel className="max-w-lg space-y-4 border bg-neutral-100 p-12 shadow-2xl text-neutral-900">
                         
                         <div className="flex justify-between gap-2">
-                          <img className="w-52 " src="https://site--strapi-business-manager--gvp7rrrvnwfz.code.run/uploads/logo_16af861cf8.png" alt="" />
+                          <img className="w-52" src={logo.src} alt="" />
 
                           <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {values.ticket_number}</span><span>Fecha: {new Date(today).toLocaleDateString() }</span></DialogTitle>
                         </div>
