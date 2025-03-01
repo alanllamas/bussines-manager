@@ -229,12 +229,24 @@ const VariantsField = (props: {products: Product[], index: number, className: st
 
 const ClientTickets: React.FC = () => {
   // @ts-expect-error no type found
+ const { user } = useAuth();
+  const [interval, setinterval] = useState<NodeJS.Timeout>()
 
-  const { user} = useAuth();
 
+  
+  useEffect(() => {
+    const interval =
+      setInterval(() => {
+        window.location.pathname = '/'
+      }, 200)
+    setinterval(interval)
+  }, [])
   // Listen for changes on loading and authUser, redirect if needed
   useEffect(() => {
-    if (!user) redirect('/')
+    // console.log(interval);
+    if (user) {
+      clearInterval(interval)
+    }
   }, [user])
   const today: number = new Date().valueOf()
 
