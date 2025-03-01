@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { AuthProvider } from '@/app/context/AuthUserContext';
+import ProfileAvatar from "@/components/profile";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,35 +27,34 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiase bg-neutral-100`}
-      >
-        <nav className="flex justify-around bg-neutral-200 text-neutral-900 align-middle py-2 ">
-          <Link className="" href="/">
-            <img src="https://place-hold.it/80x80&text=logo&fontsize=18" alt="logo" />
-          </Link>
-       
-          <ul className="flex justify-center flex-col">
-            <Link className="" href="/tickets">
-              <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                  Notas
-                {/* <button className="font-bold bg-neutral-400 py-2 px-6 flex">
-                </button> */}
-              </li>
+      <AuthProvider>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiase bg-neutral-100`}
+        >
+          <nav className="flex justify-between bg-neutral-200 text-neutral-900 align-middle py-2 px-20 ">
+            <Link className="" href="/">
+              <img src="https://place-hold.it/80x80&text=logo&fontsize=18" alt="logo" />
             </Link>
-          </ul>
-          <div>
-            {/* login */}
-            <img src="https://place-hold.it/80x80&text=user&fontsize=18" alt="logo" />
-          </div>
+        
+            <ul className="flex justify-center flex-col">
+              <Link className="" href="/tickets">
+                <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                    Notas
+                  {/* <button className="font-bold bg-neutral-400 py-2 px-6 flex">
+                  </button> */}
+                </li>
+              </Link>
+            </ul>
+            <ProfileAvatar />
 
-        </nav>
+          </nav>
 
-        <section className="bg-neutral-100 flex justify-center w-full h-full">
+          <section className="bg-neutral-100 flex justify-center w-full h-full">
+              {children}
+          </section>
+        </body>
+      </AuthProvider>
 
-          {children}
-        </section>
-      </body>
     </html>
   );
 }

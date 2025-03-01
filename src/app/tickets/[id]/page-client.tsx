@@ -5,14 +5,34 @@ import React, { useEffect, useState } from "react"
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
 import logo from "@/public/logo.png"
+import { useAuth } from "@/app/context/AuthUserContext";
 
 const emptyTicket: TicketProduct = {
   id: 0
 }
 const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
+  // @ts-expect-error no type found
+  const { user } = useAuth();
+  const [interval, setinterval] = useState<NodeJS.Timeout>()
+
+
+  
+  useEffect(() => {
+    const interval =
+      setInterval(() => {
+        window.location.pathname = '/'
+      }, 200)
+    setinterval(interval)
+  }, [])
+  // Listen for changes on loading and authUser, redirect if needed
+  useEffect(() => {
+    // console.log(interval);
+    if (user) {
+      clearInterval(interval)
+    }
+  }, [user])
 
   const [ticket, setTicket] = useState<Ticket>()
-  
   const {
     ticket: ticketData,
     error: ticketError,
