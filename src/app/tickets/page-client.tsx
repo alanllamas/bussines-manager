@@ -1,17 +1,16 @@
 'use client'
-import useGetTickets, { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/getTickets";
+import useGetTickets, { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import useGetProducts, { Product } from "@/api/hooks/getProducts";
 import useGetClients, { Client } from "@/api/hooks/getClients";
 import { Formik, Field, Form, FieldArray, useFormikContext, useField } from "formik";
-import useCreateTicket from "@/api/hooks/useCreateTicket";
+import useCreateTicket from "@/api/hooks/tickets/useCreateTicket";
 import logo from "@/public/logo.png"
 import { useReactToPrint } from "react-to-print";
-import useEditTicket, { EditTicketReq } from "@/api/hooks/useEditTicket";
+import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket";
 import ReactPaginate from 'react-paginate';
 import { useAuth } from "@/app/context/AuthUserContext";
-import { redirect } from "next/navigation";
 
 // import { useAuth } from "@/context/AuthUserContext";
 // import { useRouter } from "next/navigation";
@@ -235,11 +234,14 @@ const ClientTickets: React.FC = () => {
 
   
   useEffect(() => {
-    const interval =
-      setInterval(() => {
-        window.location.pathname = '/'
-      }, 200)
-    setinterval(interval)
+    if(!user) {
+      const interval =
+        setInterval(() => {
+          window.location.pathname = '/'
+        }, 500)
+      setinterval(interval)
+    }
+
   }, [])
   // Listen for changes on loading and authUser, redirect if needed
   useEffect(() => {

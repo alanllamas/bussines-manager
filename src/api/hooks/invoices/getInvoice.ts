@@ -1,7 +1,8 @@
 'use-client'
-import { fetcher } from '../fetcher';
+import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
-import { Ticket } from './getTickets';
+import { Ticket } from '../tickets/getTickets';
+import { Invoice } from './getInvoices';
 
 export type Meta = {
   pagination?: {
@@ -16,12 +17,12 @@ const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 
 
 // Promise<{ id: any }>
-async function GetTicket(
+async function GetInvoice(
   [url, token, id]: [string, string, number]
 ) {
-  return await fetcher<{data: Ticket, meta: Meta}>(
-
-    `${url}/tickets/${id}/?populate=client&populate=products&populate=products.product&populate=products.product_variants`,
+  return await fetcher<{data: Invoice, meta: Meta}>(
+// client&populate=products&populate=products.product&populate=products.product_variants
+    `${url}/invoices/${id}/?populate=*`,
     {
       method: 'GET',
       headers: {
@@ -31,23 +32,23 @@ async function GetTicket(
   );
 }
 
-export default function useGetTicket(id: number) {
+export default function useGetInvoice(id: number) {
   const { data, isLoading, error } = useSWR(
     [
       process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API,
       token,
       id
     ],
-    GetTicket,
+    GetInvoice,
     //    {
     //   revalidateOnFocus: false,
     // }
   );
   
-   const ticket = data;
+   const invoice = data;
 
   return {
-    ticket,
+    invoice,
     error,
     isLoading,
   };

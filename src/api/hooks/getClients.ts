@@ -4,6 +4,7 @@ import useSWR from 'swr';
 export type Client = {
   id: number;
   name: string;
+  documentId: string
 }
 
 

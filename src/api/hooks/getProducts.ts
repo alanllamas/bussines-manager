@@ -14,6 +14,7 @@ export type Product = {
   total: number
   quantity: number
   measurement_unit: string;
+  taxes?: number
 }
 
 const WEBHOOK_PRODUCTS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/products?populate=*`;

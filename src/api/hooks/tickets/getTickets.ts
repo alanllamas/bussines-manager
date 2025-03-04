@@ -1,8 +1,8 @@
 'use-client'
-import { fetcher } from '../../api/fetcher';
+import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
-import { Client } from './getClients';
-import { Product } from './getProducts';
+import { Client } from '../getClients';
+import { Product } from '../getProducts';
 export type ProductVariant = {
   name: string;
   id: number;
@@ -18,6 +18,7 @@ export type TicketProduct = {
   quantity?: number
   measurement_unit?: string;
   product?: Product
+  
 } 
 export type Ticket = {
   id: number;

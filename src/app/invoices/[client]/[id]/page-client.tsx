@@ -10,7 +10,7 @@ import { useAuth } from "@/app/context/AuthUserContext";
 const emptyTicket: TicketProduct = {
   id: 0
 }
-const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
+const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
   // @ts-expect-error no type found
   const { user } = useAuth();
   const [interval, setinterval] = useState<NodeJS.Timeout>()
@@ -18,14 +18,11 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
 
   
   useEffect(() => {
-    if(!user) {
-      const interval =
-        setInterval(() => {
-          window.location.pathname = '/'
-        }, 500)
-      setinterval(interval)
-    }
-
+    const interval =
+      setInterval(() => {
+        window.location.pathname = '/'
+      }, 200)
+    setinterval(interval)
   }, [])
   // Listen for changes on loading and authUser, redirect if needed
   useEffect(() => {
@@ -133,4 +130,4 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
     </section>
   </section>
 }
-export default ClientTicket
+export default ClientInvoice
