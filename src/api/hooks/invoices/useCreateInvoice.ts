@@ -1,12 +1,10 @@
 import useSWR from 'swr';
 import { fetcher } from '../../fetcher';
-import { Ticket } from '../tickets/getTickets';
-import { createTicketReq } from '@/app/tickets/page-client';
 import { Invoice } from './getInvoices';
 
-type createInvoiceReq = {
+// type createInvoiceReq = {
 
-}
+// }
 
 async function postInvoice([
   url,
@@ -26,7 +24,7 @@ async function postInvoice([
 }
 
 export default function useCreateInvoice(
-  data?: createInvoiceReq,
+  data?: any,
 ) {
     const WEBHOOK_INVOICES_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/invoices?populate=*`;
     const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`

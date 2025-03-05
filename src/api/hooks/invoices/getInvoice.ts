@@ -1,7 +1,6 @@
 'use-client'
 import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
-import { Ticket } from '../tickets/getTickets';
 import { Invoice } from './getInvoices';
 
 export type Meta = {

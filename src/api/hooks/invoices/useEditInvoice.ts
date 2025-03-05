@@ -1,6 +1,5 @@
 import useSWR from 'swr';
 import { fetcher } from '../../fetcher';
-import { Ticket } from '../tickets/getTickets'
 import { Invoice } from './getInvoices';
 
 export type EditInvoiceReq = {
