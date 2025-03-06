@@ -3,7 +3,7 @@ import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTi
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import useGetClients, { Client } from "@/api/hooks/getClients";
-import { Formik, Field, Form, FieldArray, FormikErrors } from "formik";
+import { Formik, Field, Form, FieldArray } from "formik";
 import useCreateTicket from "@/api/hooks/tickets/useCreateTicket";
 import logo from "@/public/logo.png"
 import { useReactToPrint } from "react-to-print";
@@ -14,42 +14,58 @@ import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices";
 import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice";
+export type StrapiFile = {
+    file?: File
+    ref: string
+    refId: string
+    field: string
+  }
 
 export type InitialValues = {
-  payment_date: number;
+  payment_date?: Date | null;
   invoice_id: string;
   client: string;
   tickets: string[];
-  subtotal: number,
+  sub_total: number,
   taxes: number,
   total: number,
   shipping: number
-  expected_payment_date: number
-  initial_date: Date
-  ending_date: Date
-  invoice_send_date: number
+  expected_payment_date?: Date | null
+  initial_date?: Date | null
+  ending_date?: Date | null
+  invoice_send_date?: Date | null
   comments: string
   inner_comments: string
   invoice_status: string
-  invoice_file?: File
-  proof_of_payment?: File
-  payment_reference?: string
-  payment_supplement?: string
+  invoice_file?: StrapiFile
+  proof_of_payment?: StrapiFile
+  payment_supplement?: StrapiFile
+  payment_reference?: string,
+  resume: {}
 }
-export type createTicketReq = {
-  sale_date: Date
-  client: number[]
-  shipping_price: number
-  subtotal?: number
-  total: number
-  ticket_number: number
-  products: {
-    product: number[]
-    quantity: number
-    product_total: number
-    product_variants: number[]
-    price: number
-  }[]
+
+export type createInvoiceReq = {
+  payment_date?: Date | null;
+  invoice_id: string;
+  client: string[];
+  tickets: string[];
+  sub_total: number,
+  taxes: number,
+  total: number,
+  shipping: number
+  expected_payment_date?: Date | null
+  initial_date?: Date | null
+  ending_date?: Date | null
+  invoice_send_date?: Date | null
+  comments: string
+  inner_comments: string
+  invoice_status: string
+  invoice_file?: StrapiFile
+  proof_of_payment?: StrapiFile
+  payment_supplement?: StrapiFile
+  payment_reference?: string,
+  resume: string
 }
 
 type ResumeData = {
@@ -119,8 +135,9 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [create, setCreate] = useState(false)
   const [editTicket, setEditTicket] = useState<Ticket>()
-  const [newTicket, setNewTicket] = useState<createTicketReq>()
+  const [newInvoice, setNewInvoice] = useState<createInvoiceReq>()
   const [newEditTicket, setNewEditTicket] = useState<{ticket: EditTicketReq, documentId: string}>()
   const [printTicket, setPrintTicket] = useState<Ticket>()
   const [initialFormValues, setInitialFormValues] = useState<InitialValues>()
@@ -141,10 +158,10 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     isLoading: clientsIsLoading
   } = useGetClients()
   const {
-    ticket: TicketData,
-    error: TicketError,
-    isLoading: TicketIsLoading
-  } = useCreateTicket(newTicket)
+    invoice: InvoiceData,
+    error: InvoiceError,
+    isLoading: InvoiceIsLoading
+  } = useCreateInvoice(newInvoice)
   const {
     ticket: EditTicketData,
     error: EditTicketError,
@@ -186,17 +203,17 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     }
       // @ts-expect-error missing type
   }, [clientsIsLoading, clientsData.data, clientsError])
-  // useEffect(() => {
-  //   // make refresh
+  useEffect(() => {
+    // make refresh
 
-  //   if (!TicketError && !TicketIsLoading && TicketData) {
-  //     // console.log('TicketData: ', TicketData);
-  //     setTimeout(() => window.location.reload(), 500);
+    if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
+      // console.log('InvoiceData: ', InvoiceData);
+      setTimeout(() => window.location.reload(), 500);
       
 
-  //     // setTicket(TicketData.data)
-  //   }
-  // }, [TicketIsLoading, TicketData, TicketError])
+      // setTicket(InvoiceData.data)
+    }
+  }, [InvoiceIsLoading, InvoiceData, InvoiceError])
   // useEffect(() => {
   //   // make refresh
 
@@ -205,7 +222,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
   //     setTimeout(() => window.location.reload(), 500);
       
 
-  //     // setTicket(TicketData.data)
+  //     // setTicket(InvoiceData.data)
   //   }
   // }, [EditTicketData, EditTicketError, EditTicketIsLoading])
 
@@ -227,7 +244,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
   //           unit: product?.product?.measurement_unit || '',
   //         } 
   //       }) || [emptyProduct],
-  //       subtotal: editTicket?.sub_total || 0,
+  //       sub_total: editTicket?.sub_total || 0,
   //       shipping: editTicket?.shipping_price || 0,
   //       ticket_number: editTicket?.ticket_number || 0,
   //       total: editTicket?.total || 0
@@ -257,58 +274,65 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
   //   }
   //   setPrintTicket(ticket)
   // }
+
   const handleSubmit = async (values: InitialValues) => {
     setIsOpen(false)
     console.log(values);
-    // const { date, client, shipping, subtotal, products, ticket_number, total } = values
-    // const data = {
-    //   sale_date: new Date(date),
-    //   client: [Number(client)],
-    //   shipping_price: shipping,
-    //   sub_total: subtotal,
-    //   total,
-    //   ticket_number,
-    //   products: products.map((product: EProduct) => {
-    //     return {
-    //       product: [product.product],
-    //       quantity: product.quantity,
-    //       product_total: product.total,
-    //       product_variants: product.product_variants.map(variant => { return Number(variant.id) }),
-    //       price: product.price
-    //     }
-    //   })
-    // } 
+    const data = {
+      ...values,
+
+      client: [values.client],
+      resume: JSON.stringify(values.resume) 
+    } 
     // if (editTicket) {
     //   setNewEditTicket({ ticket: data, documentId: editTicket.documentId})
     // } else {
-    //   setNewTicket(data)
+      setNewInvoice(data)
     // }
+
+    // client
+    // resume
 
   }
   const sendCreate = () => {
+    setCreate(true)
+
     setInitialFormValues({
       client: `${client?.id}`,
-      subtotal: 0,
+      sub_total: 0,
       taxes: 0,
       total: 0,
       shipping: 0,
       comments: "",
       inner_comments: "",
-      ending_date: new Date(),
-      expected_payment_date: 0,
-      initial_date: new Date(),
-      invoice_send_date: 0,
-      payment_date: 0,
+      ending_date: null,
+      expected_payment_date: null,
+      initial_date: null,
+      invoice_send_date: null,
+      payment_date: null,
       invoice_id: "",
       invoice_status: "creado",
       payment_reference: "",
-      tickets: []
+      tickets: [],
+      proof_of_payment: undefined,
+      invoice_file: undefined,
+      payment_supplement: undefined,
+      resume: {}
     })
+    // {
+    //   file: undefined,
+    //   field: 'proof_of_payment',
+    //   refId: '',
+    //   ref: 'api::invoice.invoice'
+    // }
   }
   const sendClose = () => {
     setEditTicket(undefined)
+    setResume(undefined)
+    setTotals({total: 0, sub_total:0, total_taxes: 0})
     setInitialFormValues(undefined)
     setIsOpen(false)
+    setCreate(false)
   }
   
 
@@ -389,20 +413,20 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     );
   }
   
-  const generateResume = (values: InitialValues, setFieldValue: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<InitialValues>>) => {
-    const resume = values.tickets.reduce((acc: {[key: string]: any}, ticket_id: string) => {
+  const generateResume = (filteredTickets: InitialValues['tickets']) => {
+    const resume = filteredTickets.reduce((acc: {[key: string]: any}, ticket_id: string) => {
         // console.log(ticket_id);
       const ticket = tickets.find((value, i) => { return value.id === Number(ticket_id)})
       if (ticket) {
-        // console.log(ticket);
-        const prods = ticket.products.reduce((prodAcc: {[key: string]: any}, prod: TicketProduct) => {
-          prodAcc = {
-            ...prodAcc,
-            [prod?.product?.name || '']: {
-              ...prod,
-              name: prod?.product?.name,
-            }
-          }
+        console.log(ticket);
+        ticket.products.reduce((prodAcc: {[key: string]: any}, prod: TicketProduct) => {
+          // prodAcc = {
+          //   ...prodAcc,
+          //   [prod?.product?.name || '']: {
+          //     ...prod,
+          //     name: prod?.product?.name,
+          //   }
+          // }
 
           if (acc[prod?.product?.name || ''] && acc[prod?.product?.name || '']?.price === prod?.price) {
             // console.log('prod.product_total: ', prod.product_total);
@@ -427,37 +451,39 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
         }, {})
         // console.log('prods: ', prods);
 
-        if (acc['envios']) {
+        if (acc['envios'].quantity) {
           if (ticket.shipping_price) {
             acc['envios'].total += ticket.shipping_price + (ticket.shipping_price * (16/100))
             acc['envios'].sub_total += ticket.shipping_price
             acc['envios'].total_taxes += (ticket.shipping_price * (16/100))
             acc['envios'].quantity += 1
           }
-            
-          } else  if (ticket.shipping_price) {
-            acc.envios = {
-              price: 0,
-              quantity: 1,
-              unit: '',
-              taxes: 16,
-              variants: [],
-              sub_total: ticket.shipping_price,
-              total: ticket.shipping_price + (ticket.shipping_price * (16/100)),
-              total_taxes: ticket.shipping_price * (16/100)
-            }
+        } else  if (ticket.shipping_price) {
+          acc.envios = {
+            price: 0,
+            quantity: 1,
+            unit: '',
+            taxes: 16,
+            variants: [],
+            sub_total: ticket.shipping_price || 0,
+            total: ticket.shipping_price + (ticket.shipping_price * (16/100)), // catch case for needs or not shipping taxes
+            total_taxes: ticket.shipping_price * (16/100)
           }
-        // sum products from same name and price
-        // Object.entries(prods).map(([key, value], index) => {
-
-        // })
-        // if (acc[]) {
-          
-        // }
-        // acc = {...acc}
+        }
       }
       return acc
-    },{})
+    },{
+      envios: {
+        price: 0,
+        quantity: 0,
+        unit: '',
+        taxes: 16,
+        variants: [],
+        sub_total:  0,
+        total: 0,
+        total_taxes: 0
+      }
+    })
 
     // console.log('resume: ', resume);
     const totals = Object.entries(resume).reduce((acc: {total: number, sub_total: number, total_taxes: number},[key, value]) => {
@@ -472,9 +498,9 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
       }
       return acc
     }, {total: 0, sub_total: 0, total_taxes: 0})
-    // console.log(totals);
     // console.table(totals);
     const { envios, ...rest} = resume
+    console.log('envios: ', envios);
     const results: Resume = {
       ...totals,
       envios: {
@@ -488,81 +514,6 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
       totals,
       results
     }
-
-    
-    // return <>
-      // <div className="my-4 w-full">
-      //   <table className="text-sm w-full text-left font-medium">
-      //     <thead>
-      //       <tr>
-      //         <th>Producto</th>
-      //         <th>Variantes</th>
-      //         <th>Cantidad</th>
-      //         <th>Precio</th>
-      //         <th>Sub Total</th>
-      //         <th>IVA</th>
-      //         <th>total IVA</th>
-      //         <th>Total</th>
-      //       </tr>
-      //     </thead>
-      //     <tbody>
-      //       {
-      //         results.products.map((res, index: number) => {
-      //           return <tr className="border-b border-neutral-300" key={index}>
-      //             <td>{res.name}</td>
-      //             <td>{res.variants?.join(' ')}</td>
-      //             <td>{res.quantity} {res.unit}</td>
-      //             <td>{res.price?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-      //             <td>{res.sub_total?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-      //             <td>% {res.taxes || 0}</td>
-      //             <td>{(res.total_taxes)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-      //             {/* @ts-expect-error typing maybe undefined */}
-      //             <td>{(res.total).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                  
-      //           </tr>
-      //         })
-      //       }
-      //       {
-      //         results.envios && results.envios.total && <>
-      //           <tr className="border-b border-neutral-300" key={results.products.length}>
-      //             <td>{results.envios.name}</td>
-      //             <td>{results.envios.variants?.join(' ')}</td>
-      //             <td>{results.envios.quantity} {results.envios.unit}</td>
-      //             <td>{results?.envios.sub_total && results?.envios.quantity && (results?.envios.sub_total / results?.envios.quantity).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-      //             <td>{results.envios.sub_total?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-      //             <td>% {results.envios.taxes || 0}</td>
-      //             <td>{(results.envios.total_taxes)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-      //             <td>{(results.envios.total || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                  
-      //           </tr>
-      //         </>
-      //       }
-      //     </tbody>
-      //   </table>
-      // </div>
-      // <div className="my-4 w-1/2 self-end">
-      //   <div className="flex justify-between gap-x-4 my-2">
-      //     <label htmlFor="subtotal">Sub total</label>
-      //     <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="subtotal" value={values.subtotal} name="subtotal" type="string" placeholder="sub total" />
-      //     <div className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300">{totals?.sub_total.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
-      //   </div>
-      //   <div className="flex justify-between gap-x-4 my-2">
-      //     <label htmlFor="shipping">Envío</label>
-      //     <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" value={resume?.envios?.sub_total || values.shipping} name="shipping" type="string" placeholder="Envio" />
-      //     <div className="border border-neutral-400 rounded-sm px-2 w-1/2 ">{(values.shipping).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
-      //   </div>
-      //   <div className="flex justify-between gap-x-4 my-2">
-      //     <label htmlFor="shipping">IVA</label>
-      //     <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" value={totals?.total_taxes || 0} name="total_taxes" type="string" placeholder="Impuestos" />
-      //     <div className="border border-neutral-400 rounded-sm px-2 w-1/2 ">{(totals?.total_taxes || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
-      //   </div>
-      //   <div className="flex justify-between gap-x-4 my-2">
-      //     <label htmlFor="total">Total</label>
-      //     <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" required disabled id="total" value={totals?.total} name="total" type="string" placeholder="total" />
-      //     <div className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300">{totals?.total.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
-      //   </div>
-      // </div>
-    // </> 
   }
 
 
@@ -585,17 +536,18 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
             >
               {
                 ({values, setFieldValue}) => (
-                  <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50">
-                    <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-                      <DialogPanel className="w-5/12 space-y-4 border bg-neutral-100 p-12 shadow-2xl text-neutral-900">
+                  <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50 my-20">
+                    <div className="fixed inset-0 flex w-screen items-center justify-center">
+                      <DialogPanel className="w-5/12 space-y-2 border bg-neutral-100 p-8 shadow-2xl text-neutral-900">
                         
-                        <div className="flex justify-between gap-2">
-                          <img className="w-52" src={logo.src} alt="" />
 
-                          <DialogTitle className="font-bold flex flex-col mt-6"><span>Nuevo corte</span></DialogTitle>
-                        </div>
+
+                          <DialogTitle className="font-bold flex flex-col">
+                            <img className="w-36" src={logo.src} alt="" />
+                            
+                          </DialogTitle>
                         {/* form for invoices */}
-                        <Form>
+                        <Form className="flex flex-col gap-y-4">
                           {/* <Field className="border border-neutral-400 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} /> */}
                           {/* <Field className="border border-neutral-400 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
                           <div className="flex align-baseline">
@@ -620,25 +572,44 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                 className="py-1"
                                 onChange={(e: any) => {
                                   // console.log(e);
-                                  setFieldValue("initial_date", new Date(new Date(e).setHours(0, 0 , 0, 0)))
+                                  const initial_date = new Date(new Date(e).setHours(0, 0 , 0, 0))
+                                  setFieldValue("initial_date", initial_date)
                                   // setFieldValue("ending_date", values.ending_date)
 
                                   
                                   if (values.ending_date) {
-                                    const filteredTickets = tickets.filter(ticket => {
-                                      const sale_date = new Date(ticket.sale_date)
-                                      const initial_date = new Date(new Date(e).setHours(0, 0 , 0, 0))
-                                      const ending_date = new Date(new Date(values.ending_date).setHours(23, 59 , 59, 999))
-                                      // console.log('sale_date: ', sale_date);
-                                      // console.log('initial_date: ', initial_date);
-                                      // console.log('ending_date: ', ending_date);
-                                      // console.log();
+                                    const ending_date = new Date(new Date(values.ending_date).setHours(23, 59 , 59, 999))
+                                    if (initial_date < ending_date) {
+                                      setFieldValue('tickets', [])
+                                      setResume(undefined)
+                                      setFieldValue('resume', undefined )
+
+                                      const filteredTickets = tickets.filter(ticket => {
+                                        const sale_date = new Date(ticket.sale_date)
+                                        // console.log('sale_date: ', sale_date);
+                                        // console.log('initial_date: ', initial_date);
+                                        // console.log('ending_date: ', ending_date);
+                                        // console.log();
+                                        return sale_date > initial_date && sale_date < ending_date
+                                      }).map(ticket => `${ticket.id}`)
+                                      // const filteredTickets = tickets.filter(ticket => {
+                                      //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
+                                      // }).map(ticket => `${ticket.id}`)
+                                      // console.log('filteredTickets: ', filteredTickets);
+                                      setFieldValue('tickets', filteredTickets)
+                                      setTimeout(() => {
+                                        const { results, totals } = generateResume(filteredTickets)
+                                        setFieldValue('shipping', results.envios.sub_total || 0 )
+                                        setFieldValue('total', totals.total )
+                                        setFieldValue('sub_total', totals.sub_total )
+                                        setFieldValue('taxes', totals.total_taxes )
+                                        setFieldValue('resume', results )
+
+                                        setResume(results)
+                                        setTotals(totals)
+                                      }, 300);
                                       
-                                      return sale_date >= initial_date && sale_date <= ending_date
-                                    }).map(ticket => ticket.id)
-                                    // console.log('filteredTickets: ', filteredTickets);
-                                    setFieldValue('tickets', filteredTickets)
-                                    
+                                    }
                                   }
                                 }}
                                 selected={values.initial_date}
@@ -654,32 +625,39 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                   // console.log("ending date", e)
 
                                   // console.log("values.initial_date", values.initial_date)
-                                  setFieldValue("ending_date", new Date(new Date(e).setHours(23, 59 , 59, 999)))
+                                  const ending_date = new Date(new Date(e).setHours(23, 59 , 59, 999))
+                                  setFieldValue("ending_date", ending_date)
                                   if (values.initial_date) {
-                                    const filteredTickets = tickets.filter(ticket => {
-                                      const sale_date = new Date(ticket.sale_date)
                                       const initial_date = new Date(values.initial_date)
-                                      const ending_date = new Date(new Date(e).setHours(23, 59 , 59, 999))
-                                      // console.log('sale_date: ', sale_date);
-                                      // console.log('initial_date: ', initial_date);
-                                      // console.log('ending_date: ', ending_date);
-                                      // console.log();
-                                      return sale_date >= initial_date && sale_date <= ending_date
-                                    }).map(ticket => ticket.id)
-                                    // const filteredTickets = tickets.filter(ticket => {
-                                    //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
-                                    // }).map(ticket => `${ticket.id}`)
-                                    // console.log('filteredTickets: ', filteredTickets);
-                                    setFieldValue('tickets', filteredTickets)
-                                    const { results, totals } = generateResume(values, setFieldValue)
-                                    if (results.envios) {
-                                      setFieldValue('shipping', results.envios.sub_total )
+                                    if (initial_date < ending_date) {
+                                      setFieldValue('tickets', [])
+                                      setResume(undefined)
+                                      setFieldValue('resume', {} )
+
+                                      const filteredTickets = tickets.filter(ticket => {
+                                        const sale_date = new Date(ticket.sale_date)
+                                        // console.log('sale_date: ', sale_date);
+                                        // console.log('initial_date: ', initial_date);
+                                        // console.log('ending_date: ', ending_date);
+                                        // console.log();
+                                        return sale_date > initial_date && sale_date < ending_date
+                                      }).map(ticket => `${ticket.id}`)
+                                      // const filteredTickets = tickets.filter(ticket => {
+                                      //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
+                                      // }).map(ticket => `${ticket.id}`)
+                                      // console.log('filteredTickets: ', filteredTickets);
+                                      setFieldValue('tickets', filteredTickets)
+                                      setTimeout(() => {
+                                        const { results, totals } = generateResume(filteredTickets)
+                                        setFieldValue('shipping', results.envios.sub_total || 0)
+                                        setFieldValue('total', totals.total )
+                                        setFieldValue('sub_total', totals.sub_total )
+                                        setFieldValue('taxes', totals.total_taxes )
+                                        setFieldValue('resume', results )
+                                        setResume(results)
+                                        setTotals(totals)
+                                      }, 200);
                                     }
-                                    setFieldValue('total', totals.total )
-                                    setFieldValue('subtotal', totals.sub_total )
-                                    setFieldValue('taxes', totals.total_taxes )
-                                    setResume(results)
-                                    setTotals(totals)
                                   }
                                 }}
                                 selected={values.ending_date}
@@ -706,7 +684,6 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                       </button>
                                     </div>
                                     <div className="max-h-64 overflow-hidden overflow-y-scroll">
-                                      
                                       { values.tickets.map((ticket, index) => {
                                           return (
                                             <Disclosure key={index}>
@@ -746,7 +723,20 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                                       }
 
                                                     </DisclosureButton>
-                                                    <button type="button" className="flex justify-end px-3 py-1 bg-red-800 text-white" onClick={() => remove(index)}>X</button>
+                                                    <button type="button" className="flex justify-end px-3 py-1 bg-red-800 text-white" onClick={() => {
+                                                      remove(index)
+                                                      const newtickets = values.tickets.filter((_, i: number) => { return index !== i})
+                                                      const res = generateResume(newtickets)
+                                                      if (res) {
+                                                        setFieldValue('shipping', res.results.envios.sub_total || 0 )
+                                                        setFieldValue('total', res.totals.total )
+                                                        setFieldValue('sub_total', res.totals.sub_total )
+                                                        setFieldValue('taxes', res.totals.total_taxes )
+                                                        setFieldValue('resume', res.results )
+                                                        setResume(res.results)
+                                                        setTotals(res.totals)
+                                                      }
+                                                    }}>X</button>
                                                   </div>
                                                   <DisclosurePanel className="text-gray-500">
                                                     <div className="p-2 pt-0 border border-neutral-300 w-full" key={index}>
@@ -754,18 +744,20 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                                       <div className="flex flex-col w-full">
 
                                                         <label htmlFor="`tickets.${index}`">Nota</label>
-                                                        <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" value={values.tickets[index]} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                                          // onProductChange(e.target.value)
-                                                            // const product = tickets.filter((product: Product) => {
-                                                            //   // console.log(product);
-                                                              
-                                                            //   return Number(e.target.value) === product.id
-                                                            // })[0] || null
-                                                            // console.log(product);
+                                                        <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" value={values.tickets[index]}
+                                                          onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                            const newtickets = [...values.tickets, e.target.value]
                                                             setFieldValue(`tickets.${index}`, e.target.value)
-                                                            // setFieldValue(`products.${index}.name`, product.name)
-                                                            // setFieldValue(`products.${index}.product`, product.id)
-                                                            // setFieldValue(`products.${index}.price`, product.price)
+                                                            const res = generateResume(newtickets)
+                                                            if (res) {
+                                                              setFieldValue('shipping', res.results.envios.sub_total || 0 )
+                                                              setFieldValue('total', res.totals.total )
+                                                              setFieldValue('sub_total', res.totals.sub_total )
+                                                              setFieldValue('taxes', res.totals.total_taxes )
+
+                                                              setResume(res.results)
+                                                              setTotals(res.totals)
+                                                            }
                                                           }} name={`tickets.${index}`}
                                                         >
                                                           <option value="">Nota</option>
@@ -811,57 +803,171 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                           </Disclosure>
                           <Disclosure>
                             <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
-                              Totales
+                              Resumen
                             </DisclosureButton>
                             <DisclosurePanel>
                               <div className="flex flex-col">
                                 <div className="my-4 w-full">
-                                  <table className="text-sm w-full text-left font-medium">
-                                    <thead>
-                                      <tr>
-                                        <th>Producto</th>
-                                        <th>Variantes</th>
-                                        <th>Cantidad</th>
-                                        <th>Precio</th>
-                                        <th>Sub Total</th>
-                                        <th>IVA</th>
-                                        <th>total IVA</th>
-                                        <th>Total</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {
-                                        resume?.products?.map((res, index: number) => {
-                                          return <tr className="border-b border-neutral-300" key={index}>
-                                            <td>{res.name}</td>
-                                            <td>{res.variants?.join(' ')}</td>
-                                            <td>{res.quantity} {res.unit}</td>
-                                            <td>{res.price?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            <td>{res.sub_total?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            <td>% {res.taxes || 0}</td>
-                                            <td>{(res.total_taxes)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            <td>{(res.total || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            
-                                          </tr>
-                                        })
-                                      }
-                                      {
-                                        resume?.envios && resume?.envios.total && <>
-                                          <tr className="border-b border-neutral-300" key={resume.products.length}>
-                                            <td>{resume.envios.name}</td>
-                                            <td>{resume.envios.variants?.join(' ')}</td>
-                                            <td>{resume.envios.quantity} {resume.envios.unit}</td>
-                                            <td>{resume?.envios.sub_total && resume?.envios.quantity && (resume?.envios.sub_total / resume?.envios.quantity).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            <td>{resume.envios.sub_total?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            <td>% {resume.envios.taxes || 0}</td>
-                                            <td>{(resume.envios.total_taxes)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            <td>{(resume.envios.total || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
-                                            
-                                          </tr>
-                                        </>
-                                      }
-                                    </tbody>
-                                  </table>
+                                  {
+                                    (resume?.products && resume?.products?.length > 0) || (resume?.envios && resume?.envios.total)
+                                      ? <table className="text-sm w-full text-left font-medium">
+                                          <thead>
+                                            <tr>
+                                              <th>Producto</th>
+                                              <th>Variantes</th>
+                                              <th>Cantidad</th>
+                                              <th>Precio</th>
+                                              <th>Sub Total</th>
+                                              <th>IVA</th>
+                                              <th>total IVA</th>
+                                              <th>Total</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {
+                                              resume?.products && resume?.products?.length > 0
+                                                ? resume?.products?.map((res, index: number) => {
+                                                    return <tr className="border-b border-neutral-300" key={index}>
+                                                      <td>{res.name}</td>
+                                                      <td>{res.variants?.join(' ')}</td>
+                                                      <td>{res.quantity} {res.unit}</td>
+                                                      <td>{res.price?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      <td>{res.sub_total?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      <td>% {res.taxes || 0}</td>
+                                                      <td>{(res.total_taxes)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      <td>{(res.total || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      
+                                                    </tr>
+                                                  })
+                                                : null
+                                            }
+                                            {
+                                              resume?.envios && resume?.envios.total
+                                                ? <>
+                                                    <tr className="border-b border-neutral-300" key={resume.products.length}>
+                                                      <td>{resume.envios.name}</td>
+                                                      <td>{resume.envios.variants?.join(' ')}</td>
+                                                      <td>{resume.envios.quantity} {resume.envios.unit}</td>
+                                                      <td>{resume?.envios.sub_total && resume?.envios.quantity && (resume?.envios.sub_total / resume?.envios.quantity).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      <td>{resume.envios.sub_total?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      <td>% {resume.envios.taxes || 0}</td>
+                                                      <td>{(resume.envios.total_taxes)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      <td>{(resume.envios.total || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</td>
+                                                      
+                                                    </tr>
+                                                  </>
+                                                : null
+                                            }
+                                          </tbody>
+                                        </table>
+                                      : null
+                                  }
+                                  
+                                </div>
+                                
+                              </div>
+                            </DisclosurePanel>
+                          </Disclosure>
+                          {
+                            !create && <Disclosure>
+                              <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+                                Archivos
+                              </DisclosureButton>
+                              <DisclosurePanel>
+                                <div className="flex flex-col">
+                                  <div className="flex justify-between w-full ">
+                                    <label htmlFor="file">Factura</label> 
+                                    <Field type="file" name="invoice_file.file" value={values?.invoice_file?.file}></Field>
+                                  </div>
+                                  <div className="flex justify-between w-full ">
+                                    <label htmlFor="file">Comprobante de pago</label> 
+                                    <Field type="file" name="proof_of_payment.file" value={values?.proof_of_payment?.file}></Field>
+                                  </div>
+                                  <div className="flex justify-between w-full ">
+                                    <label htmlFor="file">Complemento de pago</label> 
+                                    <Field type="file" name="payment_supplement.file" value={values?.payment_supplement?.file}></Field>
+                                  </div>
+                                  
+                                </div>
+                              </DisclosurePanel>
+                            </Disclosure>
+                          }
+                          <Disclosure>
+                            <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+                              Fechas y referencias
+                            </DisclosureButton>
+                            <DisclosurePanel>
+                             
+                              <div className="flex flex-col gap-2">
+                                <div className="flex">
+
+                                  <div className="flex flex-col w-1/3 px-2">
+                                    <label htmlFor="invoice_id">Folio de factura</label> 
+                                    <Field type="text" name="invoice_id" value={values?.invoice_id}></Field>
+                                  </div>
+                                  <div className="flex flex-col w-1/3 px-2">
+                                    <label htmlFor="payment_reference">Referencia de pago</label> 
+                                    <Field type="text" name="payment_reference" value={values?.payment_reference}></Field>
+                                  </div>
+                                  <div className="flex flex-col w-1/3 px-2">
+                                    <label htmlFor="invoice_status">Estatus de corte</label>
+                                    <Field as="select" name="invoice_status" value={values?.invoice_status}>
+                                      <option value="">Selecciona una opción</option>
+                                      <option value="creado">Creado</option>
+                                      <option value="enviado">Enviado</option>
+                                      <option value="pagado">Pagado</option>
+                                    </Field>
+                                  </div>
+                                </div>
+                                <div className="flex">
+                                  <div className="flex flex-col w-1/3 px-2">
+                                    <label htmlFor="invoice_send_date">Fecha de envio</label>
+                                    <DatePicker
+                                      className="py-1 w-10/12"
+                                      onChange={(e: any) => {
+                                        console.log(e);
+                                        
+                                        const invoice_send_date = new Date(e)
+                                        console.log('client: ', client);
+                                        console.log('client?.taxing_info: ', client?.taxing_info);
+                                        
+                                        if (client?.taxing_info) {
+                                          // payment_period
+                                          setFieldValue("expected_payment_date", new Date(invoice_send_date.setDate(invoice_send_date.getDate() + client?.taxing_info.payment_period)))
+                                          setFieldValue("invoice_send_date", e)
+                                        } else {
+                                          setFieldValue("invoice_send_date", e)
+
+                                        }
+                                      }}
+                                      selected={values.invoice_send_date}
+                                      name="invoice_send_date"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col w-1/3 px-2">
+                                    <label htmlFor="">Fecha de pago</label>
+                                    <DatePicker
+                                      className="py-1 w-10/12"
+                                      onChange={(e: any) => {
+                                        const payment_date = new Date(e)
+                                        setFieldValue("payment_date", payment_date)
+                                      }}
+                                      name="payment_date"
+                                      selected={values.payment_date}
+                                    />
+                                  </div>
+                                  <div className="flex flex-col w-1/3 px-2">
+                                    <label htmlFor="">Fecha vencimiento</label> 
+                                    <DatePicker
+                                      className="py-1 w-10/12"
+                                      onChange={(e: any) => {
+                                        const expected_payment_date = new Date(e)
+                                        setFieldValue("expected_payment_date", expected_payment_date)
+                                      }}
+                                      name="expected_payment_date"
+                                      selected={values.expected_payment_date}
+                                    />
+                                  </div>
                                 </div>
                                 
                               </div>
@@ -870,20 +976,20 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                           <div className="my-4 w-full flex justify-between">
                             <div className="w-1/2 px-4">
                               <div className="flex justify-between gap-x-4 my-2">
-                                <label htmlFor="subtotal">Sub total</label>
-                                <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="subtotal" value={values.subtotal} name="subtotal" type="string" placeholder="sub total" />
+                                <label htmlFor="sub_total">Sub total</label>
+                                <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="sub_total" value={totals?.sub_total} name="sub_total" type="string" placeholder="sub total" />
                                 <div className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300">{totals?.sub_total.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
                               </div>
                               <div className="flex justify-between gap-x-4 my-2">
                                 <label htmlFor="shipping">Envío</label>
-                                <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" value={resume?.envios?.sub_total || values.shipping} name="shipping" type="string" placeholder="Envio" />
-                                <div className="border border-neutral-400 rounded-sm px-2 w-1/2 ">{(values.shipping).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
+                                <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" value={values.shipping} name="shipping" type="string" placeholder="Envio" />
+                                <div className="border border-neutral-400 rounded-sm px-2 w-1/2 ">{(resume?.envios?.sub_total || 0)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
                               </div>
                             </div>
                             <div className="w-1/2 px-4">
                               <div className="flex justify-between gap-x-4 my-2">
-                                <label htmlFor="shipping">IVA</label>
-                                <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" value={totals?.total_taxes || 0} name="total_taxes" type="string" placeholder="Impuestos" />
+                                <label htmlFor="total_taxes">IVA</label>
+                                <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="total_taxes" value={totals?.total_taxes || 0} name="total_taxes" type="string" placeholder="Impuestos" />
                                 <div className="border border-neutral-400 rounded-sm px-2 w-1/2 ">{(totals?.total_taxes || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
                               </div>
                               <div className="flex justify-between gap-x-4 my-2">

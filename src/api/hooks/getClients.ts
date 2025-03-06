@@ -5,6 +5,9 @@ export type Client = {
   id: number;
   name: string;
   documentId: string
+  taxing_info: {
+    payment_period: number
+  }
 }
 
 
