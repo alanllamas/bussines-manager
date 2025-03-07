@@ -7,7 +7,6 @@ import { Formik, Field, Form, FieldArray } from "formik";
 import useCreateTicket from "@/api/hooks/tickets/useCreateTicket";
 import logo from "@/public/logo.png"
 import { useReactToPrint } from "react-to-print";
-import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket";
 import ReactPaginate from 'react-paginate';
 import { useAuth } from "@/app/context/AuthUserContext";
 import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices";
@@ -15,8 +14,9 @@ import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice";
+import useEditInvoice, { EditInvoiceReq } from "@/api/hooks/invoices/useEditInvoice";
 export type StrapiFile = {
-    file?: File
+    files?: File
     ref: string
     refId: string
     field: string
@@ -133,12 +133,13 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
   const [clients, setClients] = useState<Client[]>([])
   const [client, setclient] = useState<Client>()
   const [tickets, setTickets] = useState<Ticket[]>([])
+  const [availableTickets, setAvailableTickets] = useState<Ticket[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [create, setCreate] = useState(false)
-  const [editTicket, setEditTicket] = useState<Ticket>()
+  const [editInvoice, setEditInvoice] = useState<Invoice>()
   const [newInvoice, setNewInvoice] = useState<createInvoiceReq>()
-  const [newEditTicket, setNewEditTicket] = useState<{ticket: EditTicketReq, documentId: string}>()
+  const [newEditInvoice, setNewEditInvoice] = useState<{invoice: Invoice, documentId: string}>()
   const [printTicket, setPrintTicket] = useState<Ticket>()
   const [initialFormValues, setInitialFormValues] = useState<InitialValues>()
 
@@ -146,7 +147,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     invoices: invoicesData,
     error: invoicesError,
     isLoading: invoicesIsLoading,
-  } = useGetInvoices()
+  } = useGetInvoices(client_param)
   const {
     tickets: ticketsData,
     error: ticketsError,
@@ -163,10 +164,10 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     isLoading: InvoiceIsLoading
   } = useCreateInvoice(newInvoice)
   const {
-    ticket: EditTicketData,
-    error: EditTicketError,
-    isLoading: EditTicketIsLoading
-  } = useEditTicket(newEditTicket)
+    invoice: EditInvoiceData,
+    error: EditInvoiceError,
+    isLoading: EditInvoiceIsLoading
+  } = useEditInvoice(newEditInvoice)
  
   useEffect(() => {
     if ((!invoicesError && !invoicesIsLoading && invoicesData.data)) {
@@ -186,8 +187,9 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
       
       // console.log('ticketsData.data: ', ticketsData.data);
       // console.log('meta.pagination.total: ', productsData.meta.pagination.total);
-
+      
       setTickets(ticketsData.data)
+      setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null))
     }
   }, [ticketsData.data, ticketsError, ticketsIsLoading])
   useEffect(() => {
@@ -209,49 +211,108 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
       // console.log('InvoiceData: ', InvoiceData);
       setTimeout(() => window.location.reload(), 500);
+    }
+  }, [InvoiceIsLoading, InvoiceData, InvoiceError])
+  useEffect(() => {
+    // make refresh
+
+    if (EditInvoiceData && !EditInvoiceError && !EditInvoiceIsLoading) {
+      // console.log('EditInvoiceData: ', EditInvoiceData);
+      setTimeout(() => window.location.reload(), 500);
       
 
       // setTicket(InvoiceData.data)
     }
-  }, [InvoiceIsLoading, InvoiceData, InvoiceError])
-  // useEffect(() => {
-  //   // make refresh
+  }, [EditInvoiceData, EditInvoiceError, EditInvoiceIsLoading])
 
-  //   if (EditTicketData && !EditTicketError && !EditTicketIsLoading) {
-  //     // console.log('EditTicketData: ', EditTicketData);
-  //     setTimeout(() => window.location.reload(), 500);
-      
-
-  //     // setTicket(InvoiceData.data)
-  //   }
-  // }, [EditTicketData, EditTicketError, EditTicketIsLoading])
-
-  // useEffect(() => {
-  //   // console.log('editTicket: ', editTicket);
-  //   if (editTicket) {
-      
-  //     setInitialFormValues({
-  //       client: editTicket?.client.id.toString() || "",
-  //       date: new Date(editTicket?.sale_date || '').valueOf(),
-  //       products: editTicket?.products?.map((product: TicketProduct): EProduct => {
-  //         return {
-  //           name: product?.product?.name || '',
-  //           product: product?.product?.id || 0,
-  //           price: product.price || 0,
-  //           product_variants: product?.product_variants?.map((variant: ProductVariant) => ({id: variant.id, name: variant.name, type: variant.type})) || [],
-  //           quantity: product.quantity || 0,
-  //           total: product.product_total || 0, 
-  //           unit: product?.product?.measurement_unit || '',
-  //         } 
-  //       }) || [emptyProduct],
-  //       sub_total: editTicket?.sub_total || 0,
-  //       shipping: editTicket?.shipping_price || 0,
-  //       ticket_number: editTicket?.ticket_number || 0,
-  //       total: editTicket?.total || 0
-  //     })
-  //   } 
+  useEffect(() => {
+    if (editInvoice) {
+      console.log('editInvoice: ', editInvoice);
+      console.log('editInvoice.tickets: ', editInvoice.tickets);
+      const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
+      console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
+      const { results, totals } = generateResume(editTickets)
+      setResume(results)
+      setTotals(totals)
+      setInitialFormValues({
+        client: editInvoice?.client?.id?.toString() || "",
+        sub_total: editInvoice?.sub_total || 0,
+        shipping: editInvoice?.shipping_price || 0,
+        total: editInvoice?.total || 0,
+        taxes: editInvoice.taxes,
+        comments: editInvoice.comments,
+        inner_comments: editInvoice.inner_comments,
+        ending_date: editInvoice.ending_date,
+        expected_payment_date: editInvoice.expected_payment_date,
+        initial_date: editInvoice.initial_date,
+        invoice_send_date: editInvoice.invoice_send_date,
+        payment_date: editInvoice.payment_date,
+        invoice_id: editInvoice.invoice_id,
+        invoice_status: editInvoice.invoice_status,
+        payment_reference: editInvoice.payment_reference,
+        tickets: editTickets,
+        resume: results
+      })
+      // proof_of_payment: editInvoice.proof_of_payment || {
+      //   files: undefined,
+      //   field: 'proof_of_payment',
+      //   refId: editInvoice.documentId || '',
+      //   ref: 'api::invoice.invoice'
+      // },
+      // invoice_file: editInvoice.invoice_file || {
+      //   files: undefined,
+      //   field: 'invoice_file',
+      //   refId: editInvoice.documentId || '',
+      //   ref: 'api::invoice.invoice'
+      // },
+      // payment_supplement: editInvoice.payment_supplement || {
+      //   files: undefined,
+      //   field: 'payment_supplement',a
+      //   refId: editInvoice.documentId || '',
+      //   ref: 'api::invoice.invoice'
+      // },
+      // {
+      //   !create && <Disclosure>
+      //     <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+      //       Archivos
+      //     </DisclosureButton>
+      //     <DisclosurePanel>
+      //       <div className="flex flex-col">
+      //         <div className="flex justify-between w-full ">
+      //           <label htmlFor="file">Factura</label> 
+      //           <Field type="file" name="invoice_file.file" value={values?.invoice_file?.files}></Field>
+      //         </div>
+      //         <div className="flex justify-between w-full ">
+      //           <label htmlFor="file">Comprobante de pago</label> 
+      //           <Field type="file" name="proof_of_payment.file" value={values?.proof_of_payment?.files}></Field>
+      //         </div>
+      //         <div className="flex justify-between w-full ">
+      //           <label htmlFor="file">Complemento de pago</label> 
+      //           <Field type="file" name="payment_supplement.file" value={values?.payment_supplement?.files}></Field>
+      //         </div>
+              
+      //       </div>
+      //     </DisclosurePanel>
+      //   </Disclosure>
+      // }
+      // const proof_of_payment = new FormData()
+      // const invoice_file = new FormData()
+      // const payment_supplement = new FormData()
+      // values.proof_of_payment ?? Object.entries(values.proof_of_payment || {}).forEach(([key, value]) => {
+      //   // @ts-expect-error value could be undefined
+      //   if(value) proof_of_payment.append(key, value)
+      // });
+      // values.invoice_file ?? Object.entries(values.invoice_file || {}).forEach(([key, value]) => {
+      //   // @ts-expect-error value could be undefined
+      //   if(value) invoice_file.append(key, value)
+      // });
+      // values.payment_supplement ?? Object.entries(values.payment_supplement || {}).forEach(([key, value]) => {
+      //   // @ts-expect-error value could be undefined
+      //   if(value) payment_supplement.append(key, value)
+      // });
+    } 
     
-  // }, [editTicket])
+  }, [editInvoice])
 
   useEffect(() => {
     // console.log('initialFormValues: ', initialFormValues);
@@ -277,18 +338,17 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
 
   const handleSubmit = async (values: InitialValues) => {
     setIsOpen(false)
-    console.log(values);
+    // console.log(values);
     const data = {
       ...values,
-
       client: [values.client],
       resume: JSON.stringify(values.resume) 
     } 
-    // if (editTicket) {
-    //   setNewEditTicket({ ticket: data, documentId: editTicket.documentId})
-    // } else {
+    if (editInvoice) {
+      setNewEditInvoice({ invoice: data, documentId: editInvoice.documentId || ''})
+    } else {
       setNewInvoice(data)
-    // }
+    }
 
     // client
     // resume
@@ -319,15 +379,11 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
       payment_supplement: undefined,
       resume: {}
     })
-    // {
-    //   file: undefined,
-    //   field: 'proof_of_payment',
-    //   refId: '',
-    //   ref: 'api::invoice.invoice'
-    // }
+    
+
   }
   const sendClose = () => {
-    setEditTicket(undefined)
+    setEditInvoice(undefined)
     setResume(undefined)
     setTotals({total: 0, sub_total:0, total_taxes: 0})
     setInitialFormValues(undefined)
@@ -346,12 +402,16 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
           currentItems?.map((invoice: Invoice, index: number) => {
           // console.log('invoice: ', invoice);
           return <tr className="border-b border-neutral-300" key={`invoice-${index}`}>
+
             <td className="py-2"><a href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
             <td className="py-2">{invoice.client?.name}</td>
-            <td className="py-2">{new Date(invoice.initial_date).toLocaleDateString()}</td>
-            <td className="py-2">{new Date(invoice.ending_date).toLocaleDateString()}</td>
+            <td className="py-2">{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
+            <td className="py-2">{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
             <td className="py-2">$ {invoice.total}</td>
-            {/* <td className="py-2"><button onClick={() => setEditTicket(ticket)}><span>edit</span></button> | <button onClick={() => sendPrint(ticket)}><span>print</span></button></td> */}
+            <td className="py-2">
+              <button onClick={() => setEditInvoice(invoice)}><span>edit</span></button> 
+            {/* | <button onClick={() => sendPrint(ticket)}><span>print</span></button> */}
+            </td>
           </tr>
           return <></>
         })}
@@ -418,7 +478,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
         // console.log(ticket_id);
       const ticket = tickets.find((value, i) => { return value.id === Number(ticket_id)})
       if (ticket) {
-        console.log(ticket);
+        // console.log(ticket);
         ticket.products.reduce((prodAcc: {[key: string]: any}, prod: TicketProduct) => {
           // prodAcc = {
           //   ...prodAcc,
@@ -449,13 +509,13 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
           }
           return prodAcc
         }, {})
-        // console.log('prods: ', prods);
+        // console.log('client: ', client);
 
         if (acc['envios'].quantity) {
           if (ticket.shipping_price) {
-            acc['envios'].total += ticket.shipping_price + (ticket.shipping_price * (16/100))
+            acc['envios'].total += client?.taxing_info?.shipping_invoice ? ticket.shipping_price + (ticket.shipping_price * (16/100)) : ticket.shipping_price
             acc['envios'].sub_total += ticket.shipping_price
-            acc['envios'].total_taxes += (ticket.shipping_price * (16/100))
+            acc['envios'].total_taxes += client?.taxing_info?.shipping_invoice ? (ticket.shipping_price * (16/100)) : 0
             acc['envios'].quantity += 1
           }
         } else  if (ticket.shipping_price) {
@@ -466,8 +526,8 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
             taxes: 16,
             variants: [],
             sub_total: ticket.shipping_price || 0,
-            total: ticket.shipping_price + (ticket.shipping_price * (16/100)), // catch case for needs or not shipping taxes
-            total_taxes: ticket.shipping_price * (16/100)
+            total: client?.taxing_info?.shipping_invoice ? ticket.shipping_price + (ticket.shipping_price * (16/100)) : ticket.shipping_price,
+            total_taxes: client?.taxing_info?.shipping_invoice ? (ticket.shipping_price * (16/100)) : 0
           }
         }
       }
@@ -500,7 +560,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     }, {total: 0, sub_total: 0, total_taxes: 0})
     // console.table(totals);
     const { envios, ...rest} = resume
-    console.log('envios: ', envios);
+    // console.log('envios: ', envios);
     const results: Resume = {
       ...totals,
       envios: {
@@ -509,7 +569,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
       },
       products: Object.entries(rest).map(([key, value]) => ({name: key, ...value}))
     }
-    console.table(results);
+    // console.table(results);
     return {
       totals,
       results
@@ -762,8 +822,8 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                                         >
                                                           <option value="">Nota</option>
                                                           {
-                                                            tickets.map((ticket: Ticket, index: number) => {
-                                                              return <option key={`ticket-${index}`} value={ticket.id}>{ticket.total} | {new Date(ticket.sale_date).toLocaleDateString()}</option>
+                                                            [...(editInvoice?.tickets || []), ...availableTickets].map((ticket: Ticket, i: number) => {
+                                                              return <option className="disabled:bg-neutral-200" disabled={values.tickets.includes(`${ticket.id}`)} key={`ticket-${i}`} value={`${ticket.id}`}>{ticket.id} | {ticket.total} | {new Date(ticket.sale_date).toLocaleDateString()}</option>
                                                             })
                                                           }
                                                         </Field>
@@ -868,30 +928,6 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                               </div>
                             </DisclosurePanel>
                           </Disclosure>
-                          {
-                            !create && <Disclosure>
-                              <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
-                                Archivos
-                              </DisclosureButton>
-                              <DisclosurePanel>
-                                <div className="flex flex-col">
-                                  <div className="flex justify-between w-full ">
-                                    <label htmlFor="file">Factura</label> 
-                                    <Field type="file" name="invoice_file.file" value={values?.invoice_file?.file}></Field>
-                                  </div>
-                                  <div className="flex justify-between w-full ">
-                                    <label htmlFor="file">Comprobante de pago</label> 
-                                    <Field type="file" name="proof_of_payment.file" value={values?.proof_of_payment?.file}></Field>
-                                  </div>
-                                  <div className="flex justify-between w-full ">
-                                    <label htmlFor="file">Complemento de pago</label> 
-                                    <Field type="file" name="payment_supplement.file" value={values?.payment_supplement?.file}></Field>
-                                  </div>
-                                  
-                                </div>
-                              </DisclosurePanel>
-                            </Disclosure>
-                          }
                           <Disclosure>
                             <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
                               Fechas y referencias
@@ -925,11 +961,11 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                     <DatePicker
                                       className="py-1 w-10/12"
                                       onChange={(e: any) => {
-                                        console.log(e);
+                                        // console.log(e);
                                         
                                         const invoice_send_date = new Date(e)
-                                        console.log('client: ', client);
-                                        console.log('client?.taxing_info: ', client?.taxing_info);
+                                        // console.log('client: ', client);
+                                        // console.log('client?.taxing_info: ', client?.taxing_info);
                                         
                                         if (client?.taxing_info) {
                                           // payment_period
@@ -1002,7 +1038,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                           
                           <div className="flex gap-4 justify-end">
                             <button className="bg-red-800 px-4 py-2 rounded-sm text-white" onClick={() => sendClose()}>Cancelar</button>
-                            <button className="bg-green-700 px-4 py-2 text-white" type="submit">{ editTicket ? 'Editar' : 'Crear'}</button>
+                            <button className=" disabled:bg-green-300 bg-green-700 px-4 py-2 text-white" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
                           </div>
                         </Form>
                       </DialogPanel>

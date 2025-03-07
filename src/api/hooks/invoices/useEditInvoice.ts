@@ -3,19 +3,6 @@ import { fetcher } from '../../fetcher';
 import { Invoice } from './getInvoices';
 
 export type EditInvoiceReq = {
-  sale_date: Date
-  client: number[]
-  shipping_price: number
-  subtotal?: number
-  total: number
-  ticket_number: number
-  products: {
-    product: number[]
-    quantity: number
-    product_total: number
-    product_variants: number[]
-    price: number
-  }[]
 }
 
 async function postInvoice([
@@ -37,14 +24,14 @@ async function postInvoice([
 
 export default function useEditInvoice(
   data?: {
-    invoice: EditInvoiceReq,
+    invoice: Invoice,
     documentId: string,
   }
 ) {
   const WEBHOOK_INVOICES_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/invoices/${data?.documentId}?populate=*`;
   const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
   // console.log('data: ', data);
-  
+
   const { data: invoice, error, isLoading } = useSWR(
     data
       ? [

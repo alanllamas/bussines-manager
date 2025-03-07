@@ -3,6 +3,7 @@ import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Client } from '../getClients';
 import { Product } from '../getProducts';
+import { Invoice } from '../invoices/getInvoices';
 export type ProductVariant = {
   name: string;
   id: number;
@@ -31,6 +32,7 @@ export type Ticket = {
   products: TicketProduct[]
   sub_total:number
   shipping_price: number
+  invoice: Invoice
 }
 export type Meta = {
   pagination: {

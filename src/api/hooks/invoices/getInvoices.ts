@@ -3,6 +3,7 @@ import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Client } from '../getClients';
 import { Product } from '../getProducts';
+import { Ticket } from '../tickets/getTickets';
 export type ProductVariant = {
   name: string;
   id: number;
@@ -18,20 +19,60 @@ export type InvoiceProduct = {
   quantity?: number
   measurement_unit?: string;
   product?: Product
-} 
+}
+export type StrapiFile = {
+  file?: File
+  ref: string
+  refId: string
+  field: string
+}
+
+type ResumeData = {
+  price?: number
+  quantity?: number
+  unit?: string
+  taxes?: number
+  variants?: string[]
+  total?: number
+  sub_total?: number
+  total_taxes?: number
+  name: string
+}
+type Resume = {
+  products: ResumeData[]
+  envios: ResumeData
+  total: number,
+  sub_total: number,
+  total_taxes: number
+}
+type Totals = {
+  total: number,
+  sub_total: number,
+  total_taxes: number
+}
 export type Invoice = {
-  id: number;
-  name: string;
-  ticket_number: number
-  client: Client
-  sale_date: Date
-  total: number
-  documentId: string
-  products: InvoiceProduct[]
-  sub_total:number
-  shipping_price: number
-  initial_date: Date
-  ending_date: Date
+  id?: number
+  documentId?: string
+  payment_date?: Date | null;
+  invoice_id: string;
+  client: Client | any;
+  tickets: any[];
+  sub_total: number,
+  taxes: number,
+  total: number,
+  shipping_price?: number
+  expected_payment_date?: Date | null
+  initial_date?: Date | null
+  ending_date?: Date | null
+  invoice_send_date?: Date | null
+  comments: string
+  inner_comments: string
+  invoice_status: string
+  invoice_file?: StrapiFile
+  proof_of_payment?: StrapiFile
+  payment_supplement?: StrapiFile
+  payment_reference?: string,
+  resume: Resume | string
 }
 export type Meta = {
   pagination: {
@@ -43,16 +84,18 @@ export type Meta = {
 
 // &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
 // client&populate=products&populate=products.product&populate=products.product_variants
-const WEBHOOK_INVOICES_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/invoices?populate=*&sort=id:desc&pagination[limit]=10000`;
+// const WEBHOOK_INVOICES_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/invoices?populate=*&filter[client]=&sort=id:desc&pagination[limit]=10000`;
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 
 
 
 async function GetInvoices(
-  [url, token]: [string, string]
+  [url, token, client]: [string, string, string]
 ) {
+  console.log('client: ', client);
+  
   return await fetcher<{ data:Invoice[], meta: Meta}>(
-    url,
+    `${url}/invoices?populate=*&filters[client][documentId][$eq]=${client}&sort=id:desc&pagination[limit]=10000`,
     {
       method: 'GET',
       headers: {
@@ -62,15 +105,17 @@ async function GetInvoices(
   );
 }
 
-export default function useGetInvoices() {
+export default function useGetInvoices(client: string) {
   const { data, isLoading, error } = useSWR(
-    [WEBHOOK_INVOICES_API, token],
+    [process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API, token, client],
     GetInvoices,
     //    {
     //   revalidateOnFocus: false,
     // }
   );
-   const invoices = data ?? {data: [], meta:{ pagination: { total: 0, page: 0, count: 0 }}};
+  console.log('invoices: ', data?.data);
+  
+  const invoices = data ?? {data: [], meta:{ pagination: { total: 0, page: 0, count: 0 }}};
 
   return {
     invoices,

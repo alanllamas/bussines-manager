@@ -3,6 +3,7 @@ import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Client } from '../getClients';
 import { Product } from '../getProducts';
+import { Invoice } from './getInvoices';
 export type ProductVariant = {
   name: string;
   id: number;
@@ -29,7 +30,8 @@ export type Ticket = {
   documentId: string
   products: TicketProduct[]
   sub_total:number
-  shipping_price: number
+  shipping_price: number,
+  invoice: Invoice
 }
 export type Meta = {
   pagination: {
@@ -48,8 +50,11 @@ const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 async function GetTicketsByClient(
   [url, token, client]: [string, string, string]
 ) {
+  // check filter should not birng data with related invoice
+  console.log(client);
+    
   return await fetcher<{ data:Ticket[], meta: Meta}>(
-    `${url}?populate=client&populate=products&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000&filter[client]=${client}&filter[invoice][$isNull]=true`,
+    `${url}?populate=client&populate=products&populate=invoice&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000&filters[$and][0][client][documentId][$eq]=${client}`,
     {
       method: 'GET',
       headers: {
@@ -67,6 +72,8 @@ export default function useGetTicketsByClient(client: string) {
     //   revalidateOnFocus: false,
     // }
   );
+    console.log(data);
+  
    const tickets = data ?? {data: [], meta:{ pagination: { total: 0, page: 0, count: 0 }}};
 
   return {
