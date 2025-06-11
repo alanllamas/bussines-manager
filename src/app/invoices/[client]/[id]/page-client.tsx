@@ -1,27 +1,24 @@
 'use client'
-import useGetTicket from "@/api/hooks/tickets/getTicket"
-import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
-import React, { useEffect, useState } from "react"
-import { useReactToPrint } from "react-to-print";
-import { useRef } from "react";
-import logo from "@/public/logo.png"
+import React, { useEffect, useRef, useState } from "react"
 import { useAuth } from "@/app/context/AuthUserContext";
+import useGetInvoice from "@/api/hooks/invoices/getInvoice";
+import { Invoice } from "@/api/hooks/invoices/getInvoices";
+import logo from '@/public/logo.png'
+import { Ticket } from "@/api/hooks/tickets/getTickets";
+import { generateResume, Resume, Totals } from "../page-client";
+import { useReactToPrint } from "react-to-print";
 
-const emptyTicket: TicketProduct = {
-  id: 0
-}
+
 const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
   // @ts-expect-error no type found
   const { user } = useAuth();
   const [interval, setinterval] = useState<NodeJS.Timeout>()
 
-
-  
   useEffect(() => {
     const interval =
       setInterval(() => {
         window.location.pathname = '/'
-      }, 200)
+      }, 500)
     setinterval(interval)
   }, [])
   // Listen for changes on loading and authUser, redirect if needed
@@ -32,98 +29,363 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
     }
   }, [user])
 
-  const [ticket, setTicket] = useState<Ticket>()
+  const [invoice, setInvoice] = useState<Invoice>()
+  const [totals, setTotals] = useState<Totals>({total: 0, sub_total:0, total_taxes: 0})
+  const [resume, setResume] = useState<Resume>()
   const {
-    ticket: ticketData,
-    error: ticketError,
-    isLoading: ticketIsLoading,
-  } = useGetTicket(id)
+    invoice: invoiceData,
+    error: invoiceError,
+    isLoading: invoiceIsLoading,
+  } = useGetInvoice(id)
 
   useEffect(() => {
-    if (ticketData &&!ticketError && !ticketIsLoading) {
-      const data = ticketData.data
-      while (data.products.length < 10) {
-        data.products.push(emptyTicket)
-      }
-      setTicket(data)
+    if (invoiceData &&!invoiceError && !invoiceIsLoading) {
+      const data = invoiceData.data
+      console.log(data);
+      const { client, tickets } = data
+      
+      const { results, totals } = generateResume(tickets.map(ticket => `${ticket.id}`), tickets, client)
+      console.log(results);
+      
+      setResume(results)
+      setTotals(totals)
+      setInvoice(data)
       
     }
-  },[ticketData, ticketError, ticketIsLoading])
+  },[invoiceData, invoiceError, invoiceIsLoading])
 
-  const date = new Date(ticket?.sale_date || '').toLocaleDateString()
-
+  // const date = new Date(invoice?.sale_date || '').toLocaleDateString()
+  const copyParam = (param: string) => {
+      navigator.clipboard.writeText(param)
+  }
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const Print = useReactToPrint({ contentRef, documentTitle: `Nota-${ticket?.ticket_number}-${ticket?.client?.name?.toLocaleUpperCase()}-${new Date(ticket?.sale_date || '').toLocaleDateString()}` });
+  const Print = useReactToPrint({ contentRef, documentTitle: `Corte-${invoice?.client?.name?.toLocaleUpperCase()}-${new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}-${new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}` });
 
-  return <section className="flex flex-col w-full justify-center items-center">
-  <div className="text-neutral-900 flex justify-end w-1/2 py-4">
-    <button className="bg-neutral-400 px-3 py-2" onClick={() => Print()}>imprimir</button>
-  </div>
+  return <section className="flex flex-col w-full justify-center items-center text-neutral-900 py-5">
+    <div className="w-full pb-4 px-32 flex justify-end">
 
-    <section ref={contentRef} className="xl:w-1/3 print:w-full lg:w-1/2 md:w-3/4 print:shadow-none print:border-none shadow-xl my-2 px-12 pt-2 text-base text-neutral-900 border border-neutral-200">
-      <div className="flex justify-between my-3 items-center">
-        <img className="w-64" src={logo.src} alt="" />
-        <div className="font-bold flex flex-col mt-6 gap-4 w-1/4">
-          <span className="flex justify-around">
-            <span>Folio:</span>
-            <span>{ticket?.ticket_number.toString().padStart(6, "0")}</span>
-          </span>
-          <span className="flex justify-between">
-            <span>Fecha:</span>
-            <span>{date}</span>
-          </span>
+      <button className="px-4 py-2 bg-neutral-300" onClick={() => Print()}>Imprimir</button>
+    </div>
+    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-14 shadow-xl border text-sm">
+      <div className="w-full flex justify-between items-start">
+        <img className="w-72" src={logo.src} alt="" />
+        <div className="w-1/2 flex flex-col px-4 py-2">
+          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+            <p>Fechas de corte: </p>
+            <div className="flex justify-between gap-2">
+
+              <p>{new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})} al</p>
+              <p>{new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
+            </div>
+          </div>
+          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+            <p>Fecha de envio: </p>
+            <p>{(invoice?.invoice_send_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
+          </div>
+          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+            <p>Vencimiento: </p>
+            <p>{(invoice?.expected_payment_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
+          </div>
+          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+            <p>Fecha de pago: </p>
+            <p>{(invoice?.payment_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
+          </div>
+          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+            <p>Folio fiscal: </p>
+            <p>{(invoice?.invoice_id || '')}</p>
+          </div>
+          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+            <p>Status: </p>
+            <p>{invoice?.invoice_status}</p>
+          </div>
         </div>
       </div>
-      <div className="flex mt-4 mb-8">
-        <h4 className="mr-8">Cliente: </h4><span className="w-full flex justify-center border-b border-neutral-500">{ticket?.client?.name}</span>
+      <h3 className="px-2 font-bold text-base">Data fiscal</h3>
+      <div className="w-full flex justify-between pt-2 pb-4">
+        <div className="w-1/2">
+          <div className="flex gap-1 border border-neutral-200 pl-2 items-center justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p className="">Cliente: </p>
+              <p className="text-xs pt-1">{(invoice?.client.name || '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client.name)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 items-center justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Razón social: </p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.taxing_company_name || '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.taxing_company_name)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 items-center justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>RFC: </p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.taxing_RFC || '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.taxing_RFC)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 items-center justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Codigo postal: </p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.zip_code || '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.zip_code)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 items-center justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Regimen fiscal: </p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.taxing_regime || '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.taxing_regime)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+        </div>
+        <div className="w-1/2">
+
+          <div className="flex gap-1 border border-neutral-200 pl-2 justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Forma de pago:</p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.taxing_payment_method|| '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.taxing_payment_method)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Metodo de pago:</p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.taxing_method_of_payment|| '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.taxing_method_of_payment)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Uso de CFDI: </p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.taxing_CFDI_use|| '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.taxing_CFDI_use)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Correo: </p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.email|| '')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.email)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+          <div className="flex gap-1 border border-neutral-200 pl-2 justify-between">
+            <div className="flex gap-2 justify-between w-full pr-2">
+              <p>Factura envios: </p>
+              <p className="text-xs pt-1">{(invoice?.client?.taxing_info?.shipping_invoice ? 'Si' : 'No')}</p>
+            </div>
+            <button onClick={() => copyParam(invoice?.client?.taxing_info?.shipping_invoice)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
+          </div>
+        </div>
       </div>
-      <div className="flex flex-col my-3">
-        <table className="print:text-sm">
+      <h3 className="px-2 font-bold text-base mt-2">Notas</h3>
+      <div className="w-full flex justify-between px-2 pt-2 pb-4">
+        <table className="w-full">
           <thead>
-            <tr>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Producto</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Variantes</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Cantidad</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Precio</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Importe</th>
+            <tr className="border-b border-neutral-300">
+              <th className="w-1/6 text-left pl-4">folio</th>
+              <th className="text-left">fecha</th>
+              <th className="text-center">sub total</th>
+              <th className="text-center">envios</th>
+              <th className="text-center">total</th>
             </tr>
           </thead>
           <tbody>
             {
-              ticket?.products?.map((product: TicketProduct, index: number) => {
-                return <tr key={index} className="">
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100">{ product?.product?.name|| ''}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100">{ product?.product_variants?.map((variant: ProductVariant) => variant.name ).join(' | ') || ''}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right">{ product?.quantity } {product?.product?.measurement_unit|| ''}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right h-8">{ product?.price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right h-8">{ product?.product_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
-                </tr>
+              invoice?.tickets?.map((ticket: Ticket, i) => {
+                return   <tr key={`ticket-${i}`} className="border-b border-neutral-300">
+                    <td className="w-1/6 text-left pl-4"># { ticket.ticket_number }</td>
+                    <td className="text-left">{ new Date(ticket.sale_date).toLocaleDateString('es-mx')}</td>
+                    <td>
+                      <div className="flex justify-between px-2">
+                        <p>$</p>
+                        <p>
+                          { ticket.sub_total.toLocaleString('es-mx', { minimumFractionDigits: 2 } )}
+                        </p>
+                      </div>
+                      
+                    </td>
+                    <td>
+                      <div className="flex justify-between px-2">
+                        <p>$</p>
+                        <p>
+                          { ticket.shipping_price.toLocaleString('es-mx', { minimumFractionDigits: 2 } )}
+                        </p>
+                      </div>
+                      
+                    </td>
+                    <td className="pr-4">
+                      <div className="flex justify-between px-2">
+                        <p>$</p>
+                        <p>
+                          { ticket.total.toLocaleString('es-mx', { minimumFractionDigits: 2 } )}
+                        </p>
+                      </div>
+                      
+                    </td>
+                  </tr>
               })
             }
-            
           </tbody>
-
         </table>
-        <div className="my-8 flex justify-between">
-          <div className="w-2/3 pr-4 pt-4 text-sm">
-            <p className="mb-2">Tu compra ayuda a la conservación de nuestros maíces nativos. Gracias!</p>
-            <p><span className="font-bold">Email: </span>itacatedemaiz@gmail.com</p>
-            <p><span className="font-bold">Telefono: </span>322-294-7798</p>
+      </div>
+      <h3 className="px-2 font-bold text-base mt-2">Resumen</h3>
+      <div className="flex flex-col px-2 pt-2 pb-4">
+        {
+          (resume?.products && resume?.products?.length > 0) || (resume?.envios && resume?.envios.total)
+            ? <table className="text-sm w-full text-left font-medium">
+                <thead>
+                  <tr className="border-b border-neutral-300">
+                    <th className="pl-4">Producto</th>
+                    <th>Variantes</th>
+                    <th className="text-center">Cantidad</th>
+                    <th className="text-center">Precio</th>
+                    <th className="text-center">Sub Total</th>
+                    <th className="text-center">IVA</th>
+                    <th className="text-center">total IVA</th>
+                    <th className="text-center pr-4">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    resume?.products && resume?.products?.length > 0
+                      ? resume?.products?.map((res, index: number) => {
+                          return <tr className="border-b border-neutral-300" key={index}>
+                            <td className="pl-4">{res.name}</td>
+                            <td>{res.variants?.join(' ')}</td>
+                            <td className="text-right">{res.quantity} {res.unit}</td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {res.price?.toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            
+                            </td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {res.sub_total?.toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            
+                            </td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {(res.taxes  ? res.taxes/100 : 0).toLocaleString('es-mx', {style: 'percent'})}
+                                </p>
+                              </div>
+                            
+                            </td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {(res.total_taxes)?.toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            
+                            </td>
+                            <td className=" pr-4">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {(res.total || 0).toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            
+                            </td>
+                            
+                          </tr>
+                        })
+                      : null
+                  }
+                  {
+                    resume?.envios && resume?.envios.total
+                      ? <>
+                          <tr className="border-b border-neutral-300" key={resume.products.length}>
+                            <td className="pl-4">{resume.envios.name}</td>
+                            <td>{resume.envios.variants?.join(' ')}</td>
+                            <td className="text-right">
+                                <p>
+                                  {resume.envios.quantity} {resume.envios.unit}
+                                </p>
+                            </td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {resume?.envios.sub_total && resume?.envios.quantity && (resume?.envios.sub_total / resume?.envios.quantity).toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {resume.envios.sub_total?.toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {(resume.envios.taxes  ? resume.envios.taxes/100 : 0).toLocaleString('es-mx', {style: 'percent'})}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {(resume.envios.total_taxes)?.toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="pr-4">
+                              <div className="flex justify-between px-2">
+                                <p>$</p>
+                                <p>
+                                  {(resume.envios.total || 0).toLocaleString('es-mx', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            </td>
+                          </tr>
+                        </>
+                      : null
+                  }
+                </tbody>
+              </table>
+            : null
+        }
+      </div>
+      <div className="my-8 w-full flex self-end justify-end">
+        <div className="w-1/3 px-4">
+          <div className="flex justify-between gap-x-4 my-1">
+            <label htmlFor="sub_total">Sub total</label>
+            {/* <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="sub_total" value={totals?.sub_total} name="sub_total" type="string" placeholder="sub total" /> */}
+            <div className="border border-neutral-400 rounded-sm px-2 w-1/2 flex justify-between bg-neutral-300"><p>$</p>{totals?.sub_total.toLocaleString('es-mx', { minimumFractionDigits: 2 })}</div>
           </div>
-          <div className=" flex  flex-col w-1/2 gap-y-2 mt-2">
-            <div className="flex w-full">
-              <p className="mr-1 w-3/4" >Sub total</p>
-              <p className="border p-0.5 border-neutral-300 w-full px-3 text-right">{ticket?.sub_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
-            </div>
-            <div className="flex w-full">
-              <p className="mr-1 w-3/4" >Envio</p>
-              <p className="border p-0.5 border-neutral-300 w-full px-3 text-right">{ticket?.shipping_price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
-            </div>
-            <div className="flex w-full">
-              <p className="mr-1 w-3/4" >Total</p>
-              <p className="border p-0.5 border-neutral-300 w-full px-3 text-right">{ticket?.total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
-            </div>
+          <div className="flex justify-between gap-x-4 my-1">
+            <label htmlFor="shipping">Envío</label>
+            {/* <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" value={values.shipping} name="shipping" type="string" placeholder="Envio" /> */}
+            <div className="border border-neutral-400 rounded-sm px-2 w-1/2 flex justify-between "><p>$</p>{(resume?.envios?.sub_total || 0)?.toLocaleString('es-mx', { minimumFractionDigits: 2 })}</div>
+          </div>
+          <div className="flex justify-between gap-x-4 my-1">
+            <label htmlFor="total_taxes">IVA</label>
+            {/* <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="total_taxes" value={totals?.total_taxes || 0} name="total_taxes" type="string" placeholder="Impuestos" /> */}
+            <div className="border border-neutral-400 rounded-sm px-2 w-1/2 flex justify-between "><p>$</p>{(totals?.total_taxes || 0).toLocaleString('es-mx', { minimumFractionDigits: 2 })}</div>
+          </div>
+          <div className="flex justify-between gap-x-4 my-1">
+            <label htmlFor="total">Total</label>
+            {/* <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" required disabled id="total" value={totals?.total} name="total" type="string" placeholder="total" /> */}
+            <div className="border border-neutral-400 rounded-sm px-2 w-1/2 flex justify-between bg-neutral-300"><p>$</p>{totals?.total.toLocaleString('es-mx', { minimumFractionDigits: 2 })}</div>
           </div>
         </div>
       </div>
@@ -131,3 +393,18 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
   </section>
 }
 export default ClientInvoice
+
+
+// <>
+//   {/* {
+//     ticket.products?.map((prod, j) => {
+//       return <tr key={j}>
+//         <td>{prod.product?.name}</td>
+//         <td>{prod.product_variants?.map(variant => variant.name).join(' ')}</td>
+//         <td>{prod.quantity} {prod.product?.measurement_unit}</td>
+//         <td>{prod.price?.toLocaleString('es-MX', {style: 'currency', currency: 'MXN'})}</td>
+//         <td>{prod.product_total?.toLocaleString('es-MX', {style: 'currency', currency: 'MXN'})}</td>
+//       </tr>
+//     })
+//   } */}
+// </>

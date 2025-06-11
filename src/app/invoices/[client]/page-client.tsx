@@ -79,18 +79,121 @@ type ResumeData = {
   total_taxes?: number
   name: string
 }
-type Resume = {
+export type Resume = {
   products: ResumeData[]
   envios: ResumeData
   total: number,
   sub_total: number,
   total_taxes: number
 }
-type Totals = {
+export type Totals = {
   total: number,
   sub_total: number,
   total_taxes: number
 }
+
+  export const generateResume = (filteredTickets: InitialValues['tickets'], tickets:Ticket[], client?:Client) => {
+    const resume = filteredTickets.reduce((acc: {[key: string]: any}, ticket_id: string) => {
+        // console.log(ticket_id);
+      const ticket = tickets.find((value, i) => { return value.id === Number(ticket_id)})
+      if (ticket) {
+        // console.log(ticket);
+        ticket.products.reduce((prodAcc: {[key: string]: any}, prod: TicketProduct) => {
+          // prodAcc = {
+          //   ...prodAcc,
+          //   [prod?.product?.name || '']: {
+          //     ...prod,
+          //     name: prod?.product?.name,
+          //   }
+          // }
+
+          if (acc[prod?.product?.name || ''] && acc[prod?.product?.name || '']?.price === prod?.price) {
+            // console.log('prod.product_total: ', prod.product_total);
+            acc[prod?.product?.name || ''].total += prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total,
+            acc[prod?.product?.name || ''].sub_total += prod.product_total
+            acc[prod?.product?.name || ''].quantity += prod.quantity
+            acc[prod?.product?.name || ''].total_taxes += prod?.product?.taxes ? (prod?.product_total || 0) * (prod?.product?.taxes/100) : 0
+            
+          } else {
+            acc[prod?.product?.name || ''] = {
+              price: prod.price,
+              quantity: prod.quantity,
+              unit: prod?.product?.measurement_unit,
+              taxes: prod?.product?.taxes,
+              variants: [prod.product_variants?.map(variant => variant.name)],
+              total:  prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total,
+              sub_total: prod.product_total,
+              total_taxes: prod?.product?.taxes ? (prod?.product_total || 0) * (prod?.product?.taxes/100) : 0
+            }
+          }
+          return prodAcc
+        }, {})
+        // console.log('client: ', client);
+
+        if (acc['envios'].quantity) {
+          if (ticket.shipping_price) {
+            acc['envios'].total += client?.taxing_info?.shipping_invoice ? ticket.shipping_price + (ticket.shipping_price * (16/100)) : ticket.shipping_price
+            acc['envios'].sub_total += ticket.shipping_price
+            acc['envios'].total_taxes += client?.taxing_info?.shipping_invoice ? (ticket.shipping_price * (16/100)) : 0
+            acc['envios'].quantity += 1
+          }
+        } else  if (ticket.shipping_price) {
+          acc.envios = {
+            price: 0,
+            quantity: 1,
+            unit: '',
+            taxes: 16,
+            variants: [],
+            sub_total: ticket.shipping_price || 0,
+            total: client?.taxing_info?.shipping_invoice ? ticket.shipping_price + (ticket.shipping_price * (16/100)) : ticket.shipping_price,
+            total_taxes: client?.taxing_info?.shipping_invoice ? (ticket.shipping_price * (16/100)) : 0
+          }
+        }
+      }
+      return acc
+    },{
+      envios: {
+        price: 0,
+        quantity: 0,
+        unit: '',
+        taxes: 16,
+        variants: [],
+        sub_total:  0,
+        total: 0,
+        total_taxes: 0
+      }
+    })
+
+    // console.log('resume: ', resume);
+    const totals = Object.entries(resume).reduce((acc: {total: number, sub_total: number, total_taxes: number},[key, value]) => {
+      const { total, sub_total, total_taxes} = value
+      // console.log('key: ', key);
+      // console.log('value: ', value);
+      
+      acc = {
+        total: (total || 0) + (acc.total),
+        sub_total: key === 'envios' ? acc.sub_total : (sub_total || 0) + (acc.sub_total),
+        total_taxes: (total_taxes || 0) + (acc.total_taxes) 
+      }
+      return acc
+    }, {total: 0, sub_total: 0, total_taxes: 0})
+    // console.table(totals);
+    const { envios, ...rest} = resume
+    // console.log('envios: ', envios);
+    const results: Resume = {
+      ...totals,
+      envios: {
+        ...envios,
+        name: 'envios'
+      },
+      products: Object.entries(rest).map(([key, value]) => ({name: key, ...value}))
+    }
+    // console.table(results);
+    return {
+      totals,
+      results
+    }
+  }
 
 const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_param }) => {
   // console.log('client_param: ', client_param);
@@ -231,7 +334,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
       console.log('editInvoice.tickets: ', editInvoice.tickets);
       const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
       console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
-      const { results, totals } = generateResume(editTickets)
+      const { results, totals } = generateResume(editTickets, tickets, client)
       setResume(results)
       setTotals(totals)
       setInitialFormValues({
@@ -403,7 +506,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
           // console.log('invoice: ', invoice);
           return <tr className="border-b border-neutral-300" key={`invoice-${index}`}>
 
-            <td className="py-2"><a href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
+            <td className="py-2"><a href={`/invoices/${client_param}/${invoice.documentId}`}>{invoice.id}</a></td>
             <td className="py-2">{invoice.client?.name}</td>
             <td className="py-2">{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
             <td className="py-2">{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
@@ -473,108 +576,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
     );
   }
   
-  const generateResume = (filteredTickets: InitialValues['tickets']) => {
-    const resume = filteredTickets.reduce((acc: {[key: string]: any}, ticket_id: string) => {
-        // console.log(ticket_id);
-      const ticket = tickets.find((value, i) => { return value.id === Number(ticket_id)})
-      if (ticket) {
-        // console.log(ticket);
-        ticket.products.reduce((prodAcc: {[key: string]: any}, prod: TicketProduct) => {
-          // prodAcc = {
-          //   ...prodAcc,
-          //   [prod?.product?.name || '']: {
-          //     ...prod,
-          //     name: prod?.product?.name,
-          //   }
-          // }
 
-          if (acc[prod?.product?.name || ''] && acc[prod?.product?.name || '']?.price === prod?.price) {
-            // console.log('prod.product_total: ', prod.product_total);
-            acc[prod?.product?.name || ''].total += prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total,
-            acc[prod?.product?.name || ''].sub_total += prod.product_total
-            acc[prod?.product?.name || ''].quantity += prod.quantity
-            acc[prod?.product?.name || ''].total_taxes += prod?.product?.taxes ? (prod?.product_total || 0) * (prod?.product?.taxes/100) : 0
-            
-          } else {
-            acc[prod?.product?.name || ''] = {
-              price: prod.price,
-              quantity: prod.quantity,
-              unit: prod?.product?.measurement_unit,
-              taxes: prod?.product?.taxes,
-              variants: [prod.product_variants?.map(variant => variant.name)],
-              total:  prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total,
-              sub_total: prod.product_total,
-              total_taxes: prod?.product?.taxes ? (prod?.product_total || 0) * (prod?.product?.taxes/100) : 0
-            }
-          }
-          return prodAcc
-        }, {})
-        // console.log('client: ', client);
-
-        if (acc['envios'].quantity) {
-          if (ticket.shipping_price) {
-            acc['envios'].total += client?.taxing_info?.shipping_invoice ? ticket.shipping_price + (ticket.shipping_price * (16/100)) : ticket.shipping_price
-            acc['envios'].sub_total += ticket.shipping_price
-            acc['envios'].total_taxes += client?.taxing_info?.shipping_invoice ? (ticket.shipping_price * (16/100)) : 0
-            acc['envios'].quantity += 1
-          }
-        } else  if (ticket.shipping_price) {
-          acc.envios = {
-            price: 0,
-            quantity: 1,
-            unit: '',
-            taxes: 16,
-            variants: [],
-            sub_total: ticket.shipping_price || 0,
-            total: client?.taxing_info?.shipping_invoice ? ticket.shipping_price + (ticket.shipping_price * (16/100)) : ticket.shipping_price,
-            total_taxes: client?.taxing_info?.shipping_invoice ? (ticket.shipping_price * (16/100)) : 0
-          }
-        }
-      }
-      return acc
-    },{
-      envios: {
-        price: 0,
-        quantity: 0,
-        unit: '',
-        taxes: 16,
-        variants: [],
-        sub_total:  0,
-        total: 0,
-        total_taxes: 0
-      }
-    })
-
-    // console.log('resume: ', resume);
-    const totals = Object.entries(resume).reduce((acc: {total: number, sub_total: number, total_taxes: number},[key, value]) => {
-      const { total, sub_total, total_taxes} = value
-      // console.log('key: ', key);
-      // console.log('value: ', value);
-      
-      acc = {
-        total: (total || 0) + (acc.total),
-        sub_total: key === 'envios' ? acc.sub_total : (sub_total || 0) + (acc.sub_total),
-        total_taxes: (total_taxes || 0) + (acc.total_taxes) 
-      }
-      return acc
-    }, {total: 0, sub_total: 0, total_taxes: 0})
-    // console.table(totals);
-    const { envios, ...rest} = resume
-    // console.log('envios: ', envios);
-    const results: Resume = {
-      ...totals,
-      envios: {
-        ...envios,
-        name: 'envios'
-      },
-      products: Object.entries(rest).map(([key, value]) => ({name: key, ...value}))
-    }
-    // console.table(results);
-    return {
-      totals,
-      results
-    }
-  }
 
 
   return <section className="w-full flex flex-col items-center">
@@ -658,7 +660,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                       // console.log('filteredTickets: ', filteredTickets);
                                       setFieldValue('tickets', filteredTickets)
                                       setTimeout(() => {
-                                        const { results, totals } = generateResume(filteredTickets)
+                                        const { results, totals } = generateResume(filteredTickets, tickets, client)
                                         setFieldValue('shipping', results.envios.sub_total || 0 )
                                         setFieldValue('total', totals.total )
                                         setFieldValue('sub_total', totals.sub_total )
@@ -708,7 +710,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                       // console.log('filteredTickets: ', filteredTickets);
                                       setFieldValue('tickets', filteredTickets)
                                       setTimeout(() => {
-                                        const { results, totals } = generateResume(filteredTickets)
+                                        const { results, totals } = generateResume(filteredTickets, tickets, client)
                                         setFieldValue('shipping', results.envios.sub_total || 0)
                                         setFieldValue('total', totals.total )
                                         setFieldValue('sub_total', totals.sub_total )
@@ -786,7 +788,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                                     <button type="button" className="flex justify-end px-3 py-1 bg-red-800 text-white" onClick={() => {
                                                       remove(index)
                                                       const newtickets = values.tickets.filter((_, i: number) => { return index !== i})
-                                                      const res = generateResume(newtickets)
+                                                      const res = generateResume(newtickets, tickets, client)
                                                       if (res) {
                                                         setFieldValue('shipping', res.results.envios.sub_total || 0 )
                                                         setFieldValue('total', res.totals.total )
@@ -808,7 +810,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
                                                           onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                             const newtickets = [...values.tickets, e.target.value]
                                                             setFieldValue(`tickets.${index}`, e.target.value)
-                                                            const res = generateResume(newtickets)
+                                                            const res = generateResume(newtickets, tickets, client)
                                                             if (res) {
                                                               setFieldValue('shipping', res.results.envios.sub_total || 0 )
                                                               setFieldValue('total', res.totals.total )

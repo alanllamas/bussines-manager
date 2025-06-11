@@ -21,7 +21,7 @@ async function GetInvoice(
 ) {
   return await fetcher<{data: Invoice, meta: Meta}>(
 // client&populate=products&populate=products.product&populate=products.product_variants
-    `${url}/invoices/${id}/?populate=*`,
+    `${url}/invoices/${id}/?populate=client&populate=client.taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants`,
     {
       method: 'GET',
       headers: {
