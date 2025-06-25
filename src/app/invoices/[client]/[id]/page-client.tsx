@@ -106,7 +106,7 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
           </div>
         </div>
       </div>
-      <h3 className="px-2 font-bold text-base">Data fiscal</h3>
+      {/* <h3 className="px-2 font-bold text-base">Data fiscal</h3>
       <div className="w-full flex justify-between pt-2 pb-4">
         <div className="w-1/2">
           <div className="flex gap-1 border border-neutral-200 pl-2 items-center justify-between">
@@ -183,8 +183,8 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
             <button onClick={() => copyParam(invoice?.client?.taxing_info?.shipping_invoice)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
           </div>
         </div>
-      </div>
-      {/* <h3 className="px-2 font-bold text-base mt-2">Notas</h3>
+      </div> */}
+      <h3 className="px-2 font-bold text-base mt-2">Notas</h3>
       <div className="w-full flex justify-between px-2 pt-2 pb-4">
         <table className="w-full">
           <thead>
@@ -234,7 +234,7 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
             }
           </tbody>
         </table>
-      </div> */}
+      </div>
       <h3 className="px-2 font-bold text-base mt-2">Resumen</h3>
       <div className="flex flex-col px-2 pt-2 pb-4">
         {
