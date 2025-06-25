@@ -7,6 +7,7 @@ import logo from '@/public/logo.png'
 import { Ticket } from "@/api/hooks/tickets/getTickets";
 import { generateResume, Resume, Totals } from "../page-client";
 import { useReactToPrint } from "react-to-print";
+import ReactMarkdown from 'react-markdown'
 
 
 const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
@@ -60,44 +61,48 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
   }
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const Print = useReactToPrint({ contentRef, documentTitle: `Corte-${invoice?.client?.name?.toLocaleUpperCase()}-${new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}-${new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}` });
+
+  const initial_date = new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
+  const ending_date = new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
+  const send_date = (invoice?.invoice_send_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
+  const client_name = invoice?.client?.name?.toLocaleUpperCase()
+
+  const Print = useReactToPrint({
+    contentRef,
+    documentTitle: `Corte-${client_name}-${initial_date}-${ending_date}`
+  });
 
   return <section className="flex flex-col w-full justify-center items-center text-neutral-900 py-5">
     <div className="w-full pb-4 px-32 flex justify-end">
 
       <button className="px-4 py-2 bg-neutral-300" onClick={() => Print()}>Imprimir</button>
     </div>
-    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-14 shadow-xl border text-sm">
-      <div className="w-full flex justify-between items-start">
+    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-3 shadow-xl border text-sm">
+      <div className="w-full flex justify-between items-start py-5">
         <img className="w-72" src={logo.src} alt="" />
-        <div className="w-1/2 flex flex-col px-4 py-2">
+        <div className="w-1/2 flex flex-col-reverse px-4 pt-12">
+          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+            <p>Notas: </p>
+            <div className="flex flex-row-reverse justify-between gap-2">
+              { invoice?.tickets?.map((ticket, index) => {
+                return <p>{ticket.id} {index !== 0 && '|'} </p>
+              }) }
+            </div>
+          </div>
           <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
             <p>Fechas de corte: </p>
             <div className="flex justify-between gap-2">
-
-              <p>{new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})} al</p>
-              <p>{new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
+              <p>{initial_date} al</p>
+              <p>{ending_date}</p>
             </div>
           </div>
           <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
             <p>Fecha de envio: </p>
-            <p>{(invoice?.invoice_send_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
-          </div>
-          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
-            <p>Vencimiento: </p>
-            <p>{(invoice?.expected_payment_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
-          </div>
-          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
-            <p>Fecha de pago: </p>
-            <p>{(invoice?.payment_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})}</p>
-          </div>
-          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
-            <p>Folio fiscal: </p>
-            <p>{(invoice?.invoice_id || '')}</p>
+            <p>{send_date}</p>
           </div>
           <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
             <p>Status: </p>
-            <p>{invoice?.invoice_status}</p>
+            <p>{invoice?.invoice_status.replace('-', ' ')}</p>
           </div>
         </div>
       </div>
@@ -179,7 +184,7 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
           </div>
         </div>
       </div>
-      <h3 className="px-2 font-bold text-base mt-2">Notas</h3>
+      {/* <h3 className="px-2 font-bold text-base mt-2">Notas</h3>
       <div className="w-full flex justify-between px-2 pt-2 pb-4">
         <table className="w-full">
           <thead>
@@ -229,7 +234,7 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
             }
           </tbody>
         </table>
-      </div>
+      </div> */}
       <h3 className="px-2 font-bold text-base mt-2">Resumen</h3>
       <div className="flex flex-col px-2 pt-2 pb-4">
         {
@@ -365,7 +370,16 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
             : null
         }
       </div>
+      <h3 className="px-2 font-bold text-base mt-2">Comentarios</h3>
+      <div className="flex flex-col px-2 pt-2 pb-4">
+        {
+          invoice?.comments
+            ? <ReactMarkdown>{invoice.comments}</ReactMarkdown>
+            : <p className="text-neutral-500">No hay comentarios</p>
+        }
+      </div>
       <div className="my-8 w-full flex self-end justify-end">
+        {/* add payment rules */}
         <div className="w-1/3 px-4">
           <div className="flex justify-between gap-x-4 my-1">
             <label htmlFor="sub_total">Sub total</label>
