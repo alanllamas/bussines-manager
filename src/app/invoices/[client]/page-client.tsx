@@ -474,7 +474,7 @@ const ClientInvoicesByCLient: React.FC<{ client: string }> = ({ client: client_p
       invoice_send_date: null,
       payment_date: null,
       invoice_id: "",
-      invoice_status: "creado",
+      invoice_status: "por-pagar",
       payment_reference: "",
       tickets: [],
       proof_of_payment: undefined,

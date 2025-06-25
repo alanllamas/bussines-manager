@@ -65,8 +65,8 @@ export type Invoice = {
   initial_date?: Date | null
   ending_date?: Date | null
   invoice_send_date?: Date | null
-  comments: string
-  inner_comments: string
+  comments: any
+  inner_comments: any
   invoice_status: string
   invoice_file?: StrapiFile
   proof_of_payment?: StrapiFile
