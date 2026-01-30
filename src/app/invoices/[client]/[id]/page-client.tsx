@@ -81,14 +81,14 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
       <div className="w-full flex justify-between items-start py-5">
         <img className="w-72" src={logo.src} alt="" />
         <div className="w-1/2 flex flex-col-reverse px-4 pt-12">
-          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+          {/* <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
             <p>Notas: </p>
             <div className="flex flex-row-reverse justify-between gap-2">
               { invoice?.tickets?.map((ticket, index) => {
                 return <p>{ticket.id} {index !== 0 && '|'} </p>
               }) }
             </div>
-          </div>
+          </div> */}
           <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
             <p>Fechas de corte: </p>
             <div className="flex justify-between gap-2">
@@ -100,13 +100,13 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
             <p>Fecha de envio: </p>
             <p>{send_date}</p>
           </div>
-          <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
+          {/* <div className="flex gap-4 border border-neutral-200 px-4 justify-between ">
             <p>Status: </p>
             <p>{invoice?.invoice_status.replace('-', ' ')}</p>
-          </div>
+          </div> */}
         </div>
       </div>
-      {/* <h3 className="px-2 font-bold text-base">Data fiscal</h3>
+      <h3 className="px-2 font-bold text-base">Data fiscal</h3>
       <div className="w-full flex justify-between pt-2 pb-4">
         <div className="w-1/2">
           <div className="flex gap-1 border border-neutral-200 pl-2 items-center justify-between">
@@ -183,7 +183,7 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
             <button onClick={() => copyParam(invoice?.client?.taxing_info?.shipping_invoice)}><span className="material-symbols-outlined text-xs text-neutral-500 print:hidden">content_copy</span></button>
           </div>
         </div>
-      </div> */}
+      </div>
       <h3 className="px-2 font-bold text-base mt-2">Notas</h3>
       <div className="w-full flex justify-between px-2 pt-2 pb-4">
         <table className="w-full">
