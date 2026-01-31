@@ -9,13 +9,15 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
+/** @type {import('eslint').Linter.Config[]} */
+
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   ...compat.config({
     extends: ['next'],
     rules:{
       '@typescript-eslint/no-explicit-any': 'off',
-      "react-hooks/exhaustive-deps": ["warn", { "enableDangerousAutofixThisMayCauseInfiniteLoops": true }],
+      'react-hooks/exhaustive-deps': 'on',
       '@typescript-eslint/no-unused-vars': 'warn'
     }
   })
