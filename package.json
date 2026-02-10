@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.0",
+    "@headlessui/react": "^2.2.9",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "firebase": "^11.4.0",
