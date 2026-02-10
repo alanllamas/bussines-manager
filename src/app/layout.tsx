@@ -51,6 +51,13 @@ export default function RootLayout({
                   </button> */}
                 </li>
               </Link>
+              <Link className="px-4" href="/clients">
+                <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                    Clientes
+                  {/* <button className="font-bold bg-neutral-400 py-2 px-6 flex">
+                  </button> */}
+                </li>
+              </Link>
             </ul>
             <ProfileAvatar />
 
