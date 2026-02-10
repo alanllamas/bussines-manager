@@ -7,9 +7,9 @@ import Link from "next/link";
 // import { useAuth } from "@/context/AuthUserContext";
 // import { useRouter } from "next/navigation";
 
-const ClientInvoices: React.FC = () => {
+const ClientsSideBar: React.FC = () => {
   // @ts-expect-error no type found
- const { user } = useAuth();
+  const { user } = useAuth();
   const [interval, setinterval] = useState<NodeJS.Timeout>()
 
 
@@ -59,23 +59,27 @@ const ClientInvoices: React.FC = () => {
   
 
 
-  return <section className="w-full">
-    <section className=" py-12 px-4 bg-neutral-100 text-neutral-900 ">
+  return <section className="w-3/12 bg-neutral-200 text-neutral-900">
       {
         clients.map((client, index: number) => {
-          return <div key={`client-${index}`} className="shadow-md bg-neutral-200 rounded-md px-6 py-2 m-4">
-            <h4>{client.name}</h4>
-            <Link href={`/invoices/${client.documentId}`}>
-              <p>ver cortes </p>
+          return (
+            <Link
+              key={`client-${index}`}
+              href={`/clients/${client.documentId}`}
+              className="flex items-center justify-between shadow-md bg-neutral-200 rounded-md px-6 py-4 hover:bg-neutral-400 hover:text-neutral-700"
+            >
+              <h4>{client.name}</h4> <h4>{'>'}</h4>
             </Link>
-          </div>
+            
+          )
         })      
       }
+      <Link
+        href={`/clients/new`}
+        className="flex items-center justify-between shadow-md bg-neutral-200 rounded-md px-6 py-4 hover:bg-neutral-400 hover:text-neutral-700"
+      >
+        <h4>Crear Cliente Nuevo</h4> <h4>{'+'}</h4>
+      </Link>
     </section>
-
-
-  </section>
-
-
 }
- export default ClientInvoices
+ export default ClientsSideBar
