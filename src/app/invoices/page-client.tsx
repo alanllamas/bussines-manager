@@ -59,11 +59,11 @@ const ClientInvoices: React.FC = () => {
   
 
 
-  return <section className="w-full flex flex-col items-center">
-    <section className="w-9/12 py-12 px-8 bg-neutral-100 text-neutral-900 flex">
+  return <section className="w-full">
+    <section className=" py-12 px-4 bg-neutral-100 text-neutral-900 ">
       {
         clients.map((client, index: number) => {
-          return <div key={`client-${index}`} className="shadow-md bg-neutral-200 rounded-md px-6 py-2 mx-4">
+          return <div key={`client-${index}`} className="shadow-md bg-neutral-200 rounded-md px-6 py-2 m-4">
             <h4>{client.name}</h4>
             <Link href={`/invoices/${client.documentId}`}>
               <p>ver cortes </p>
