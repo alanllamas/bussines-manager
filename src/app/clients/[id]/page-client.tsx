@@ -32,7 +32,7 @@ const ClientPage: React.FC<{id: string}> = ({ id }: {id: string}) => {
     <p className="text-black">Error loading client</p>
   </section>
 
-  const DataScreen = () =>  <section className="w-full flex">
+  const DataScreen = () =>  <section className="">
     <ClientTabs client={client}></ClientTabs>
   </section>
   
