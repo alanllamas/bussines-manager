@@ -11,11 +11,19 @@ export type Contact = {
   name: string
   phone: string
 }
+export type Ticket = {
+  id: number
+  client: Client
+  documentId: string
+  ticket_number: string
+  sale_date: string
+  total: number
+} 
 export type Client = {
   id: number;
   name: string;
   documentId: string
-  taxing_info: {
+  taxing_info?: {
     shipping_invoice: boolean
     billing_period: number
     comments: string
@@ -32,6 +40,7 @@ export type Client = {
     taxing_regime: string
     zip_code: number
   }
+  tickets?: Ticket[]
   contacts?: Contact[]
 }
 
@@ -43,7 +52,7 @@ async function GetClient(
   [url, token, id]: [string, string, string]
 ) {
   return await fetcher(
-    `${url}/${id}?populate=*`,
+    `${url}/${id}?populate=contacts&populate=invoices&populate=taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants`,
     {
       method: 'GET',
       headers: {

@@ -4,10 +4,9 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { Client } from "@/api/hooks/getClient";
 import ClientTab from "./ClientTab";
 import ContactsTab from "./ContactsTab";
+import TicketsTab from "./TicketsTab";
 
 const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
-
-
   return (
     <TabGroup className="text-neutral-700 p-4">
       <TabList>
@@ -20,7 +19,7 @@ const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: C
       <TabPanels>
         <ClientTab client={client}/>
         <ContactsTab client={client}/>
-        <TabPanel>Content 3</TabPanel>
+        <TicketsTab tickets={client?.tickets} clientId={client?.id}/>
         <TabPanel>Content 4</TabPanel>
         <TabPanel>Content 5</TabPanel>
       </TabPanels>
