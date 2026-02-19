@@ -2,9 +2,8 @@
 import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import useGetClients, { Client } from "@/api/hooks/getClients";
+import useGetClients from "@/api/hooks/getClients";
 import { Formik, Field, Form, FieldArray } from "formik";
-import useCreateTicket from "@/api/hooks/tickets/useCreateTicket";
 import logo from "@/public/logo.png"
 import { useReactToPrint } from "react-to-print";
 import ReactPaginate from 'react-paginate';
@@ -15,6 +14,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice";
 import useEditInvoice, { EditInvoiceReq } from "@/api/hooks/invoices/useEditInvoice";
+import { Client } from "@/api/hooks/getClient";
 export type StrapiFile = {
     files?: File
     ref: string

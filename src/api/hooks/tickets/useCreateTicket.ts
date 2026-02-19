@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { fetcher } from '../../fetcher';
 import { Ticket } from './getTickets';
-import { createTicketReq } from '@/app/tickets/page-client';
+import { createTicketReq } from '@/components/forms/ticketsForm';
 
 
 async function postTicket([
