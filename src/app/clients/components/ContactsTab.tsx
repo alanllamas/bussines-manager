@@ -4,11 +4,9 @@ import { TabPanel } from '@headlessui/react'
 import { Client, Contact } from "@/api/hooks/getClient";
 
 const ContactsTab: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
-  const copyParam = (param: string) => {
-      navigator.clipboard.writeText(param)
-  }
+
   const generateCard = (contact: any, i: number) => {
-    return <div key={i} className="w-3/12 p-4 border-2 b-neutral-900 rounded mx-2">
+    return <div key={i} className="w-1/5 p-4 border-2 b-neutral-900 rounded m-2">
       <p className="flex justify-between">
         <span className="w-4/12">Nombre: </span> 
         <span className="w-8/12">{contact?.name}</span>
@@ -37,21 +35,18 @@ const ContactsTab: React.FC<{client: Client | undefined}> = ({client}: {client: 
   }
 
   return (
-    <TabPanel className="p-4">
+    <TabPanel className="p-4 q">
       {
         client?.contacts?.length !== undefined && client?.contacts?.length > 0
-        ? ( <div className="flex-col p-4">
-              <div className=" flex gap-4">
-                  {
-                    client?.contacts?.map((contact: Contact, i: number) => generateCard(contact, i))
-                  }
-              </div>
-            </div>)
-        : ( <div className="flex">
-              <h3 className="font-bold">Favor de capturar la data fiscal del cliente</h3>
-            </div>)
+        ? <div className="flex gap-2 flex-wrap">
+            {
+              client?.contacts?.map((contact: Contact, i: number) => generateCard(contact, i))
+            }
+          </div>
+        : <div className="flex">
+            <h3 className="font-bold">Favor de capturar contactos del cliente</h3>
+          </div>
       }
-      
     </TabPanel>
   )
 }
