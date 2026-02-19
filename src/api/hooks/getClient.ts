@@ -6,23 +6,21 @@ export type Client = {
   name: string;
   documentId: string
   taxing_info: {
-    payment_period: number
     shipping_invoice: boolean
-    // billing_period: null
-    // comments: null
-    // email: null
-    // id: 1
-    // invoice_period: null
-    // payment_method: "transferencia"
-    // payment_period: 7
-    // shipping_invoice: false
-    // taxing_CFDI_use: null
-    // taxing_RFC: null
-    // taxing_company_name: null
-    // taxing_method_of_payment: null
-    // taxing_payment_method: null
-    // taxing_regime: null
-    // zip_code: null
+    billing_period: number
+    comments: string
+    email: string
+    id: number
+    invoice_period: number
+    payment_method: string // select of efectivo, transferencia o credito
+    payment_period: number
+    taxing_CFDI_use: string
+    taxing_RFC: string
+    taxing_company_name: string
+    taxing_method_of_payment: string
+    taxing_payment_method: string
+    taxing_regime: string
+    zip_code: number
   }
 }
 

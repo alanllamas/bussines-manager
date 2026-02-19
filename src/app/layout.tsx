@@ -4,6 +4,9 @@ import "./globals.css";
 import Link from "next/link";
 import { AuthProvider } from '@/app/context/AuthUserContext';
 import ProfileAvatar from "@/components/profile";
+import logo from "@/public/logo.png";
+import Image from "next/image";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +36,8 @@ export default function RootLayout({
         >
           <nav className="flex justify-between bg-neutral-200 text-neutral-900 align-middle items-center py-2 px-20 ">
             <Link className="" href="/">
-              <img src="https://place-hold.it/80x80&text=logo&fontsize=18" alt="logo" />
+              <Image width={250} height={150} src={logo.src} alt="itacate logo"></Image>
+
             </Link>
         
             <ul className="flex justify-center w-full h-10 ">
