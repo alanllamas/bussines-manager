@@ -6,7 +6,7 @@ export default async function ClientsLayout({ children }: { children: React.Reac
 
   return <section className="w-full flex">
     <ClientsSideBar></ClientsSideBar>
-    <main>
+    <main className="w-full">
       {/* The children prop renders the content of the child routes */}
       {children}
     </main>
