@@ -1,6 +1,16 @@
 'use-client'
 import { fetcher } from '../fetcher';
 import useSWR from 'swr';
+
+export type Contact = {
+  area: string
+  email: string
+  extension: string
+  id: string
+  job_title: string
+  name: string
+  phone: string
+}
 export type Client = {
   id: number;
   name: string;
@@ -22,6 +32,7 @@ export type Client = {
     taxing_regime: string
     zip_code: number
   }
+  contacts?: Contact[]
 }
 
 
