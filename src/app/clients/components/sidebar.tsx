@@ -1,8 +1,9 @@
 'use client'
 import React, { useEffect, useState } from "react";
-import useGetClients, { Client } from "@/api/hooks/getClients";
+import useGetClients from "@/api/hooks/getClients";
 import { useAuth } from "@/app/context/AuthUserContext";
 import Link from "next/link";
+import { Client } from "@/api/hooks/getClient";
 
 // import { useAuth } from "@/context/AuthUserContext";
 // import { useRouter } from "next/navigation";
