@@ -15,14 +15,14 @@ const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: C
         <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Contactos</Tab>
         <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Notas</Tab>
         <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Cortes</Tab>
-        <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Facturas</Tab>
         <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Editar</Tab>
       </TabList>
       <TabPanels>
         <ClientTab client={client}/>
         <ContactsTab client={client}/>
         <TabPanel>Content 3</TabPanel>
-        <TabPanel>Content 3</TabPanel>
+        <TabPanel>Content 4</TabPanel>
+        <TabPanel>Content 5</TabPanel>
       </TabPanels>
     </TabGroup>
   )
