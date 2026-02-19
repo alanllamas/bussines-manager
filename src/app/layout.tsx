@@ -37,29 +37,22 @@ export default function RootLayout({
           <nav className="flex justify-between bg-neutral-200 text-neutral-900 align-middle items-center py-2 px-20 ">
             <Link className="" href="/">
               <Image width={250} height={150} src={logo.src} alt="itacate logo"></Image>
-
             </Link>
         
             <ul className="flex justify-center w-full h-10 ">
               <Link className="px-4" href="/tickets">
                 <li className="font-bold bg-neutral-400 py-2 px-6 ">
                     Notas
-                  {/* <button className="font-bold bg-neutral-400 py-2 px-6 flex">
-                  </button> */}
                 </li>
               </Link>
               <Link className="px-4" href="/invoices">
                 <li className="font-bold bg-neutral-400 py-2 px-6 ">
                     Cortes
-                  {/* <button className="font-bold bg-neutral-400 py-2 px-6 flex">
-                  </button> */}
                 </li>
               </Link>
               <Link className="px-4" href="/clients">
                 <li className="font-bold bg-neutral-400 py-2 px-6 ">
                     Clientes
-                  {/* <button className="font-bold bg-neutral-400 py-2 px-6 flex">
-                  </button> */}
                 </li>
               </Link>
             </ul>
