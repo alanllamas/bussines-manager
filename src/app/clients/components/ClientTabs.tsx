@@ -3,6 +3,7 @@ import React from "react";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { Client } from "@/api/hooks/getClient";
 import ClientTab from "./ClientTab";
+import ContactsTab from "./ContactsTab";
 
 const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
 
@@ -19,9 +20,7 @@ const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: C
       </TabList>
       <TabPanels>
         <ClientTab client={client}/>
-        <TabPanel>
-          
-        </TabPanel>
+        <ContactsTab client={client}/>
         <TabPanel>Content 3</TabPanel>
         <TabPanel>Content 3</TabPanel>
       </TabPanels>
