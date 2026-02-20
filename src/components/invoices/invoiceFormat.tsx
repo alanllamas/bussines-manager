@@ -34,7 +34,7 @@ const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
   const ending_date = new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
   const send_date = (invoice?.invoice_send_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
   const client_name = invoice?.client?.name?.toLocaleUpperCase()
-  const PrintInvoice = () => useReactToPrint(PrintInvoiceFormat(contentRef, client_name, initial_date, ending_date));
+  const PrintInvoice = useReactToPrint(PrintInvoiceFormat(contentRef, client_name, initial_date, ending_date));
    
   return <section className="flex flex-col w-full justify-center items-center text-neutral-900 py-5">
     <div className="w-full pb-4 px-32 flex justify-end">
