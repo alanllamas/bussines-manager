@@ -1,25 +1,12 @@
 'use client'
-import useGetTickets, { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import useGetClients from "@/api/hooks/getClients";
-import { Formik, Field, Form, FieldArray } from "formik";
-import logo from "@/public/logo.png"
-import { useReactToPrint } from "react-to-print";
-import ReactPaginate from 'react-paginate';
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthUserContext";
 import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices";
-import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice";
-import useEditInvoice, { EditInvoiceReq } from "@/api/hooks/invoices/useEditInvoice";
-import { Client } from "@/api/hooks/getClient";
-import { createInvoiceReq, generateResume, InitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice";
 import InvoiceList from "@/components/invoices/InvoiceList";
 
 
-const ClientInvoices: React.FC<{ client: string }> = ({ client: client_param }) => {
+const ClientInvoices: React.FC = () => {
   // console.log('client_param: ', client_param);
   // @ts-expect-error no type found
   const { user } = useAuth();
