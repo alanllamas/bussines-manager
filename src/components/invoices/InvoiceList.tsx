@@ -95,7 +95,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
       // } else {
       // }
-        setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null))
+      setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null))
     }
   }, [ticketsData.data, ticketsError, ticketsIsLoading])
 
@@ -136,11 +136,12 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if (editInvoice) {
-      console.log('editInvoice: ', editInvoice);
-      console.log('editInvoice.tickets: ', editInvoice.tickets);
+      // console.log('editInvoice: ', editInvoice);
+      // console.log('editInvoice.tickets: ', editInvoice.tickets);
       const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
-      console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
-      const { results, totals } = generateResume(editTickets, tickets, client)
+      // console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
+      setTickets(editInvoice.tickets)
+      const { results, totals } = generateResume(editTickets, editInvoice.tickets, client)
       setResume(results)
       setTotals(totals)
       // setClient(editInvoice?.client)
@@ -160,7 +161,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         invoice_id: editInvoice.invoice_id,
         invoice_status: editInvoice.invoice_status,
         payment_reference: editInvoice.payment_reference,
-        tickets: editTickets,
+        tickets: editInvoice.tickets,
         resume: results
       })
       // proof_of_payment: editInvoice.proof_of_payment || {

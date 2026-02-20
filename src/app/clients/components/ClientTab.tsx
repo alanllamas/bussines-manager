@@ -12,7 +12,7 @@ const ClientTab: React.FC<{client: Client | undefined}> = ({client}: {client: Cl
         {
           data
             ? ( <>
-                  <p className="w-10/12 truncate">{ data }</p>
+                  <p className="w-10/12 truncate">{ data === true ? 'si' : data === false ? 'no' : data }</p>
                   <button onClick={() => copyParam(data)}><span className="material-symbols-outlined text-xs text-neutral-500">content_copy</span></button>
                 </>
             )

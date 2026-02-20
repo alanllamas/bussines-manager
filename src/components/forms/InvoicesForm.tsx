@@ -7,6 +7,7 @@ import logo from "@/public/logo.png"
 import DatePicker from "react-datepicker"
 import { Client } from "@/api/hooks/getClient"
 import { Ticket } from "@/api/hooks/invoices/getTicketsByClient"
+import "react-datepicker/dist/react-datepicker.css";
 
 
 
@@ -51,8 +52,9 @@ const InvoicesForm: React.FC<any> = ({
   // const [tickets, setTickets] = useState<Ticket[]>([])
 
   useEffect(() => {
+      // console.log('clientData: ', clientData);
     if ((clientData)) {
-      // console.log('invoicesData.data: ', invoicesData.data);
+      // console.log('clientData: ', clientData);
       // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
@@ -62,10 +64,10 @@ const InvoicesForm: React.FC<any> = ({
       setclient(clientData)
       setClient(clientData)
     }
-  }, [])
+  }, [clientData])
   useEffect(() => {
     if (client) {
-      console.log('client: ', client);
+      // console.log('client: ', client);
       // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
@@ -135,6 +137,7 @@ const InvoicesForm: React.FC<any> = ({
 
                         <DatePicker
                           className="py-1"
+                          disabled={!client}
                           onChange={(e: any) => {
                             // console.log(e);
                             const initial_date = new Date(new Date(e).setHours(0, 0 , 0, 0))
@@ -185,6 +188,7 @@ const InvoicesForm: React.FC<any> = ({
                         <label htmlFor="">Fecha final</label>
                         <DatePicker
                           className="py-1"
+                          disabled={!client}
                           onChange={(e: any) => {
                             // console.log(e);
                             // console.log("ending date", e)
@@ -222,7 +226,7 @@ const InvoicesForm: React.FC<any> = ({
                                   setFieldValue('resume', results )
                                   setResume(results)
                                   setTotals(totals)
-                                }, 500);
+                                }, 300);
                               }
                             }
                           }}
