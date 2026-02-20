@@ -293,7 +293,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
           // console.log('invoice: ', invoice);
           return <tr className="border-b border-neutral-300" key={`invoice-${index}`}>
 
-            <td className="py-2"><a href={`/invoices/${clientId}/${invoice.documentId}`}>{invoice.id}</a></td>
+            <td className="py-2"><a href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
             <td className="py-2">{invoice.client?.name}</td>
             <td className="py-2">{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
             <td className="py-2">{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
