@@ -24,7 +24,7 @@ const InvoicesForm: React.FC<any> = ({
     availableTickets,
     setTotals,
     setResume,
-    tickets,
+    tickets: ticketsData,
     client: clientData,
     setClient,
     blockClient = false
@@ -49,7 +49,7 @@ const InvoicesForm: React.FC<any> = ({
   }) => {
 
   const [client, setclient] = useState<Client>()
-  // const [tickets, setTickets] = useState<Ticket[]>([])
+  const [tickets, setTickets] = useState<Ticket[]>([])
 
   useEffect(() => {
       // console.log('clientData: ', clientData);
@@ -78,6 +78,19 @@ const InvoicesForm: React.FC<any> = ({
       setClient(client)
     }
   }, [client])
+  useEffect(() => {
+    if (ticketsData) {
+      // console.log('ticketsData: ', ticketsData);
+      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
+      // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
+      //   const dateA: number = new Date(a.sale_date).valueOf();
+      //   const dateB: number = new Date(b.sale_date).valueOf()
+      //   return dateB - dateA;
+      // });
+      // settickets(ticketsData)
+      setTickets(ticketsData)
+    }
+  }, [ticketsData])
 
   return <>
     <div className="flex justify-between">
@@ -204,18 +217,31 @@ const InvoicesForm: React.FC<any> = ({
                                 setFieldValue('resume', {} )
 
                                 console.log('tickets: ', tickets);
-                                const filteredTickets = tickets.filter(ticket => {
-                                  const sale_date = new Date(ticket.sale_date)
-                                  console.log('sale_date: ', sale_date);
-                                  console.log('initial_date: ', initial_date);
-                                  console.log('ending_date: ', ending_date);
+                                const filteredTickets = tickets.reduce((acc: string[], curr: Ticket) => {
+                                  const sale_date = new Date(curr.sale_date)
+                                  // console.log('sale_date: ', sale_date);
+                                  // console.log('initial_date: ', initial_date);
+                                  // console.log('ending_date: ', ending_date);
                                   // console.log();
-                                  return sale_date > initial_date && sale_date < ending_date
-                                }).map(ticket => `${ticket.id}`)
+                                  if ((sale_date > initial_date && sale_date < ending_date) && !curr.invoice) {
+                                    acc = [...acc, `${curr.id}`]
+                                  } 
+                                  return acc
+                                }, [])
+                                // tickets.filter(ticket => {
+                                //   const sale_date = new Date(ticket.sale_date)
+                                //   console.log('sale_date: ', sale_date);
+                                //   console.log('initial_date: ', initial_date);
+                                //   console.log('ending_date: ', ending_date);
+                                //   // console.log();
+                                //   return sale_date > initial_date && sale_date < ending_date
+                                // }).map(ticket => `${ticket.id}`)
+
+                               
                                 // const filteredTickets = tickets.filter(ticket => {
                                 //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
                                 // }).map(ticket => `${ticket.id}`)
-                                console.log('filteredTickets: ', filteredTickets);
+                                // console.log('filteredTickets: ', filteredTickets);
                                 setFieldValue('tickets', filteredTickets)
                                 setTimeout(() => {
                                   const { results, totals } = generateResume(filteredTickets, tickets, client)
@@ -548,7 +574,7 @@ const InvoicesForm: React.FC<any> = ({
                     
                     <div className="flex gap-4 justify-end">
                       <button className="bg-red-800 px-4 py-2 rounded-sm text-white" onClick={() => sendClose()}>Cancelar</button>
-                      <button className=" disabled:bg-green-300 bg-green-700 px-4 py-2 text-white" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
+                      <button disabled={values.tickets.length === 0} className=" disabled:bg-green-300 bg-green-700 px-4 py-2 text-white" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
                     </div>
                   </Form>
                 </DialogPanel>
