@@ -22,12 +22,11 @@ const ClientTab: React.FC<{client: Client | undefined}> = ({client}: {client: Cl
   }
 
   return (
-    <TabPanel className="p-4">
-      <h2 className="font-bold">{client?.name}</h2>
+    <TabPanel>
       {/* <h3>Informacion Fiscal</h3> */}
       {
         client?.taxing_info 
-        ? ( <div className="flex-col p-4">
+        ? ( <div className="flex-col px-4">
  
               <div className=" flex gap-4">
                   <div className="w-2/12">

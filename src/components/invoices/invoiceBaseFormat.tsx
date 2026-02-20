@@ -1,47 +1,26 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react"
-import { useAuth } from "@/app/context/AuthUserContext";
-import useGetInvoice from "@/api/hooks/invoices/getInvoice";
+import useGetInvoice, { generateResume, Resume, Totals } from "@/api/hooks/invoices/getInvoice";
 import { Invoice } from "@/api/hooks/invoices/getInvoices";
 import logo from '@/public/logo.png'
 import { Ticket } from "@/api/hooks/tickets/getTickets";
-import { generateResume, Resume, Totals } from "../page-client";
 import { useReactToPrint } from "react-to-print";
 import ReactMarkdown from 'react-markdown'
 
 
-const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
-  // @ts-expect-error no type found
-  const { user } = useAuth();
-  const [interval, setinterval] = useState<NodeJS.Timeout>()
-
-  useEffect(() => {
-    const interval =
-      setInterval(() => {
-        window.location.pathname = '/'
-      }, 500)
-    setinterval(interval)
-  }, [])
-  // Listen for changes on loading and authUser, redirect if needed
-  useEffect(() => {
-    // console.log(interval);
-    if (user) {
-      clearInterval(interval)
-    }
-  }, [user])
-
-  const [invoice, setInvoice] = useState<Invoice>()
+const InvoiceBaseFormat: React.FC<{ invoiceData: Invoice, initial_date: any, ending_date: any, send_date: any }> = ({ invoiceData, initial_date,ending_date,send_date }) => {
+ 
+ const [invoice, setInvoice] = useState<Invoice>()
   const [totals, setTotals] = useState<Totals>({total: 0, sub_total:0, total_taxes: 0})
   const [resume, setResume] = useState<Resume>()
-  const {
-    invoice: invoiceData,
-    error: invoiceError,
-    isLoading: invoiceIsLoading,
-  } = useGetInvoice(id)
+  // const {
+  //   invoice: invoiceData,
+  //   error: invoiceError,
+  //   isLoading: invoiceIsLoading,
+  // } = useGetInvoice(id)
 
   useEffect(() => {
-    if (invoiceData &&!invoiceError && !invoiceIsLoading) {
-      const data = invoiceData.data
+      const data = invoiceData
       console.log(data);
       const { client, tickets } = data
       
@@ -51,33 +30,18 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
       setResume(results)
       setTotals(totals)
       setInvoice(data)
-      
-    }
-  },[invoiceData, invoiceError, invoiceIsLoading])
+
+  },[invoiceData])
 
   // const date = new Date(invoice?.sale_date || '').toLocaleDateString()
   const copyParam = (param: string) => {
       navigator.clipboard.writeText(param)
   }
 
-  const contentRef = useRef<HTMLDivElement>(null);
 
-  const initial_date = new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
-  const ending_date = new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
-  const send_date = (invoice?.invoice_send_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
-  const client_name = invoice?.client?.name?.toLocaleUpperCase()
 
-  const Print = useReactToPrint({
-    contentRef,
-    documentTitle: `Corte-${client_name}-${initial_date}-${ending_date}`
-  });
 
-  return <section className="flex flex-col w-full justify-center items-center text-neutral-900 py-5">
-    <div className="w-full pb-4 px-32 flex justify-end">
-
-      <button className="px-4 py-2 bg-neutral-300" onClick={() => Print()}>Imprimir</button>
-    </div>
-    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-3 shadow-xl border text-sm">
+  return <section>
       <div className="w-full flex justify-between items-start py-5">
         <img className="w-72" src={logo.src} alt="" />
         <div className="w-1/2 flex flex-col-reverse px-4 pt-12">
@@ -404,9 +368,8 @@ const ClientInvoice: React.FC<{ id: number }> = ({ id }) => {
         </div>
       </div>
     </section>
-  </section>
 }
-export default ClientInvoice
+export default InvoiceBaseFormat
 
 
 // <>

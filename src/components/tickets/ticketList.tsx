@@ -2,17 +2,16 @@
 import React, { useEffect, useState } from "react"
 import { ProductVariant, Ticket, TicketProduct} from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
-import TicketFormat from "./ticketFormat"
-import TicketsForm, { createTicketReq, emptyProduct, EProduct, InitialValues } from "./forms/ticketsForm"
+import TicketFormat from "./ticketPrintFormat"
+import TicketsForm, { createTicketReq, emptyProduct, EProduct, InitialValues } from "../forms/ticketsForm"
 import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket"
 import useCreateTicket from "@/api/hooks/tickets/useCreateTicket"
 import useGetTicketNumber from "@/api/hooks/tickets/getTicketNumber"
 import { isNumber } from "util"
+import TicketPrintFormat from "./ticketPrintFormat"
 
 const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   // ticket form functions
-
-
   const [initialFormValues, setInitialFormValues] = useState<InitialValues>()
   const [isOpen, setIsOpen] = useState(false)
   const [editTicket, setEditTicket] = useState<Ticket>()
@@ -29,7 +28,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     error: TicketError,
     isLoading: TicketIsLoading
   } = useCreateTicket(newTicket)
-
   const {
     ticket_number,
     error: ticketNumberError,
@@ -100,6 +98,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     setIsOpen(true)
     
   }, [initialFormValues])
+
   const today: number = new Date().valueOf()
 
   const sendCreate = () => {
@@ -114,6 +113,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
       total: 0
     })
   }
+
   const sendClose = () => {
     setEditTicket(undefined)
     setInitialFormValues(undefined)
@@ -149,14 +149,14 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
 
   }
 
-
-
   // ticket form functions
 
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [printTicket, setPrintTicket] = useState<Ticket | null>()
 
   const sendPrint = (ticket:Ticket) => {
+    console.log(ticket);
+    
     const emptyTicket: TicketProduct = {
       id: 0
     }
@@ -169,7 +169,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   const unsetPrintTicket = () => {
     setTimeout(() => {
       setPrintTicket(null)
-    }, 100);
+    }, 1000);
   }
   useEffect(() => {
     // console.log(interval);
@@ -197,6 +197,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
       </>
     );
   }
+
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     // Here we use item offsets; we could also use page offsets
     // following the API or data you're working with.
@@ -250,17 +251,10 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     );
   }
 
-
-  // const ticket_number = tickets?.sort((ticketa: Ticket, ticketB: Ticket) => {
-  //   return Number(ticketB.ticket_number) - Number(ticketa.ticket_number)
-  // }).map((ticket: Ticket) => ticket.ticket_number)[0]
-
-  
-
   return <>
     <TicketsForm sendCreate={sendCreate} initialFormValues={initialFormValues} handleSubmit={handleSubmit} isOpen={isOpen} sendClose={sendClose} editTicket={editTicket}/>
     <PaginatedItems itemsPerPage={10}/>
-    { printTicket && <TicketFormat ticket={printTicket} /> }
+    { printTicket && <TicketPrintFormat ticket={printTicket} /> }
     
   </> 
 } 

@@ -35,7 +35,7 @@ const ContactsTab: React.FC<{client: Client | undefined}> = ({client}: {client: 
   }
 
   return (
-    <TabPanel className="p-4 q">
+    <TabPanel className="px-2 q">
       {
         client?.contacts?.length !== undefined && client?.contacts?.length > 0
         ? <div className="flex gap-2 flex-wrap">

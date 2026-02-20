@@ -90,12 +90,12 @@ const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 
 
 async function GetInvoices(
-  [url, token, client]: [string, string, string]
+  [url, token]: [string, string]
 ) {
-  console.log('client: ', client);
+  // console.log('client: ', client);
   
   return await fetcher<{ data:Invoice[], meta: Meta}>(
-    `${url}/invoices?populate=*&filters[client][documentId][$eq]=${client}&sort=id:desc&pagination[limit]=10000`,
+    `${url}/invoices?populate=client&populate=client.taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants&sort=id:desc&pagination[limit]=10000`,
     {
       method: 'GET',
       headers: {
@@ -105,9 +105,9 @@ async function GetInvoices(
   );
 }
 
-export default function useGetInvoices(client: string) {
+export default function useGetInvoices() {
   const { data, isLoading, error } = useSWR(
-    [process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API, token, client],
+    [process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API, token],
     GetInvoices,
     //    {
     //   revalidateOnFocus: false,

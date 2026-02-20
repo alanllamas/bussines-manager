@@ -5,6 +5,7 @@ import { Client } from "@/api/hooks/getClient";
 import ClientTab from "./ClientTab";
 import ContactsTab from "./ContactsTab";
 import TicketsTab from "./TicketsTab";
+import InvoicesTab from "./InvoicesTab";
 
 const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
   return (
@@ -17,10 +18,12 @@ const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: C
         <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Editar</Tab>
       </TabList>
       <TabPanels>
+        <h2 className="font-bold p-4">{client?.name}</h2>
+
         <ClientTab client={client}/>
         <ContactsTab client={client}/>
         <TicketsTab tickets={client?.tickets} clientId={client?.id}/>
-        <TabPanel>Content 4</TabPanel>
+        <InvoicesTab invoices={client?.invoices} clientId={client?.documentId}/>
         <TabPanel>Content 5</TabPanel>
       </TabPanels>
     </TabGroup>
