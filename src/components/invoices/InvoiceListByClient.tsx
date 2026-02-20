@@ -379,7 +379,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
       setClients={setClients}
       setClient={setclient}
       setAvailableTickets={setAvailableTickets}
-      clientId={clientId}
+      client={client}
       setCreate={setCreate}
       tickets={tickets}
       blockClient={true}
