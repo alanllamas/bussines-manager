@@ -23,7 +23,7 @@ const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: C
         <ClientTab client={client}/>
         <ContactsTab client={client}/>
         <TicketsTab tickets={client?.tickets} clientId={client?.id}/>
-        <InvoicesTab />
+        <InvoicesTab invoices={client?.invoices} clientId={client?.documentId}/>
         <TabPanel>Content 5</TabPanel>
       </TabPanels>
     </TabGroup>

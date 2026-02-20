@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { fetcher } from '../../fetcher';
 import { Invoice } from './getInvoices';
-import { createInvoiceReq } from '@/app/invoices/[client]/page-client';
+import { createInvoiceReq } from '@/app/invoices/page-client';
 
 // type createInvoiceReq = {
 

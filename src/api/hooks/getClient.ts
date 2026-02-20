@@ -1,6 +1,7 @@
 'use-client'
 import { fetcher } from '../fetcher';
 import useSWR from 'swr';
+import { Invoice } from './invoices/getInvoices';
 
 export type Contact = {
   area: string
@@ -41,6 +42,7 @@ export type Client = {
     zip_code: number
   }
   tickets?: Ticket[]
+  invoices?: Invoice[]
   contacts?: Contact[]
 }
 

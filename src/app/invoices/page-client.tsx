@@ -1,20 +1,30 @@
 'use client'
-import React, { useEffect, useState } from "react";
+import useGetTickets, { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import useGetClients from "@/api/hooks/getClients";
+import { Formik, Field, Form, FieldArray } from "formik";
+import logo from "@/public/logo.png"
+import { useReactToPrint } from "react-to-print";
+import ReactPaginate from 'react-paginate';
 import { useAuth } from "@/app/context/AuthUserContext";
-import Link from "next/link";
+import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices";
+import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice";
+import useEditInvoice, { EditInvoiceReq } from "@/api/hooks/invoices/useEditInvoice";
 import { Client } from "@/api/hooks/getClient";
+import { createInvoiceReq, generateResume, InitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice";
+import InvoiceList from "@/components/invoices/InvoiceList";
 
-// import { useAuth } from "@/context/AuthUserContext";
-// import { useRouter } from "next/navigation";
 
-const ClientInvoices: React.FC = () => {
+const ClientInvoices: React.FC<{ client: string }> = ({ client: client_param }) => {
+  // console.log('client_param: ', client_param);
   // @ts-expect-error no type found
- const { user } = useAuth();
+  const { user } = useAuth();
   const [interval, setinterval] = useState<NodeJS.Timeout>()
 
-
-  
   useEffect(() => {
     if(!user) {
 
@@ -22,15 +32,15 @@ const ClientInvoices: React.FC = () => {
         setInterval(() => {
           window.location.pathname = '/'
         }, 1000)
-        console.log(interval);
+        // console.log(interval);
         
       setinterval(interval)
     }
   }, [])
   // Listen for changes on loading and authUser, redirect if needed
   useEffect(() => {
-    console.log(user);
-    console.log(interval);
+    // console.log(user);
+    // console.log(interval);
     if (!user) {
         // window.location.pathname = '/'
 
@@ -40,39 +50,40 @@ const ClientInvoices: React.FC = () => {
     }
   }, [user])
 
-  const [clients, setClients] = useState<Client[]>([])
-  
+  const [invoices, setInvoices] = useState<Invoice[]>([])
+
   const {
-    clients: clientsData,
-    error: clientsError,
-    isLoading: clientsIsLoading
-  } = useGetClients()
-  
+    invoices: invoicesData,
+    error: invoicesError,
+    isLoading: invoicesIsLoading,
+  } = useGetInvoices()
+ 
   useEffect(() => {
-    if (!clientsError && !clientsIsLoading) {
+    if ((!invoicesError && !invoicesIsLoading && invoicesData.data)) {
       
-      // @ts-expect-error missing type
-
-      setClients(clientsData.data)
+      // console.log('invoicesData.data: ', invoicesData.data);
+      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
+      // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
+      //   const dateA: number = new Date(a.sale_date).valueOf();
+      //   const dateB: number = new Date(b.sale_date).valueOf()
+      //   return dateB - dateA;
+      // });
+      setInvoices(invoicesData.data)
     }
-      // @ts-expect-error missing type
-  }, [clientsIsLoading, clientsData.data, clientsError])
+  }, [invoicesIsLoading, invoicesData.data, invoicesError])
   
 
+  
 
-  return <section className="w-full">
-    <section className=" py-12 px-4 bg-neutral-100 text-neutral-900 ">
-      {
-        clients.map((client, index: number) => {
-          return <div key={`client-${index}`} className="shadow-md bg-neutral-200 rounded-md px-6 py-2 m-4">
-            <h4>{client.name}</h4>
-            <Link href={`/invoices/${client.documentId}`}>
-              <p>ver cortes </p>
-            </Link>
-          </div>
-        })      
-      }
-    </section>
+  return <section className="w-full flex flex-col items-center">
+    {
+      (invoicesIsLoading)
+        ? <p>Loading</p>
+        : <section className="w-9/12 py-12 px-8 bg-neutral-100 text-neutral-900">
+          <InvoiceList invoicesData={invoices} />
+        </section>
+    }
+
 
 
   </section>

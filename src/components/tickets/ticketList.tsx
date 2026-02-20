@@ -12,8 +12,6 @@ import TicketPrintFormat from "./ticketPrintFormat"
 
 const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   // ticket form functions
-
-
   const [initialFormValues, setInitialFormValues] = useState<InitialValues>()
   const [isOpen, setIsOpen] = useState(false)
   const [editTicket, setEditTicket] = useState<Ticket>()
@@ -30,7 +28,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     error: TicketError,
     isLoading: TicketIsLoading
   } = useCreateTicket(newTicket)
-
   const {
     ticket_number,
     error: ticketNumberError,
@@ -101,6 +98,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     setIsOpen(true)
     
   }, [initialFormValues])
+
   const today: number = new Date().valueOf()
 
   const sendCreate = () => {
@@ -115,6 +113,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
       total: 0
     })
   }
+
   const sendClose = () => {
     setEditTicket(undefined)
     setInitialFormValues(undefined)
@@ -149,8 +148,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     }
 
   }
-
-
 
   // ticket form functions
 
@@ -200,6 +197,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
       </>
     );
   }
+
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     // Here we use item offsets; we could also use page offsets
     // following the API or data you're working with.
@@ -252,13 +250,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
       </section>
     );
   }
-
-
-  // const ticket_number = tickets?.sort((ticketa: Ticket, ticketB: Ticket) => {
-  //   return Number(ticketB.ticket_number) - Number(ticketa.ticket_number)
-  // }).map((ticket: Ticket) => ticket.ticket_number)[0]
-
-  
 
   return <>
     <TicketsForm sendCreate={sendCreate} initialFormValues={initialFormValues} handleSubmit={handleSubmit} isOpen={isOpen} sendClose={sendClose} editTicket={editTicket}/>

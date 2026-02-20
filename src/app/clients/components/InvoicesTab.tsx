@@ -1,12 +1,15 @@
 'use client'
 import React from "react";
 import { TabPanel } from '@headlessui/react'
-import TicketList from "@/components/tickets/ticketList";
+import InvoiceListByCLient from "@/components/invoices/InvoiceListByClient";
 
-const InvoicesTab: React.FC<any> = ({tickets, clientId}) => {
+const InvoicesTab: React.FC<any> = ({invoices, clientId}) => {
+  console.log('invoices: ', invoices);
+  
   return (
     <TabPanel className="px-4 q">
-      <TicketList ticketData={tickets} itemsPerPage={10} clientId={clientId}/>
+      <InvoiceListByCLient invoicesData={invoices} clientId={clientId}/>
+
     </TabPanel>
   )
 }

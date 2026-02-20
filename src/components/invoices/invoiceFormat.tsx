@@ -1,11 +1,8 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react"
-import useGetInvoice, { generateResume, PrintInvoiceFormat, Resume, Totals } from "@/api/hooks/invoices/getInvoice";
+import useGetInvoice, { generateResume, PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
 import { Invoice } from "@/api/hooks/invoices/getInvoices";
-import logo from '@/public/logo.png'
-import { Ticket } from "@/api/hooks/tickets/getTickets";
 import { useReactToPrint } from "react-to-print";
-import ReactMarkdown from 'react-markdown'
 import InvoiceBaseFormat from "./invoiceBaseFormat";
 
 

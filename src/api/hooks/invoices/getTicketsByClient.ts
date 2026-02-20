@@ -64,7 +64,7 @@ async function GetTicketsByClient(
   );
 }
 
-export default function useGetTicketsByClient(client: string) {
+export default function useGetTicketsByClient(client: string | number | undefined) {
   const { data, isLoading, error } = useSWR(
     [WEBHOOK_TICKETS_API, token, client],
     GetTicketsByClient,

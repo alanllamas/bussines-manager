@@ -1,10 +1,7 @@
 'use client'
 import useGetTicket from "@/api/hooks/tickets/getTicket"
-import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
+import { Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
 import React, { useEffect, useState } from "react"
-import { useReactToPrint } from "react-to-print";
-import { useRef } from "react";
-import logo from "@/public/logo.png"
 import { useAuth } from "@/app/context/AuthUserContext";
 import TicketFormat from "@/components/tickets/ticketFormat";
 
