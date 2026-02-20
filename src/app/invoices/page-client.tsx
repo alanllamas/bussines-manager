@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthUserContext";
 import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices";
-import "react-datepicker/dist/react-datepicker.css";
 import InvoiceList from "@/components/invoices/InvoiceList";
 
 

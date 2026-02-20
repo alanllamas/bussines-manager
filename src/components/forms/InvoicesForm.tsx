@@ -7,6 +7,7 @@ import logo from "@/public/logo.png"
 import DatePicker from "react-datepicker"
 import { Client } from "@/api/hooks/getClient"
 import { Ticket } from "@/api/hooks/invoices/getTicketsByClient"
+import "react-datepicker/dist/react-datepicker.css";
 
 
 
