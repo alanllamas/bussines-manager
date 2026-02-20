@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import { TabPanel } from '@headlessui/react'
-import TicketList from "@/components/ticketList";
+import TicketList from "@/components/tickets/ticketList";
 
 const TicketsTab: React.FC<any> = ({tickets, clientId}) => {
   return (

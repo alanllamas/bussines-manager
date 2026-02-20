@@ -2,6 +2,7 @@
 import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Ticket } from './getTickets';
+import { useReactToPrint } from 'react-to-print';
 
 export type Meta = {
   pagination?: {
@@ -10,6 +11,7 @@ export type Meta = {
     count:number;
   }
 }
+export const PrintTicketFormat = (contentRef: any, ticket: any) => ({ contentRef, documentTitle: `Nota-${ticket?.ticket_number}-${ticket?.client?.name?.toLocaleUpperCase()}-${new Date(ticket?.sale_date || '').toLocaleDateString()}` })
 
 // &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
 const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`

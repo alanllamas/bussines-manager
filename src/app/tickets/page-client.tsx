@@ -3,7 +3,7 @@ import useGetTickets, { Ticket } from "@/api/hooks/tickets/getTickets";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthUserContext";
 import TicketsForm from "@/components/forms/ticketsForm";
-import TicketList from "@/components/ticketList";
+import TicketList from "@/components/tickets/ticketList";
 
 // import { useAuth } from "@/context/AuthUserContext";
 // import { useRouter } from "next/navigation";

@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from "react"
 import { ProductVariant, Ticket, TicketProduct} from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
-import TicketFormat from "./ticketFormat"
-import TicketsForm, { createTicketReq, emptyProduct, EProduct, InitialValues } from "./forms/ticketsForm"
+import TicketFormat from "./ticketPrintFormat"
+import TicketsForm, { createTicketReq, emptyProduct, EProduct, InitialValues } from "../forms/ticketsForm"
 import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket"
 import useCreateTicket from "@/api/hooks/tickets/useCreateTicket"
 import useGetTicketNumber from "@/api/hooks/tickets/getTicketNumber"
 import { isNumber } from "util"
+import TicketPrintFormat from "./ticketPrintFormat"
 
 const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   // ticket form functions
@@ -157,6 +158,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   const [printTicket, setPrintTicket] = useState<Ticket | null>()
 
   const sendPrint = (ticket:Ticket) => {
+    console.log(ticket);
+    
     const emptyTicket: TicketProduct = {
       id: 0
     }
@@ -169,7 +172,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   const unsetPrintTicket = () => {
     setTimeout(() => {
       setPrintTicket(null)
-    }, 100);
+    }, 1000);
   }
   useEffect(() => {
     // console.log(interval);
@@ -260,7 +263,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   return <>
     <TicketsForm sendCreate={sendCreate} initialFormValues={initialFormValues} handleSubmit={handleSubmit} isOpen={isOpen} sendClose={sendClose} editTicket={editTicket}/>
     <PaginatedItems itemsPerPage={10}/>
-    { printTicket && <TicketFormat ticket={printTicket} /> }
+    { printTicket && <TicketPrintFormat ticket={printTicket} /> }
     
   </> 
 } 
