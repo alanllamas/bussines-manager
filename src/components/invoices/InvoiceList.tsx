@@ -136,10 +136,10 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if (editInvoice) {
-      console.log('editInvoice: ', editInvoice);
-      console.log('editInvoice.tickets: ', editInvoice.tickets);
+      // console.log('editInvoice: ', editInvoice);
+      // console.log('editInvoice.tickets: ', editInvoice.tickets);
       const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
-      console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
+      // console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
       setTickets(editInvoice.tickets)
       const { results, totals } = generateResume(editTickets, editInvoice.tickets, client)
       setResume(results)
