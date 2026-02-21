@@ -2,7 +2,7 @@
 import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Invoice } from './getInvoices';
-import { Client } from '../getClient';
+import { Client } from '../clients/getClient';
 import { TicketProduct, Ticket } from './getTicketsByClient';
 import { useReactToPrint } from 'react-to-print';
 
@@ -21,7 +21,7 @@ export type StrapiFile = {
     field: string
   }
 
-export type InitialValues = {
+export type InvoiceInitialValues = {
   payment_date?: Date | null;
   invoice_id: string;
   client: string;
@@ -95,7 +95,7 @@ export const PrintInvoiceFormat = (contentRef: any,client_name: any,initial_date
   documentTitle: `Corte-${client_name}-${initial_date}-${ending_date}`
 });
 
-export const generateResume = (filteredTickets: InitialValues['tickets'], tickets:Ticket[], client?:Client) => {
+export const generateResume = (filteredTickets: InvoiceInitialValues['tickets'], tickets:Ticket[], client?:Client) => {
   const resume = filteredTickets?.reduce((acc: {[key: string]: any}, ticket_id: string) => {
       // console.log(ticket_id);
     const ticket = tickets.find((value, i) => { return value.id === Number(ticket_id)})

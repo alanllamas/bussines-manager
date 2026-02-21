@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import { TabPanel } from '@headlessui/react'
-import { Client, Contact } from "@/api/hooks/getClient";
+import { Client, Contact } from "@/api/hooks/clients/getClient";
 
 const ContactsTab: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
 

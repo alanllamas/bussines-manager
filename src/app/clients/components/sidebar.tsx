@@ -1,9 +1,9 @@
 'use client'
 import React, { useEffect, useState } from "react";
-import useGetClients from "@/api/hooks/getClients";
+import useGetClients from "@/api/hooks/clients/getClients";
 import { useAuth } from "@/app/context/AuthUserContext";
 import Link from "next/link";
-import { Client } from "@/api/hooks/getClient";
+import { Client } from "@/api/hooks/clients/getClient";
 
 // import { useAuth } from "@/context/AuthUserContext";
 // import { useRouter } from "next/navigation";
@@ -40,7 +40,7 @@ const ClientsSideBar: React.FC = () => {
     }
   }, [user])
 
-  const [clients, setClients] = useState<Client[]>([])
+  const [clients, setClients] = useState<Client[] | undefined>([])
   
   const {
     clients: clientsData,
@@ -50,19 +50,17 @@ const ClientsSideBar: React.FC = () => {
   
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
-      
-      // @ts-expect-error missing type
 
-      setClients(clientsData.data)
+
+      setClients(clientsData?.data)
     }
-      // @ts-expect-error missing type
-  }, [clientsIsLoading, clientsData.data, clientsError])
+  }, [clientsIsLoading, clientsData, clientsError])
   
 
 
   return <section className="w-3/12 bg-neutral-200 text-neutral-900">
       {
-        clients.map((client, index: number) => {
+        clients?.map((client, index: number) => {
           return (
             <Link
               key={`client-${index}`}

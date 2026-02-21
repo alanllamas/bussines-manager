@@ -1,7 +1,7 @@
 'use-client'
 import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
-import { Client } from '../getClient';
+import { Client } from '../clients/getClient';
 import { Product } from '../getProducts';
 import { Invoice } from './getInvoices';
 export type ProductVariant = {
