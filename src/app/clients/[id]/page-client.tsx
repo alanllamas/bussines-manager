@@ -1,5 +1,5 @@
 'use client'
-import useGetClient, { Client } from "@/api/hooks/getClient";
+import useGetClient, { Client } from "@/api/hooks/clients/getClient";
 import React, { useEffect, useState } from "react";
 import ClientTabs from "../components/ClientTabs";
 

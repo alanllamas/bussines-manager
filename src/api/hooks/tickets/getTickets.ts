@@ -3,7 +3,7 @@ import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Product } from '../getProducts';
 import { Invoice } from '../invoices/getInvoices';
-import { Client } from '../getClient';
+import { Client } from '../clients/getClient';
 export type ProductVariant = {
   name: string;
   id: number;

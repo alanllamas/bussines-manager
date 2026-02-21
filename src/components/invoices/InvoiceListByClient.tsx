@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react"
 import { Ticket } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient"
-import useGetClients from "@/api/hooks/getClients"
+import useGetClients from "@/api/hooks/clients/getClients"
 import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice"
 import useEditInvoice from "@/api/hooks/invoices/useEditInvoice"
-import { createInvoiceReq, generateResume, InitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
-import { Client } from "@/api/hooks/getClient"
+import { createInvoiceReq, generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
+import { Client } from "@/api/hooks/clients/getClient"
 import { Invoice } from "@/api/hooks/invoices/getInvoices"
 import InvoicePrintFormat from "./invoicePrintFormat"
 import InvoicesForm from "../forms/InvoicesForm"
@@ -25,7 +25,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
   const [editInvoice, setEditInvoice] = useState<Invoice>()
   const [newInvoice, setNewInvoice] = useState<createInvoiceReq>()
   const [newEditInvoice, setNewEditInvoice] = useState<{invoice: Invoice, documentId: string}>()
-  const [initialFormValues, setInitialFormValues] = useState<InitialValues>()
+  const [initialFormValues, setInitialFormValues] = useState<InvoiceInitialValues>()
   const [client, setclient] = useState<Client>()
   const [printInvoice, setPrintInvoice] = useState<Invoice>()
 
@@ -261,7 +261,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
     setCreate(false)
   }
 
-  const handleSubmit = async (values: InitialValues) => {
+  const handleSubmit = async (values: InvoiceInitialValues) => {
     setIsOpen(false)
     // console.log(values);
     const data = {

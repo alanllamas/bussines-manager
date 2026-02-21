@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react"
 import { ProductVariant, Ticket, TicketProduct} from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
-import TicketFormat from "./ticketPrintFormat"
-import TicketsForm, { createTicketReq, emptyProduct, EProduct, InitialValues } from "../forms/ticketsForm"
+import TicketsForm, { createTicketReq, emptyProduct, EProduct, TicketInitialValues } from "../forms/ticketsForm"
 import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket"
 import useCreateTicket from "@/api/hooks/tickets/useCreateTicket"
 import useGetTicketNumber from "@/api/hooks/tickets/getTicketNumber"
@@ -12,7 +11,7 @@ import TicketPrintFormat from "./ticketPrintFormat"
 
 const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   // ticket form functions
-  const [initialFormValues, setInitialFormValues] = useState<InitialValues>()
+  const [initialFormValues, setInitialFormValues] = useState<TicketInitialValues>()
   const [isOpen, setIsOpen] = useState(false)
   const [editTicket, setEditTicket] = useState<Ticket>()
   const [newEditTicket, setNewEditTicket] = useState<{ticket: EditTicketReq, documentId: string}>()
@@ -120,7 +119,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     setIsOpen(false)
   }
   
-  const handleSubmit = async (values: InitialValues) => {
+  const handleSubmit = async (values: TicketInitialValues) => {
     setIsOpen(false)
     console.log(values);
     const { date, client, shipping, subtotal, products, ticket_number, total } = values

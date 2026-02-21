@@ -1,6 +1,7 @@
 'use-client'
 import { fetcher } from '../fetcher';
 import useSWR from 'swr';
+import { Meta } from './tickets/getTickets';
 
 export type Product = {
   id: number;
@@ -23,7 +24,7 @@ const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
 async function GetProducts(
   [url, token]: [string, string]
 ) {
-  return await fetcher(
+  return await fetcher<{ data: Product[], Meta: Meta}>(
     url,
     {
       method: 'GET',
@@ -42,7 +43,7 @@ export default function useGetProducts() {
       revalidateOnFocus: false,
     }
   );
-   const products = data ?? [];
+   const products = data;
 
   return {
     products,

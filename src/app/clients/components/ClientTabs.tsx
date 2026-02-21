@@ -1,11 +1,12 @@
 'use client'
 import React from "react";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
-import { Client } from "@/api/hooks/getClient";
+import { Client } from "@/api/hooks/clients/getClient";
 import ClientTab from "./ClientTab";
 import ContactsTab from "./ContactsTab";
 import TicketsTab from "./TicketsTab";
 import InvoicesTab from "./InvoicesTab";
+import EditClientTab from "./EditClientTab";
 
 const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
   return (
@@ -24,7 +25,8 @@ const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: C
         <ContactsTab client={client}/>
         <TicketsTab tickets={client?.tickets} clientId={client?.id}/>
         <InvoicesTab invoices={client?.invoices} clientId={client?.documentId}/>
-        <TabPanel>Content 5</TabPanel>
+        <EditClientTab client={client}/>
+        <TabPanel>Content 6</TabPanel>
       </TabPanels>
     </TabGroup>
   )

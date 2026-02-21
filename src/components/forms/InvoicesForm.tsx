@@ -1,11 +1,11 @@
 'use client'
-import { generateResume, InitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
+import { generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
 import { Field, FieldArray, Form, Formik } from "formik"
 import React, { ChangeEvent, useEffect, useState } from "react"
 import logo from "@/public/logo.png"
 import DatePicker from "react-datepicker"
-import { Client } from "@/api/hooks/getClient"
+import { Client } from "@/api/hooks/clients/getClient"
 import { Ticket } from "@/api/hooks/invoices/getTicketsByClient"
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -30,7 +30,7 @@ const InvoicesForm: React.FC<any> = ({
     blockClient = false
   } : {
     sendCreate: any,
-    initialFormValues: InitialValues,
+    initialFormValues: InvoiceInitialValues,
     handleSubmit: any,
     isOpen: boolean,
     sendClose: any,
@@ -100,7 +100,7 @@ const InvoicesForm: React.FC<any> = ({
     {
       initialFormValues && <Formik
         initialValues={initialFormValues || null}
-        onSubmit={async (values: InitialValues) => values ? handleSubmit(values): null}
+        onSubmit={async (values: InvoiceInitialValues) => values ? handleSubmit(values): null}
       >
         {
           ({values, setFieldValue}) => (

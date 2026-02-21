@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import { TabPanel } from '@headlessui/react'
-import { Client } from "@/api/hooks/getClient";
+import { Client } from "@/api/hooks/clients/getClient";
 
 const ClientTab: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
   const copyParam = (param: string) => {

@@ -7,7 +7,6 @@ import ProfileAvatar from "@/components/profile";
 import logo from "@/public/logo.png";
 import Image from "next/image";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -42,26 +41,35 @@ export default function RootLayout({
             <ul className="flex justify-center w-full h-10 ">
               <Link className="px-4" href="/tickets">
                 <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                    Notas
+                  Notas
                 </li>
               </Link>
               <Link className="px-4" href="/invoices">
                 <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                    Cortes
+                  Cortes
                 </li>
               </Link>
               <Link className="px-4" href="/clients">
                 <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                    Clientes
+                  Clientes
+                </li>
+              </Link>
+              <Link className="px-4" href="/">
+                <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                  Compras
+                </li>
+              </Link>
+              <Link className="px-4" href="/">
+                <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                  Analisis
                 </li>
               </Link>
             </ul>
             <ProfileAvatar />
-
           </nav>
 
           <section className="bg-neutral-100 flex justify-center w-full h-full">
-              {children}
+            {children}
           </section>
         </body>
       </AuthProvider>

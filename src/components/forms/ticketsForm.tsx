@@ -1,17 +1,11 @@
 'use client'
-import { useAuth } from "@/app/context/AuthUserContext"
-import Image from "next/image"
 import React, { ChangeEvent, useEffect, useState } from "react"
-import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import InitialValues from "@/app/tickets/page-client"
+import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { Field, FieldArray, Form, Formik, useField, useFormikContext } from "formik"
-import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
-import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket"
-import useCreateTicket from "@/api/hooks/tickets/useCreateTicket"
 import logo from "@/public/logo.png"
-import { Client } from "@/api/hooks/getClient"
+import { Client } from "@/api/hooks/clients/getClient"
 import useGetProducts, { Product } from "@/api/hooks/getProducts"
-import useGetClients from "@/api/hooks/getClients"
+import useGetClients from "@/api/hooks/clients/getClients"
 
 export type EVariant = {
   name: string;
@@ -28,7 +22,7 @@ export type EProduct = {
   unit: string;
   subtotal?: number;
 }
-export type InitialValues = {
+export type TicketInitialValues = {
   date: number;
   client: string;
   ticket_number: number;
@@ -74,7 +68,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
 
           
   const [clients, setClients] = useState<Client[]>([])
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<Product[] | undefined>([])
 
 
 
@@ -97,12 +91,10 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
         
         // console.log('productsData.data: ', productsData.data);
         // console.log('meta.pagination.total: ', productsData.meta.pagination.total);
-        // @ts-expect-error missing type
   
-        setProducts(productsData.data)
+        setProducts(productsData?.data)
       }
-        // @ts-expect-error missing type
-  }, [productsIsLoading, productsData.data, productsError])
+  }, [productsIsLoading, productsData?.data, productsError])
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
       
@@ -179,11 +171,11 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       </>
     );
   };
-  const VariantsField = (props: {products: Product[], index: number, className: string, name: string, placeholder: string, disabled?: boolean}) => {
+  const VariantsField = (props: {products?: Product[], index: number, className: string, name: string, placeholder: string, disabled?: boolean}) => {
     const {
       values,
       setFieldValue,
-    } = useFormikContext<InitialValues>();
+    } = useFormikContext<TicketInitialValues>();
     const [field, meta] = useField(props);
     const [variants, setVariants] = useState<Product["product_variants"]>([])
     const [prod, setProd] = useState<Product>()
@@ -281,7 +273,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
     {
       initialFormValues && <Formik
         initialValues={initialFormValues || null}
-        onSubmit={async (values: InitialValues) => values ? handleSubmit(values): null}
+        onSubmit={async (values: TicketInitialValues) => values ? handleSubmit(values): null}
       >
         {
           ({values, setFieldValue}) => (
@@ -361,21 +353,21 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                   <label htmlFor="`products.${index}.product`">Producto</label>
                                                   <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" value={values.products[index].product} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                     // onProductChange(e.target.value)
-                                                      const product = products.filter((product: Product) => {
+                                                      const product = products?.filter((product: Product) => {
                                                         // console.log(product);
                                                         
                                                         return Number(e.target.value) === product.id
                                                       })[0] || null
                                                       console.log(product);
-                                                      setFieldValue(`products.${index}.unit`, product.measurement_unit)
-                                                      setFieldValue(`products.${index}.name`, product.name)
-                                                      setFieldValue(`products.${index}.product`, product.id)
-                                                      setFieldValue(`products.${index}.price`, product.price)
+                                                      setFieldValue(`products.${index}.unit`, product?.measurement_unit)
+                                                      setFieldValue(`products.${index}.name`, product?.name)
+                                                      setFieldValue(`products.${index}.product`, product?.id)
+                                                      setFieldValue(`products.${index}.price`, product?.price)
                                                     }} name={`products.${index}.product`}
                                                   >
                                                     <option value="">Producto</option>
                                                     {
-                                                      products.map((product: Product, index: number) => {
+                                                      products?.map((product: Product, index: number) => {
                                                         return <option key={`product-${index}`} value={product.id}>{product.name}</option>
                                                       })
                                                     }
