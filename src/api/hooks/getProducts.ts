@@ -18,30 +18,17 @@ export type Product = {
   taxes?: number
 }
 
-const WEBHOOK_PRODUCTS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/products?populate=*`;
-const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
+const PRODUCTS_URL = `/api/products?populate=*`;
 
-async function GetProducts(
-  [url, token]: [string, string]
-) {
-  return await fetcher<{ data: Product[], Meta: Meta}>(
-    url,
-    {
-      method: 'GET',
-      headers: {
-        'Authorization': token,
-      },
-    }
-  );
+async function GetProducts([url]: [string]) {
+  return await fetcher<{ data: Product[], Meta: Meta}>(url, { method: 'GET' });
 }
 
 export default function useGetProducts() {
   const { data, isLoading, error } = useSWR(
-    [WEBHOOK_PRODUCTS_API, token],
+    [PRODUCTS_URL],
     GetProducts,
-       {
-      revalidateOnFocus: false,
-    }
+    { revalidateOnFocus: false }
   );
    const products = data;
 

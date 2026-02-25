@@ -197,41 +197,21 @@ export const generateResume = (filteredTickets: InvoiceInitialValues['tickets'],
     results
   }
 }
-// &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
-const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
-
-
-// Promise<{ id: any }>
-async function GetInvoice(
-  [url, token, id]: [string, string, number]
-) {
-  return await fetcher<{data: Invoice, meta: Meta}>(
-// client&populate=products&populate=products.product&populate=products.product_variants
-    `${url}/invoices/${id}?populate=client&populate=client.taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants`,
-    {
-      method: 'GET',
-      headers: {
-        'Authorization': token,
-      },
-    }
-  );
+async function GetInvoice([url]: [string]) {
+  return await fetcher<{data: Invoice, meta: Meta}>(url, { method: 'GET' });
 }
 
 export default function useGetInvoice(id: number) {
+  const url = id
+    ? `/api/invoices/${id}?populate=client&populate=client.taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants`
+    : null;
+
   const { data, isLoading, error } = useSWR(
-    [
-      process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API,
-      token,
-      id
-    ],
+    url ? [url] : null,
     GetInvoice,
-    //    {
-    //   revalidateOnFocus: false,
-    // }
   );
-  console.log(data);
-  
-   const invoice = data;
+
+  const invoice = data;
 
   return {
     invoice,

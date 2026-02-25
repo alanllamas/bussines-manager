@@ -19,8 +19,8 @@ export type TicketProduct = {
   quantity?: number
   measurement_unit?: string;
   product?: Product
-  
-} 
+
+}
 export type Ticket = {
   id: number;
   name: string;
@@ -42,35 +42,18 @@ export type Meta = {
   }
 }
 
-// &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
-const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000`;
-const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
+const TICKETS_URL = `/api/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000`;
 
-
-
-async function GetTickets(
-  [url, token]: [string, string]
-) {
-  return await fetcher<{ data:Ticket[], meta: Meta}>(
-    url,
-    {
-      method: 'GET',
-      headers: {
-        'Authorization': token,
-      },
-    }
-  );
+async function GetTickets([url]: [string]) {
+  return await fetcher<{ data: Ticket[], meta: Meta}>(url, { method: 'GET' });
 }
 
 export default function useGetTickets() {
   const { data, isLoading, error } = useSWR(
-    [WEBHOOK_TICKETS_API, token],
+    [TICKETS_URL],
     GetTickets,
-    //    {
-    //   revalidateOnFocus: false,
-    // }
   );
-   const tickets = data ?? {data: [], meta:{ pagination: { total: 0, page: 0, count: 0 }}};
+  const tickets = data ?? { data: [], meta: { pagination: { total: 0, page: 0, count: 0 } } };
 
   return {
     tickets,
