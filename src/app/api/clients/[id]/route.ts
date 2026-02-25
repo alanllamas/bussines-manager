@@ -1,0 +1,18 @@
+const STRAPI_API = process.env.BUSINESS_MANAGER_API;
+const TOKEN = process.env.BUSINESS_MANAGER_TOKEN;
+
+const headers = () => ({
+  Authorization: `Bearer ${TOKEN}`,
+  'Content-Type': 'application/json',
+});
+
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const { searchParams } = new URL(request.url);
+  const res = await fetch(`${STRAPI_API}/clients/${id}?${searchParams.toString()}`, {
+    headers: headers(),
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  return Response.json(data, { status: res.status });
+}
