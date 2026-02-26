@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
+  --font-heading: 'Roboto', sans-serif;
+  --font-body: 'Roboto', sans-serif;
   /* Primary — brand teal from logo */
   --color-primary-50:  #f0fafa;
   --color-primary-100: #cceaea;
@@ -48,7 +51,11 @@
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 .material-symbols-outlined {
