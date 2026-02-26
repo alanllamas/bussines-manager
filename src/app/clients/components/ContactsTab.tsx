@@ -3,51 +3,43 @@ import React from "react";
 import { TabPanel } from '@headlessui/react'
 import { Client, Contact } from "@/api/hooks/clients/getClient";
 
-const ContactsTab: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
-
-  const generateCard = (contact: any, i: number) => {
-    return <div key={i} className="w-1/5 p-4 border-2 b-neutral-900 rounded m-2">
-      <p className="flex justify-between">
-        <span className="w-4/12">Nombre: </span> 
-        <span className="w-8/12">{contact?.name}</span>
-      </p>
-      <p className="flex justify-between">
-        <span className="w-4/12">Area: </span> 
-        <span className="w-8/12">{contact?.area}</span>
-      </p>
-      <p className="flex justify-between">
-        <span className="w-4/12">Correo: </span> 
-        <span className="w-8/12">{contact?.email}</span>
-      </p>
-      <p className="flex justify-between">
-        <span className="w-4/12">Extension: </span> 
-        <span className="w-8/12">{contact?.extension}</span>
-      </p>
-      <p className="flex justify-between">
-        <span className="w-4/12">Titulo Laboral: </span>
-        <span className="w-8/12">{contact?.job_title}</span>
-      </p>
-      <p className="flex justify-between">
-        <span className="w-4/12">Telefono: </span> 
-        <span className="w-8/12">{contact?.phone}</span>
-      </p>
+const ContactCard = ({ contact }: { contact: Contact }) => (
+  <div className="border border-surface-200 rounded-lg p-5 bg-white flex flex-col gap-3 w-64">
+    <div className="flex items-center gap-3 pb-3 border-b border-surface-100">
+      <div className="w-9 h-9 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-semibold text-sm flex-shrink-0">
+        {contact?.name?.charAt(0)?.toUpperCase() ?? '?'}
+      </div>
+      <div className="min-w-0">
+        <p className="font-semibold text-surface-900 text-sm truncate">{contact?.name || '—'}</p>
+        <p className="text-xs text-surface-400 truncate">{contact?.job_title || '—'}</p>
+      </div>
     </div>
-  }
+    {[
+      { icon: 'domain', value: contact?.area },
+      { icon: 'mail', value: contact?.email },
+      { icon: 'call', value: contact?.phone },
+      { icon: 'dialpad', value: contact?.extension },
+    ].map(({ icon, value }) => value ? (
+      <div key={icon} className="flex items-center gap-2 text-sm text-surface-600">
+        <span className="material-symbols-outlined text-[16px] text-surface-400">{icon}</span>
+        <span className="truncate">{value}</span>
+      </div>
+    ) : null)}
+  </div>
+)
 
+const ContactsTab: React.FC<{client: Client | undefined}> = ({client}) => {
   return (
-    <TabPanel className="px-2 q">
-      {
-        client?.contacts?.length !== undefined && client?.contacts?.length > 0
-        ? <div className="flex gap-2 flex-wrap">
-            {
-              client?.contacts?.map((contact: Contact, i: number) => generateCard(contact, i))
-            }
+    <TabPanel>
+      {client?.contacts?.length
+        ? <div className="flex flex-wrap gap-4">
+            {client.contacts.map((contact: Contact, i: number) => (
+              <ContactCard key={i} contact={contact} />
+            ))}
           </div>
-        : <div className="flex">
-            <h3 className="font-bold">Favor de capturar contactos del cliente</h3>
-          </div>
+        : <p className="text-sm text-surface-400">Favor de capturar los contactos del cliente.</p>
       }
     </TabPanel>
   )
 }
- export default ContactsTab
+export default ContactsTab

@@ -135,7 +135,14 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
 
   const initialFormValues: ClientInitialValues = {
     name: client?.name ?? '',
-    contacts: client?.contacts ?? [],
+    contacts: client?.contacts?.map(c => ({
+      name: c.name ?? '',
+      area: c.area ?? '',
+      email: c.email ?? '',
+      extension: c.extension ?? '',
+      job_title: c.job_title ?? '',
+      phone: c.phone ?? '',
+    })) ?? [],
     taxing_info: {
       billing_period: client?.taxing_info?.billing_period ?? 0,
       taxing_company_name: client?.taxing_info?.taxing_company_name ?? '',

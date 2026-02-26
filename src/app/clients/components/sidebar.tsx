@@ -17,7 +17,7 @@ const ClientsSideBar: React.FC = () => {
 
   return (
     <aside className="w-64 shrink-0 border-r border-surface-200 bg-white h-[calc(100vh-5rem)] flex flex-col sticky top-20 overflow-hidden">
-      <div className="px-4 py-3 border-b border-surface-200">
+      <div className="px-4 h-11 flex items-center border-b border-surface-200">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Clientes</h2>
       </div>
       <nav className="flex-1 overflow-y-auto py-2">
