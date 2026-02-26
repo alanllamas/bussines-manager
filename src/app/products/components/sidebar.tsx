@@ -4,6 +4,7 @@ import useGetProducts from "@/api/hooks/getProducts"
 import Link from "next/link"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import { usePathname } from "next/navigation"
+import Spinner from "@/components/ui/Spinner"
 
 const ProductsSideBar: React.FC = () => {
   const { isLoading: authLoading } = useAuthGuard()
@@ -20,6 +21,7 @@ const ProductsSideBar: React.FC = () => {
         <h2 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Productos</h2>
       </div>
       <nav className="flex-1 overflow-y-auto py-2">
+        {isLoading && <Spinner size="sm" className="w-full py-6" />}
         {list.map((product) => {
           const active = path === `/products/${product.documentId}`
           return (

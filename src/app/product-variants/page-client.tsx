@@ -3,6 +3,7 @@ import React, { useState } from "react"
 import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
 import ProductVariantForm from "@/components/forms/ProductVariantForm"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
+import Spinner from "@/components/ui/Spinner"
 
 const ProductVariantsPage: React.FC = () => {
   const { isLoading: authLoading } = useAuthGuard()
@@ -12,7 +13,7 @@ const ProductVariantsPage: React.FC = () => {
 
   const refresh = () => window.location.reload()
 
-  if (authLoading || isLoading) return <p className="p-4 text-surface-700">Cargando...</p>
+  if (authLoading || isLoading) return <Spinner />
   if (error) return <p className="p-4 text-surface-700">Error al cargar variantes</p>
 
   const list = variants?.data ?? []

@@ -3,6 +3,7 @@ import React from "react";
 import TicketList from "@/components/tickets/ticketList";
 import useGetTickets from "@/api/hooks/tickets/getTickets";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import Spinner from "@/components/ui/Spinner";
 
 const ClientTickets: React.FC = () => {
   const { isLoading: authLoading } = useAuthGuard();
@@ -25,7 +26,7 @@ const ClientTickets: React.FC = () => {
     <section className="w-full flex flex-col items-center">
       <section className="w-9/12 py-12 px-8 bg-surface-50 text-surface-900">
         {ticketsIsLoading
-          ? null
+          ? <Spinner className="w-full py-24" />
           : <TicketList ticketData={tickets} itemsPerPage={10} />
         }
       </section>

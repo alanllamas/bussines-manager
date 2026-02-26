@@ -4,6 +4,7 @@ import useGetClients from "@/api/hooks/clients/getClients"
 import Link from "next/link"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import { usePathname } from "next/navigation"
+import Spinner from "@/components/ui/Spinner"
 
 const ClientsSideBar: React.FC = () => {
   const { isLoading: authLoading } = useAuthGuard()
@@ -21,6 +22,7 @@ const ClientsSideBar: React.FC = () => {
         <h2 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Clientes</h2>
       </div>
       <nav className="flex-1 overflow-y-auto py-2">
+        {isLoading && <Spinner size="sm" className="w-full py-6" />}
         {clients.length === 0 && !isLoading && (
           <p className="px-4 py-6 text-sm text-surface-400 text-center">Sin clientes</p>
         )}
