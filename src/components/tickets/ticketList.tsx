@@ -9,6 +9,7 @@ import useGetTicketNumber from "@/api/hooks/tickets/getTicketNumber"
 import { isNumber } from "util"
 import TicketPrintFormat from "./ticketPrintFormat"
 import { useSWRConfig } from "swr"
+import { toast } from "sonner"
 
 const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClient}) => {
   const { mutate } = useSWRConfig()
@@ -53,7 +54,10 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   useEffect(() => {
     // make refresh
 
-    if (!TicketError && !TicketIsLoading && TicketData) {
+    if (TicketError && !TicketIsLoading) {
+      toast.error('Error al crear la nota')
+    } else if (!TicketError && !TicketIsLoading && TicketData) {
+      toast.success('Nota creada')
       invalidateTickets()
       setNewTicket(undefined)
       
@@ -64,7 +68,10 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   useEffect(() => {
     // make refresh
 
-    if (EditTicketData && !EditTicketError && !EditTicketIsLoading) {
+    if (EditTicketError && !EditTicketIsLoading) {
+      toast.error('Error al editar la nota')
+    } else if (EditTicketData && !EditTicketError && !EditTicketIsLoading) {
+      toast.success('Nota actualizada')
       invalidateTickets()
       setNewEditTicket(undefined)
       

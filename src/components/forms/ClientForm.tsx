@@ -7,6 +7,7 @@ import { Client, Contact, TaxingInfo } from "@/api/hooks/clients/getClient"
 import useCreateClient from "@/api/hooks/clients/useCreateClient"
 import useEditClient from "@/api/hooks/clients/useEditClient"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export type EVariant = {
   name: string;
@@ -186,7 +187,10 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
   }
 
   useEffect(() => {
-    if (!createError && !createLoading && createdClient) {
+    if (createError && !createLoading) {
+      toast.error('Error al crear el cliente')
+    } else if (!createError && !createLoading && createdClient) {
+      toast.success('Cliente creado')
       const id = (createdClient as any)?.data?.documentId
       if (id) router.push(`/clients/${id}`)
       else if (onSuccess) onSuccess()
@@ -194,7 +198,10 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
   }, [createLoading, createdClient, createError])
 
   useEffect(() => {
-    if (!editError && !editLoading && editedClient) {
+    if (editError && !editLoading) {
+      toast.error('Error al guardar el cliente')
+    } else if (!editError && !editLoading && editedClient) {
+      toast.success('Cliente guardado')
       if (onSuccess) onSuccess()
     }
   }, [editLoading, editedClient, editError])

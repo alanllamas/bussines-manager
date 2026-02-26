@@ -9,6 +9,7 @@ import useCreateProductVariant from "@/api/hooks/productVariants/useCreateProduc
 import { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
 import { CreateProductReq } from "@/api/hooks/products/useCreateProduct"
 import { useSWRConfig } from "swr"
+import { toast } from "sonner"
 
 const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
   const { mutate } = useSWRConfig()
@@ -33,12 +34,18 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
 
   const updateVariants = async (newIds: number[]) => {
     setSaving(true)
-    await fetcher(`/api/products/${product.documentId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ data: { product_variants: newIds } }),
-    })
-    setSaving(false)
-    invalidateProducts()
+    try {
+      await fetcher(`/api/products/${product.documentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ data: { product_variants: newIds } }),
+      })
+      invalidateProducts()
+      toast.success('Variantes actualizadas')
+    } catch {
+      toast.error('Error al actualizar variantes')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleAdd = () => {
@@ -53,13 +60,19 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
 
   const handleSaveProduct = async (values: CreateProductReq) => {
     setSaving(true)
-    await fetcher(`/api/products/${product.documentId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ data: values }),
-    })
-    setSaving(false)
-    setEditing(false)
-    invalidateProducts()
+    try {
+      await fetcher(`/api/products/${product.documentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ data: values }),
+      })
+      setEditing(false)
+      invalidateProducts()
+      toast.success('Producto guardado')
+    } catch {
+      toast.error('Error al guardar el producto')
+    } finally {
+      setSaving(false)
+    }
   }
 
   // After new variant is created, add it to the product

@@ -5,6 +5,7 @@ import { Product } from "@/api/hooks/getProducts"
 import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
 import { fetcher } from "@/api/fetcher"
 import { useSWRConfig } from "swr"
+import { toast } from "sonner"
 
 const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
   const { mutate } = useSWRConfig()
@@ -21,13 +22,19 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
 
   const updateVariants = async (newIds: number[]) => {
     setSaving(true)
-    await fetcher(`/api/products/${product.documentId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ data: { product_variants: newIds } }),
-    })
-    setSaving(false)
-    mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/products'))
-    setSelectedId('')
+    try {
+      await fetcher(`/api/products/${product.documentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ data: { product_variants: newIds } }),
+      })
+      mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/products'))
+      setSelectedId('')
+      toast.success('Variantes actualizadas')
+    } catch {
+      toast.error('Error al actualizar variantes')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleAdd = () => {

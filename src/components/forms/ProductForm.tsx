@@ -5,6 +5,7 @@ import { Product } from "@/api/hooks/getProducts"
 import useCreateProduct, { CreateProductReq } from "@/api/hooks/products/useCreateProduct"
 import useEditProduct from "@/api/hooks/products/useEditProduct"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ product, onSuccess }) => {
   const router = useRouter()
@@ -32,7 +33,10 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
   }
 
   useEffect(() => {
-    if (!createError && !createLoading && created) {
+    if (createError && !createLoading) {
+      toast.error('Error al crear el producto')
+    } else if (!createError && !createLoading && created) {
+      toast.success('Producto creado')
       const id = (created as any)?.data?.documentId
       if (id) router.push(`/products/${id}?edit=1`)
       else if (onSuccess) onSuccess()
@@ -40,7 +44,10 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
   }, [createLoading, created, createError])
 
   useEffect(() => {
-    if (!editError && !editLoading && edited) {
+    if (editError && !editLoading) {
+      toast.error('Error al guardar el producto')
+    } else if (!editError && !editLoading && edited) {
+      toast.success('Producto guardado')
       if (onSuccess) onSuccess()
     }
   }, [editLoading, edited, editError])

@@ -12,6 +12,7 @@ import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices"
 import InvoicePrintFormat from "./invoicePrintFormat"
 import InvoicesForm from "../forms/InvoicesForm"
 import { useSWRConfig } from "swr"
+import { toast } from "sonner"
 
 const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   const { mutate } = useSWRConfig()
@@ -96,14 +97,20 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   useEffect(() => {
     // make refresh
 
-    if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
+    if (InvoiceError && !InvoiceIsLoading) {
+      toast.error('Error al crear el corte')
+    } else if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
+      toast.success('Corte creado')
       invalidateInvoices()
       setNewInvoice(undefined)
     }
   }, [InvoiceIsLoading, InvoiceData, InvoiceError])
 
   useEffect(() => {
-    if (EditInvoiceData && !EditInvoiceError && !EditInvoiceIsLoading) {
+    if (EditInvoiceError && !EditInvoiceIsLoading) {
+      toast.error('Error al editar el corte')
+    } else if (EditInvoiceData && !EditInvoiceError && !EditInvoiceIsLoading) {
+      toast.success('Corte actualizado')
       invalidateInvoices()
       setNewEditInvoice(undefined)
       

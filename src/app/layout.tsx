@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "sonner";
 import { AuthProvider } from '@/app/context/AuthUserContext';
 import ProfileAvatar from "@/components/profile";
 import NavLinks from "@/components/NavLinks";
@@ -35,6 +36,7 @@ export default function RootLayout({
           <main className="min-h-[calc(100vh-5rem)]">
             {children}
           </main>
+          <Toaster position="bottom-right" richColors />
 
         </body>
       </AuthProvider>
