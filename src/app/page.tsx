@@ -4,9 +4,7 @@ import logo from "@/public/logo.png";
 import { useAuth } from "./context/AuthUserContext";
 
 export default function Home() {
-  // @ts-expect-error no type found
-
-      const { user } = useAuth();
+  const { user } = useAuth();
   
   return !user
     ? <section className="w-full flex flex-col items-center text-neutral-900 py-20 ">

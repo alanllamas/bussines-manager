@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import { AuthProvider } from '@/app/context/AuthUserContext';
 import ProfileAvatar from "@/components/profile";
+import NavProductsMenu from "@/components/NavProductsMenu";
 import logo from "@/public/logo.png";
 import Image from "next/image";
 
@@ -54,16 +55,13 @@ export default function RootLayout({
                   Clientes
                 </li>
               </Link>
-              <Link className="px-4" href="/">
-                <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                  Compras
-                </li>
-              </Link>
-              <Link className="px-4" href="/">
-                <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                  Analisis
-                </li>
-              </Link>
+              <NavProductsMenu />
+              <li className="px-4 font-bold bg-neutral-300 py-2 px-6 text-neutral-400 cursor-not-allowed">
+                Compras
+              </li>
+              <li className="px-4 font-bold bg-neutral-300 py-2 px-6 text-neutral-400 cursor-not-allowed">
+                Analisis
+              </li>
             </ul>
             <ProfileAvatar />
           </nav>

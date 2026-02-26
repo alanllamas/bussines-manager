@@ -6,10 +6,9 @@ const headers = () => ({
   'Content-Type': 'application/json',
 });
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const res = await fetch(`${STRAPI_API}/clients/${id}?${searchParams.toString()}`, {
+  const res = await fetch(`${STRAPI_API}/product-variants?${searchParams.toString()}`, {
     headers: headers(),
     cache: 'no-store',
   });
@@ -17,11 +16,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   return Response.json(data, { status: res.status });
 }
 
-export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function POST(request: Request) {
   const body = await request.json();
-  const res = await fetch(`${STRAPI_API}/clients/${id}?populate=*`, {
-    method: 'PUT',
+  const res = await fetch(`${STRAPI_API}/product-variants`, {
+    method: 'POST',
     headers: headers(),
     body: JSON.stringify(body),
   });
