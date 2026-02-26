@@ -57,18 +57,10 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   } = useGetInvoices()
 
   useEffect(() => {
-    if ((!invoicesError && !invoicesIsLoading && invoicesData.data)) {
-      
-      // console.log('invoicesData.data: ', invoicesData.data);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
-      // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
-      //   const dateA: number = new Date(a.sale_date).valueOf();
-      //   const dateB: number = new Date(b.sale_date).valueOf()
-      //   return dateB - dateA;
-      // });
+    if (!invoicesError && !invoicesIsLoading && invoicesData?.data) {
       setInvoices(invoicesData.data)
     }
-  }, [invoicesIsLoading, invoicesData.data, invoicesError])
+  }, [invoicesIsLoading, invoicesError])
    
   useEffect(() => {
     if ((invoicesData.data)) {
@@ -85,33 +77,16 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if (!ticketsError && !ticketsIsLoading) {
-      
-      // console.log('ticketsData.data: ', ticketsData.data);
-      // console.log('meta.pagination.total: ', productsData.meta.pagination.total);
-      
-      setTickets(ticketsData.data)
-      // if (client) {
-      //   setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null && client.id === ticket.client.id))
-
-      // } else {
-      // }
-      setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null))
+      setTickets(ticketsData?.data ?? [])
+      setAvailableTickets(ticketsData?.data?.filter(ticket => ticket.invoice === null) ?? [])
     }
-  }, [ticketsData.data, ticketsError, ticketsIsLoading])
+  }, [ticketsIsLoading, ticketsError])
 
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
-      
-      // console.log('clientsData.data: ', clientsData.data);
-      // console.log('meta.pagination.total: ', clientsData.meta.pagination.total);
-      // @ts-expect-error missing type
-      const clients = clientsData.data
-      // const client = clients.filter((cli: Client) => cli.documentId === clientId)[0]
-      setClients(clients)
-      // setclient(client)
+      setClients(clientsData?.data ?? [])
     }
-      // @ts-expect-error missing type
-  }, [clientsIsLoading, clientsData.data, clientsError])
+  }, [clientsIsLoading, clientsError])
         
   useEffect(() => {
     // make refresh
@@ -161,7 +136,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         invoice_id: editInvoice.invoice_id,
         invoice_status: editInvoice.invoice_status,
         payment_reference: editInvoice.payment_reference,
-        tickets: editInvoice.tickets,
+        tickets: editTickets,
         resume: results
       })
       // proof_of_payment: editInvoice.proof_of_payment || {
@@ -308,7 +283,6 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
               <button onClick={() => (setClient(invoice.client),setEditInvoice(invoice))}><span>edit</span></button> | <button onClick={() => sendPrint(invoice)}><span>print</span></button>
             </td>
           </tr>
-          return <></>
         })}
       </>
     );
@@ -389,6 +363,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         setCreate={setCreate}
         tickets={tickets}
         client={client}
+        editInvoice={editInvoice}
       />
     }
     <PaginatedItems itemsPerPage={10}/>

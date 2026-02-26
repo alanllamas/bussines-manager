@@ -41,40 +41,21 @@ export type Meta = {
   }
 }
 
-// &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
-const WEBHOOK_TICKETS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/tickets`;
-const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
-
-
-
-async function GetTicketsByClient(
-  [url, token, client]: [string, string, string]
-) {
-  // check filter should not birng data with related invoice
-  console.log(client);
-    
-  return await fetcher<{ data:Ticket[], meta: Meta}>(
-    `${url}?populate=client&populate=products&populate=invoice&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000&filters[$and][0][client][documentId][$eq]=${client}`,
-    {
-      method: 'GET',
-      headers: {
-        'Authorization': token,
-      },
-    }
-  );
+async function GetTicketsByClient([url]: [string]) {
+  return await fetcher<{ data: Ticket[], meta: Meta}>(url, { method: 'GET' });
 }
 
 export default function useGetTicketsByClient(client: string | number | undefined) {
+  const url = client
+    ? `/api/tickets?populate=client&populate=products&populate=invoice&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000&filters[$and][0][client][documentId][$eq]=${client}`
+    : null;
+
   const { data, isLoading, error } = useSWR(
-    [WEBHOOK_TICKETS_API, token, client],
+    url ? [url] : null,
     GetTicketsByClient,
-    //    {
-    //   revalidateOnFocus: false,
-    // }
   );
-    console.log(data);
-  
-   const tickets = data ?? {data: [], meta:{ pagination: { total: 0, page: 0, count: 0 }}};
+
+  const tickets = data ?? { data: [], meta: { pagination: { total: 0, page: 0, count: 0 } } };
 
   return {
     tickets,
