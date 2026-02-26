@@ -32,41 +32,41 @@ export default function RootLayout({
     <html lang="en">
       <AuthProvider>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiase bg-neutral-100`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiase bg-surface-50`}
         >
-          <nav className="flex justify-between bg-neutral-200 text-neutral-900 align-middle items-center py-2 px-20 ">
+          <nav className="flex justify-between bg-surface-100 text-surface-900 align-middle items-center py-2 px-20 ">
             <Link className="" href="/">
               <Image width={250} height={150} src={logo.src} alt="itacate logo"></Image>
             </Link>
         
             <ul className="flex justify-center w-full h-10 ">
               <Link className="px-4" href="/tickets">
-                <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                <li className="font-bold bg-primary-500 text-white py-2 px-6 hover:bg-primary-600">
                   Notas
                 </li>
               </Link>
               <Link className="px-4" href="/invoices">
-                <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                <li className="font-bold bg-primary-500 text-white py-2 px-6 hover:bg-primary-600">
                   Cortes
                 </li>
               </Link>
               <Link className="px-4" href="/clients">
-                <li className="font-bold bg-neutral-400 py-2 px-6 ">
+                <li className="font-bold bg-primary-500 text-white py-2 px-6 hover:bg-primary-600">
                   Clientes
                 </li>
               </Link>
               <NavProductsMenu />
-              <li className="px-4 font-bold bg-neutral-300 py-2 px-6 text-neutral-400 cursor-not-allowed">
+              <li className="px-4 font-bold bg-surface-200 py-2 px-6 text-surface-400 cursor-not-allowed">
                 Compras
               </li>
-              <li className="px-4 font-bold bg-neutral-300 py-2 px-6 text-neutral-400 cursor-not-allowed">
+              <li className="px-4 font-bold bg-surface-200 py-2 px-6 text-surface-400 cursor-not-allowed">
                 Analisis
               </li>
             </ul>
             <ProfileAvatar />
           </nav>
 
-          <section className="bg-neutral-100 flex justify-center w-full h-full">
+          <section className="bg-surface-50 flex justify-center w-full h-full">
             {children}
           </section>
         </body>

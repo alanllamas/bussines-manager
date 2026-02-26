@@ -6,7 +6,7 @@ import useCreateProduct, { CreateProductReq } from "@/api/hooks/products/useCrea
 import useEditProduct from "@/api/hooks/products/useEditProduct"
 import { useRouter } from "next/navigation"
 
-const fieldClass = "border border-neutral-400 rounded-sm px-2"
+const fieldClass = "border border-surface-300 rounded-sm px-2"
 
 const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ product, onSuccess }) => {
   const router = useRouter()
@@ -52,7 +52,7 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
       {() => (
-        <Form className="text-neutral-600 flex flex-col gap-2 w-80">
+        <Form className="text-surface-600 flex flex-col gap-2 w-80">
           <div className="flex justify-between">
             <label className="px-2">Nombre:</label>
             <Field className={fieldClass} name="name" type="text" />
@@ -78,7 +78,7 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-green-700 px-4 py-2 text-white disabled:opacity-50"
+              className="bg-primary-500 px-4 py-2 text-white disabled:opacity-50"
             >
               {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear'}
             </button>

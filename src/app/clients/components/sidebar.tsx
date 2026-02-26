@@ -18,19 +18,19 @@ const ClientsSideBar: React.FC = () => {
   const clients = (!clientsError && !clientsIsLoading) ? (clientsData?.data ?? []) : [];
 
   return (
-    <section className="w-3/12 bg-neutral-200 text-neutral-900">
+    <section className="w-3/12 bg-surface-100 text-surface-900">
       {clients.map((client, index: number) => (
         <Link
           key={`client-${index}`}
           href={`/clients/${client.documentId}`}
-          className="flex items-center justify-between shadow-md bg-neutral-200 rounded-md px-6 py-4 hover:bg-neutral-400 hover:text-neutral-700"
+          className="flex items-center justify-between shadow-md bg-surface-100 rounded-md px-6 py-4 hover:bg-surface-300 hover:text-surface-700"
         >
           <h4>{client.name}</h4> <h4>{'>'}</h4>
         </Link>
       ))}
       <Link
         href={`/clients/new`}
-        className="flex items-center justify-between shadow-md bg-neutral-200 rounded-md px-6 py-4 hover:bg-neutral-400 hover:text-neutral-700"
+        className="flex items-center justify-between shadow-md bg-surface-100 rounded-md px-6 py-4 hover:bg-surface-300 hover:text-surface-700"
       >
         <h4>Crear Cliente Nuevo</h4> <h4>{'+'}</h4>
       </Link>

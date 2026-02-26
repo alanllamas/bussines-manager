@@ -184,7 +184,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
         {currentItems &&
           currentItems?.map((ticket: Ticket, index: number) => {
           // console.log('ticket: ', ticket);
-          return <tr className="border-b border-neutral-300" key={`ticket-${index}`}>
+          return <tr className="border-b border-surface-200" key={`ticket-${index}`}>
             <td className="py-2"><a href={`/tickets/${ticket.documentId}`}>{ticket.ticket_number}</a></td>
             <td className="py-2">{ticket.client?.name}</td>
             <td className="py-2">{new Date(ticket.sale_date).toLocaleDateString()}</td>
@@ -237,8 +237,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
         <ReactPaginate
           className="flex gap-3 p-4 w-1/4 self-center items-center"
           breakLabel="..."
-          pageClassName="bg-neutral-300 px-2 py-1"
-          activeClassName="bg-neutral-500 text-white"
+          pageClassName="bg-surface-200 px-2 py-1"
+          activeClassName="bg-surface-500 text-white"
           nextLabel="next >"
           onPageChange={handlePageChange}
           pageRangeDisplayed={5}

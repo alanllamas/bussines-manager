@@ -12,18 +12,18 @@ const ProductVariantsPage: React.FC = () => {
 
   const refresh = () => window.location.reload()
 
-  if (authLoading || isLoading) return <p className="p-4 text-neutral-700">Cargando...</p>
-  if (error) return <p className="p-4 text-neutral-700">Error al cargar variantes</p>
+  if (authLoading || isLoading) return <p className="p-4 text-surface-700">Cargando...</p>
+  if (error) return <p className="p-4 text-surface-700">Error al cargar variantes</p>
 
   const list = variants?.data ?? []
 
   return (
-    <section className="w-full p-6 text-neutral-700">
+    <section className="w-full p-6 text-surface-700">
       <h1 className="text-xl font-bold mb-4">Variantes de Productos</h1>
 
-      <table className="w-full text-sm mb-4 border border-neutral-200">
+      <table className="w-full text-sm mb-4 border border-surface-200">
         <thead>
-          <tr className="bg-neutral-200 text-left">
+          <tr className="bg-surface-100 text-left">
             <th className="px-4 py-2">Nombre</th>
             <th className="px-4 py-2">Tipo</th>
             <th className="px-4 py-2"></th>
@@ -31,7 +31,7 @@ const ProductVariantsPage: React.FC = () => {
         </thead>
         <tbody>
           {list.map((v) => (
-            <tr key={v.documentId} className="border-b border-neutral-200">
+            <tr key={v.documentId} className="border-b border-surface-200">
               {editingId === v.documentId ? (
                 <td colSpan={3} className="px-4 py-2">
                   <ProductVariantForm
@@ -47,7 +47,7 @@ const ProductVariantsPage: React.FC = () => {
                   <td className="px-4 py-2">
                     <button
                       onClick={() => setEditingId(v.documentId)}
-                      className="text-xs px-2 py-1 bg-neutral-300 hover:bg-neutral-400"
+                      className="text-xs px-2 py-1 bg-surface-200 hover:bg-surface-300"
                     >
                       Editar
                     </button>
@@ -58,7 +58,7 @@ const ProductVariantsPage: React.FC = () => {
           ))}
           {list.length === 0 && (
             <tr>
-              <td colSpan={3} className="px-4 py-3 text-neutral-400">No hay variantes registradas</td>
+              <td colSpan={3} className="px-4 py-3 text-surface-400">No hay variantes registradas</td>
             </tr>
           )}
         </tbody>
@@ -69,7 +69,7 @@ const ProductVariantsPage: React.FC = () => {
       ) : (
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-neutral-300 hover:bg-neutral-400 text-sm"
+          className="px-4 py-2 bg-surface-200 hover:bg-surface-300 text-sm"
         >
           + Nueva variante
         </button>

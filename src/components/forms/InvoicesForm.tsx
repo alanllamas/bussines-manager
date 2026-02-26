@@ -95,7 +95,7 @@ const InvoicesForm: React.FC<any> = ({
   return <>
     <div className="flex justify-between">
       {/* <h2>{client?.name}</h2> */}
-      <button className="px-6 py-2 bg-neutral-400" onClick={() => sendCreate()}>Crear corte</button>
+      <button className="px-6 py-2 bg-surface-300" onClick={() => sendCreate()}>Crear corte</button>
     </div>
     {
       initialFormValues && <Formik
@@ -106,7 +106,7 @@ const InvoicesForm: React.FC<any> = ({
           ({values, setFieldValue}) => (
             <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50 my-20">
               <div className="fixed inset-0 flex w-screen items-center justify-center">
-                <DialogPanel className="w-5/12 space-y-2 border bg-neutral-100 p-8 shadow-2xl text-neutral-900">
+                <DialogPanel className="w-5/12 space-y-2 border bg-surface-50 p-8 shadow-2xl text-surface-900">
                   
 
 
@@ -116,13 +116,13 @@ const InvoicesForm: React.FC<any> = ({
                     </DialogTitle>
                   {/* form for invoices */}
                   <Form className="flex flex-col gap-y-4">
-                    {/* <Field className="border border-neutral-400 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} /> */}
-                    {/* <Field className="border border-neutral-400 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
+                    {/* <Field className="border border-surface-300 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} /> */}
+                    {/* <Field className="border border-surface-300 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
                     <div className="flex align-baseline">
 
                       <label htmlFor="client" className="p-2">Cliente: </label>
 
-                      <Field required as="select" disabled={blockClient} className="border-b border-neutral-400 rounded-sm p-2 w-full" id="client" name="client" value={values.client}
+                      <Field required as="select" disabled={blockClient} className="border-b border-surface-300 rounded-sm p-2 w-full" id="client" name="client" value={values.client}
                       onChange={(e: any) => {
                         // console.log(e.target.value);
                         // console.log(clients);
@@ -261,7 +261,7 @@ const InvoicesForm: React.FC<any> = ({
                       </div>
                     </div>
                     <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
                         Notas
                       </DisclosureButton>
                       <DisclosurePanel>
@@ -286,7 +286,7 @@ const InvoicesForm: React.FC<any> = ({
                                           <div key={`product=${index}`}>
                                             <div className="flex justify-between items-center">
 
-                                              <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+                                              <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
                                                 {/* <p className="mx-1 self-start">{ open ? 'A' : 'V' }</p>
                                                 <p className="mx-1">{values.products[index].name ? values.products[index].name : ''}</p>
                                                 <p className="mx-1">{
@@ -334,12 +334,12 @@ const InvoicesForm: React.FC<any> = ({
                                               }}>X</button>
                                             </div>
                                             <DisclosurePanel className="text-gray-500">
-                                              <div className="p-2 pt-0 border border-neutral-300 w-full" key={index}>
+                                              <div className="p-2 pt-0 border border-surface-200 w-full" key={index}>
 
                                                 <div className="flex flex-col w-full">
 
                                                   <label htmlFor="`tickets.${index}`">Nota</label>
-                                                  <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" value={values.tickets[index]}
+                                                  <Field as="select" className="border border-surface-300 rounded-sm px-2 w-full" value={values.tickets[index]}
                                                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                       const newtickets = [...values.tickets, e.target.value]
                                                       setFieldValue(`tickets.${index}`, e.target.value)
@@ -358,7 +358,7 @@ const InvoicesForm: React.FC<any> = ({
                                                     <option value="">Nota</option>
                                                     {
                                                       [...(editInvoice?.tickets || []), ...availableTickets].map((ticket: Ticket, i: number) => {
-                                                        return <option className="disabled:bg-neutral-200" disabled={values.tickets.includes(`${ticket.id}`)} key={`ticket-${i}`} value={`${ticket.id}`}>{ticket.id} | {ticket.total} | {new Date(ticket.sale_date).toLocaleDateString()}</option>
+                                                        return <option className="disabled:bg-surface-100" disabled={values.tickets.includes(`${ticket.id}`)} key={`ticket-${i}`} value={`${ticket.id}`}>{ticket.id} | {ticket.total} | {new Date(ticket.sale_date).toLocaleDateString()}</option>
                                                       })
                                                     }
                                                   </Field>
@@ -378,13 +378,13 @@ const InvoicesForm: React.FC<any> = ({
                       </DisclosurePanel>
                     </Disclosure>
                     <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
                         Comentarios
                       </DisclosureButton>
                       <DisclosurePanel>
                         <div className="flex flex-col p-4 gap-2">
-                          <Field as="textarea" className="border border-neutral-300 p-2" type="text" name="comments" value={values.comments} rows="3" placeholder="Comentarios para el cliente"></Field>
-                          <Field as="textarea" className="border border-neutral-300 p-2" type="text" name="inner_comments" value={values.inner_comments} rows="3" placeholder="Comentarios internos"></Field>
+                          <Field as="textarea" className="border border-surface-200 p-2" type="text" name="comments" value={values.comments} rows="3" placeholder="Comentarios para el cliente"></Field>
+                          <Field as="textarea" className="border border-surface-200 p-2" type="text" name="inner_comments" value={values.inner_comments} rows="3" placeholder="Comentarios internos"></Field>
                         </div>
                         {/* 
                           expected_payment_date
@@ -397,7 +397,7 @@ const InvoicesForm: React.FC<any> = ({
                       </DisclosurePanel>
                     </Disclosure>
                     <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
                         Resumen
                       </DisclosureButton>
                       <DisclosurePanel>
@@ -422,7 +422,7 @@ const InvoicesForm: React.FC<any> = ({
                                       {
                                         resume?.products && resume?.products?.length > 0
                                           ? resume?.products?.map((res: any, index: number) => {
-                                              return <tr className="border-b border-neutral-300" key={index}>
+                                              return <tr className="border-b border-surface-200" key={index}>
                                                 <td>{res.name}</td>
                                                 <td>{res.variants?.join(' ')}</td>
                                                 <td>{res.quantity} {res.unit}</td>
@@ -439,7 +439,7 @@ const InvoicesForm: React.FC<any> = ({
                                       {
                                         resume?.envios && resume?.envios.total
                                           ? <>
-                                              <tr className="border-b border-neutral-300" key={resume.products.length}>
+                                              <tr className="border-b border-surface-200" key={resume.products.length}>
                                                 <td>{resume.envios.name}</td>
                                                 <td>{resume.envios.variants?.join(' ')}</td>
                                                 <td>{resume.envios.quantity} {resume.envios.unit}</td>
@@ -464,7 +464,7 @@ const InvoicesForm: React.FC<any> = ({
                       </DisclosurePanel>
                     </Disclosure>
                     <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
                         Fechas y referencias
                       </DisclosureButton>
                       <DisclosurePanel>
@@ -548,32 +548,32 @@ const InvoicesForm: React.FC<any> = ({
                       <div className="w-1/2 px-4">
                         <div className="flex justify-between gap-x-4 my-2">
                           <label htmlFor="sub_total">Sub total</label>
-                          <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="sub_total" value={totals?.sub_total} name="sub_total" type="string" placeholder="sub total" />
-                          <div className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300">{totals?.sub_total.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
+                          <Field className="hidden border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200" disabled id="sub_total" value={totals?.sub_total} name="sub_total" type="string" placeholder="sub total" />
+                          <div className="border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200">{totals?.sub_total.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
                         </div>
                         <div className="flex justify-between gap-x-4 my-2">
                           <label htmlFor="shipping">Envío</label>
-                          <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" value={values.shipping} name="shipping" type="string" placeholder="Envio" />
-                          <div className="border border-neutral-400 rounded-sm px-2 w-1/2 ">{(resume?.envios?.sub_total || 0)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
+                          <Field className="hidden border border-surface-300 rounded-sm px-2 w-1/2 " id="shipping" value={values.shipping} name="shipping" type="string" placeholder="Envio" />
+                          <div className="border border-surface-300 rounded-sm px-2 w-1/2 ">{(resume?.envios?.sub_total || 0)?.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
                         </div>
                       </div>
                       <div className="w-1/2 px-4">
                         <div className="flex justify-between gap-x-4 my-2">
                           <label htmlFor="total_taxes">IVA</label>
-                          <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 " id="total_taxes" value={totals?.total_taxes || 0} name="total_taxes" type="string" placeholder="Impuestos" />
-                          <div className="border border-neutral-400 rounded-sm px-2 w-1/2 ">{(totals?.total_taxes || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
+                          <Field className="hidden border border-surface-300 rounded-sm px-2 w-1/2 " id="total_taxes" value={totals?.total_taxes || 0} name="total_taxes" type="string" placeholder="Impuestos" />
+                          <div className="border border-surface-300 rounded-sm px-2 w-1/2 ">{(totals?.total_taxes || 0).toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
                         </div>
                         <div className="flex justify-between gap-x-4 my-2">
                           <label htmlFor="total">Total</label>
-                          <Field className="hidden border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" required disabled id="total" value={totals?.total} name="total" type="string" placeholder="total" />
-                          <div className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300">{totals?.total.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
+                          <Field className="hidden border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200" required disabled id="total" value={totals?.total} name="total" type="string" placeholder="total" />
+                          <div className="border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200">{totals?.total.toLocaleString('es-mx', {style:"currency", currency:"MXN"})}</div>
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex gap-4 justify-end">
                       <button className="bg-red-800 px-4 py-2 rounded-sm text-white" onClick={() => sendClose()}>Cancelar</button>
-                      <button disabled={values.tickets.length === 0} className=" disabled:bg-green-300 bg-green-700 px-4 py-2 text-white" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
+                      <button disabled={values.tickets.length === 0} className=" disabled:bg-green-300 bg-primary-500 px-4 py-2 text-white" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
                     </div>
                   </Form>
                 </DialogPanel>

@@ -5,7 +5,7 @@ import { ProductVariant } from "@/api/hooks/getProducts"
 import useCreateProductVariant, { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
 import useEditProductVariant from "@/api/hooks/productVariants/useEditProductVariant"
 
-const fieldClass = "border border-neutral-400 rounded-sm px-2"
+const fieldClass = "border border-surface-300 rounded-sm px-2"
 
 const ProductVariantForm: React.FC<{
   variant?: ProductVariant;
@@ -61,12 +61,12 @@ const ProductVariantForm: React.FC<{
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-green-700 px-3 py-1 text-white text-sm disabled:opacity-50"
+            className="bg-primary-500 px-3 py-1 text-white text-sm disabled:opacity-50"
           >
             {isSubmitting ? '...' : isEdit ? 'Guardar' : 'Agregar'}
           </button>
           {onCancel && (
-            <button type="button" onClick={onCancel} className="px-3 py-1 text-sm bg-neutral-300">
+            <button type="button" onClick={onCancel} className="px-3 py-1 text-sm bg-surface-200">
               Cancelar
             </button>
           )}

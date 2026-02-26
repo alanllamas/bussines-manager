@@ -126,8 +126,8 @@ const PERIODOS = [
   { value: 30, label: '30 días' },
 ]
 
-const selectClass = "border border-neutral-400 rounded-sm px-2 bg-white"
-const fieldClass = "border border-neutral-400 rounded-sm px-2"
+const selectClass = "border border-surface-300 rounded-sm px-2 bg-white"
+const fieldClass = "border border-surface-300 rounded-sm px-2"
 
 const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ client, onSuccess }) => {
   const router = useRouter()
@@ -191,7 +191,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
       enableReinitialize
     >
       {({ values }) => (
-        <Form className="text-neutral-600 w-2/4">
+        <Form className="text-surface-600 w-2/4">
           <div className="flex w-full justify-between mb-2">
             <label htmlFor="name" className="px-2">Nombre: </label>
             <Field className={fieldClass} id="name" name="name" type="text" />
@@ -211,7 +211,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                       {({ open }) => (
                         <div>
                           <div className="flex justify-between items-center">
-                            <DisclosureButton className="py-2 px-2 w-full flex bg-neutral-200 justify-between">
+                            <DisclosureButton className="py-2 px-2 w-full flex bg-surface-100 justify-between">
                               <p className="mx-1">{open ? 'A' : 'V'}</p>
                               <p className="mx-1">{values.contacts[index].name || ''}</p>
                               <p className="mx-1">{values.contacts[index].phone}</p>
@@ -219,7 +219,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                             <button className="flex justify-end px-3 py-2 bg-red-800 text-white" type="button" onClick={() => remove(index)}>X</button>
                           </div>
                           <DisclosurePanel className="text-gray-500">
-                            <div className="px-2 pt-0 border border-neutral-300 w-full">
+                            <div className="px-2 pt-0 border border-surface-200 w-full">
                               {[
                                 { label: 'Nombre', name: `contacts.${index}.name` },
                                 { label: 'Área', name: `contacts.${index}.area` },
@@ -356,7 +356,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
           </div>
 
           <div className="flex gap-4 justify-end">
-            <button className="bg-green-700 px-4 py-2 text-white disabled:opacity-50" type="submit" disabled={isSubmitting}>
+            <button className="bg-primary-500 px-4 py-2 text-white disabled:opacity-50" type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear'}
             </button>
           </div>

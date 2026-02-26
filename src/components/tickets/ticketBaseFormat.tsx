@@ -27,22 +27,22 @@ const TicketBaseFormat: React.FC<any> = ({ticket, date}) => {
         <table className="print:text-sm">
           <thead>
             <tr>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Producto</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Variantes</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Cantidad</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Precio</th>
-              <th className="px-2 py-1 border  border-neutral-300 print:border-neutral-100">Importe</th>
+              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Producto</th>
+              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Variantes</th>
+              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Cantidad</th>
+              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Precio</th>
+              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Importe</th>
             </tr>
           </thead>
           <tbody>
             {
               ticket?.products?.map((product: TicketProduct, index: number) => {
                 return <tr key={index} className="">
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100">{ product?.product?.name|| ''}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100">{ product?.product_variants?.map((variant: ProductVariant) => variant.name ).join(' | ') || ''}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right">{ product?.quantity } {product?.product?.measurement_unit|| ''}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right h-8">{ product?.price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
-                  <td className="px-2 border  border-neutral-300 print:border-neutral-100 text-right h-8">{ product?.product_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
+                  <td className="px-2 border  border-surface-200 print:border-neutral-100">{ product?.product?.name|| ''}</td>
+                  <td className="px-2 border  border-surface-200 print:border-neutral-100">{ product?.product_variants?.map((variant: ProductVariant) => variant.name ).join(' | ') || ''}</td>
+                  <td className="px-2 border  border-surface-200 print:border-neutral-100 text-right">{ product?.quantity } {product?.product?.measurement_unit|| ''}</td>
+                  <td className="px-2 border  border-surface-200 print:border-neutral-100 text-right h-8">{ product?.price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
+                  <td className="px-2 border  border-surface-200 print:border-neutral-100 text-right h-8">{ product?.product_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
                 </tr>
               })
             }
@@ -59,15 +59,15 @@ const TicketBaseFormat: React.FC<any> = ({ticket, date}) => {
           <div className=" flex  flex-col w-1/2 gap-y-2 mt-2">
             <div className="flex w-full">
               <p className="mr-1 w-3/4" >Sub total</p>
-              <p className="border p-0.5 border-neutral-300 w-full px-3 text-right">{ticket?.sub_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
+              <p className="border p-0.5 border-surface-200 w-full px-3 text-right">{ticket?.sub_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
             </div>
             <div className="flex w-full">
               <p className="mr-1 w-3/4" >Envio</p>
-              <p className="border p-0.5 border-neutral-300 w-full px-3 text-right">{ticket?.shipping_price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
+              <p className="border p-0.5 border-surface-200 w-full px-3 text-right">{ticket?.shipping_price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
             </div>
             <div className="flex w-full">
               <p className="mr-1 w-3/4" >Total</p>
-              <p className="border p-0.5 border-neutral-300 w-full px-3 text-right">{ticket?.total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
+              <p className="border p-0.5 border-surface-200 w-full px-3 text-right">{ticket?.total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</p>
             </div>
           </div>
         </div>

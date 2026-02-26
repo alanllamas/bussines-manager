@@ -23,7 +23,7 @@ const ClientTickets: React.FC = () => {
 
   return (
     <section className="w-full flex flex-col items-center">
-      <section className="w-9/12 py-12 px-8 bg-neutral-100 text-neutral-900">
+      <section className="w-9/12 py-12 px-8 bg-surface-50 text-surface-900">
         {ticketsIsLoading
           ? null
           : <TicketList ticketData={tickets} itemsPerPage={10} />

@@ -145,7 +145,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
       // },
       // {
       //   !create && <Disclosure>
-      //     <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+      //     <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
       //       Archivos
       //     </DisclosureButton>
       //     <DisclosurePanel>
@@ -258,7 +258,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
         {currentItems &&
           currentItems?.map((invoice: Invoice, index: number) => {
           // console.log('invoice: ', invoice);
-          return <tr className="border-b border-neutral-300" key={`invoice-${index}`}>
+          return <tr className="border-b border-surface-200" key={`invoice-${index}`}>
 
             <td className="py-2"><a href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
             <td className="py-2">{invoice.client?.name}</td>
@@ -315,8 +315,8 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
         <ReactPaginate
           className="flex gap-3 p-4 w-1/4 self-center items-center"
           breakLabel="..."
-          pageClassName="bg-neutral-300 px-2 py-1"
-          activeClassName="bg-neutral-500 text-white"
+          pageClassName="bg-surface-200 px-2 py-1"
+          activeClassName="bg-surface-500 text-white"
           nextLabel="next >"
           onPageChange={handlePageChange}
           pageRangeDisplayed={5}

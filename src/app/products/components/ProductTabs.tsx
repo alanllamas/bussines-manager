@@ -9,7 +9,7 @@ import useCreateProductVariant from "@/api/hooks/productVariants/useCreateProduc
 import { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
 import { CreateProductReq } from "@/api/hooks/products/useCreateProduct"
 
-const fieldClass = "border border-neutral-400 rounded-sm px-2 text-sm"
+const fieldClass = "border border-surface-300 rounded-sm px-2 text-sm"
 
 const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
   const searchParams = useSearchParams()
@@ -70,7 +70,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
   }, [createdVariant, creatingVariant])
 
   return (
-    <div className="p-4 text-neutral-700">
+    <div className="p-4 text-surface-700">
       <h2 className="font-bold text-lg mb-4">{product.name}</h2>
 
       {/* VIEW MODE */}
@@ -78,15 +78,15 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
         <div className="flex gap-8">
           <div className="flex flex-col gap-2 text-sm flex-1">
             <div className="flex gap-4">
-              <span className="text-neutral-500 w-36">Precio</span>
+              <span className="text-surface-500 w-36">Precio</span>
               <span>${product.price}</span>
             </div>
             <div className="flex gap-4">
-              <span className="text-neutral-500 w-36">Unidad de medida</span>
+              <span className="text-surface-500 w-36">Unidad de medida</span>
               <span>{product.measurement_unit}</span>
             </div>
             <div className="flex gap-4">
-              <span className="text-neutral-500 w-36">Impuestos</span>
+              <span className="text-surface-500 w-36">Impuestos</span>
               <span>{product.taxes ?? 0}%</span>
             </div>
           </div>
@@ -94,10 +94,10 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
           <div className="flex-1">
             <h3 className="font-semibold text-sm mb-2">Variantes</h3>
             <div className="flex flex-wrap gap-2">
-              {current.length === 0 && <p className="text-sm text-neutral-400">Sin variantes</p>}
+              {current.length === 0 && <p className="text-sm text-surface-400">Sin variantes</p>}
               {current.map(v => (
-                <span key={v.id} className="bg-neutral-200 px-3 py-1 rounded-full text-sm">
-                  {v.name}{v.type && <span className="text-neutral-400 text-xs ml-1">({v.type})</span>}
+                <span key={v.id} className="bg-surface-100 px-3 py-1 rounded-full text-sm">
+                  {v.name}{v.type && <span className="text-surface-400 text-xs ml-1">({v.type})</span>}
                 </span>
               ))}
             </div>
@@ -123,15 +123,15 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
               {() => (
                 <Form className="flex flex-col gap-2 text-sm">
                   <div className="flex justify-between gap-2">
-                    <label className="w-36 text-neutral-500">Nombre</label>
+                    <label className="w-36 text-surface-500">Nombre</label>
                     <Field className={fieldClass + ' flex-1'} name="name" type="text" />
                   </div>
                   <div className="flex justify-between gap-2">
-                    <label className="w-36 text-neutral-500">Precio</label>
+                    <label className="w-36 text-surface-500">Precio</label>
                     <Field className={fieldClass + ' flex-1'} name="price" type="number" step="0.01" min="0" />
                   </div>
                   <div className="flex justify-between gap-2">
-                    <label className="w-36 text-neutral-500">Unidad de medida</label>
+                    <label className="w-36 text-surface-500">Unidad de medida</label>
                     <Field as="select" className={fieldClass + ' flex-1 bg-white'} name="measurement_unit">
                       <option value="">-- Unidad --</option>
                       <option value="kg">Kg</option>
@@ -140,14 +140,14 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
                     </Field>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <label className="w-36 text-neutral-500">Impuestos (%)</label>
+                    <label className="w-36 text-surface-500">Impuestos (%)</label>
                     <Field className={fieldClass + ' flex-1'} name="taxes" type="number" step="0.01" min="0" />
                   </div>
                   <div className="flex gap-2 mt-2">
-                    <button type="submit" disabled={saving} className="px-4 py-2 bg-green-700 text-white text-sm disabled:opacity-50">
+                    <button type="submit" disabled={saving} className="px-4 py-2 bg-primary-500 text-white text-sm disabled:opacity-50">
                       {saving ? 'Guardando...' : 'Guardar'}
                     </button>
-                    <button type="button" onClick={() => setEditing(false)} className="px-4 py-2 bg-neutral-300 text-sm">
+                    <button type="button" onClick={() => setEditing(false)} className="px-4 py-2 bg-surface-200 text-sm">
                       Cancelar
                     </button>
                   </div>
@@ -162,11 +162,11 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
 
             {/* Current variants with remove */}
             <div className="flex flex-wrap gap-2 mb-3">
-              {current.length === 0 && <p className="text-sm text-neutral-400">Sin variantes</p>}
+              {current.length === 0 && <p className="text-sm text-surface-400">Sin variantes</p>}
               {current.map(v => (
-                <span key={v.id} className="flex items-center gap-1 bg-neutral-200 px-3 py-1 rounded-full text-sm">
-                  {v.name}{v.type && <span className="text-neutral-400 text-xs ml-1">({v.type})</span>}
-                  <button onClick={() => handleRemove(v.id)} disabled={saving} className="ml-1 text-neutral-400 hover:text-red-600 disabled:opacity-50">×</button>
+                <span key={v.id} className="flex items-center gap-1 bg-surface-100 px-3 py-1 rounded-full text-sm">
+                  {v.name}{v.type && <span className="text-surface-400 text-xs ml-1">({v.type})</span>}
+                  <button onClick={() => handleRemove(v.id)} disabled={saving} className="ml-1 text-surface-400 hover:text-red-600 disabled:opacity-50">×</button>
                 </span>
               ))}
             </div>
@@ -177,7 +177,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
                 <select
                   value={selectedId}
                   onChange={e => setSelectedId(e.target.value)}
-                  className="border border-neutral-400 rounded-sm px-2 py-1 text-sm bg-white"
+                  className="border border-surface-300 rounded-sm px-2 py-1 text-sm bg-white"
                 >
                   <option value="">-- Agregar variante --</option>
                   {available.map(v => (
@@ -186,7 +186,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
                     </option>
                   ))}
                 </select>
-                <button onClick={handleAdd} disabled={!selectedId || saving} className="px-3 py-1 bg-neutral-300 hover:bg-neutral-400 text-sm disabled:opacity-50">
+                <button onClick={handleAdd} disabled={!selectedId || saving} className="px-3 py-1 bg-surface-200 hover:bg-surface-300 text-sm disabled:opacity-50">
                   Agregar
                 </button>
               </div>
@@ -207,17 +207,17 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
                       <option value="tamano">Tamaño</option>
                       <option value="empaque">Empaque</option>
                     </Field>
-                    <button type="submit" disabled={creatingVariant} className="px-3 py-1 bg-green-700 text-white text-sm disabled:opacity-50">
+                    <button type="submit" disabled={creatingVariant} className="px-3 py-1 bg-primary-500 text-white text-sm disabled:opacity-50">
                       {creatingVariant ? '...' : 'Crear'}
                     </button>
-                    <button type="button" onClick={() => setShowNewVariant(false)} className="px-3 py-1 bg-neutral-300 text-sm">
+                    <button type="button" onClick={() => setShowNewVariant(false)} className="px-3 py-1 bg-surface-200 text-sm">
                       ×
                     </button>
                   </Form>
                 )}
               </Formik>
             ) : (
-              <button onClick={() => setShowNewVariant(true)} className="text-sm text-neutral-500 underline">
+              <button onClick={() => setShowNewVariant(true)} className="text-sm text-surface-500 underline">
                 + Crear nueva variante
               </button>
             )}
@@ -226,7 +226,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
       )}
 
       {!editing && (
-        <button className="mt-4 px-4 py-2 bg-neutral-300 hover:bg-neutral-400 text-sm" onClick={() => setEditing(true)}>
+        <button className="mt-4 px-4 py-2 bg-surface-200 hover:bg-surface-300 text-sm" onClick={() => setEditing(true)}>
           Editar
         </button>
       )}

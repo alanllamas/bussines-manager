@@ -1,17 +1,44 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Primary — brand teal from logo */
+  --color-primary-50:  #f0fafa;
+  --color-primary-100: #cceaea;
+  --color-primary-200: #99d5d5;
+  --color-primary-300: #66c0c0;
+  --color-primary-400: #33abab;
+  --color-primary-500: #1e6b6b;
+  --color-primary-600: #1a5e5e;
+  --color-primary-700: #145050;
+  --color-primary-800: #0e3b3b;
+  --color-primary-900: #082626;
+  --color-primary-950: #041313;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Surface — neutral with a slight teal tint */
+  --color-surface-50:  #f7fafa;
+  --color-surface-100: #edf2f2;
+  --color-surface-200: #d9e4e4;
+  --color-surface-300: #bccece;
+  --color-surface-400: #91aeae;
+  --color-surface-500: #6b8e8e;
+  --color-surface-600: #4f6e6e;
+  --color-surface-700: #3a5252;
+  --color-surface-800: #273838;
+  --color-surface-900: #161f1f;
+  --color-surface-950: #0b1010;
+
+  /* Accent — warm amber, complements teal */
+  --color-accent-50:  #fdf8ee;
+  --color-accent-100: #faeccf;
+  --color-accent-200: #f5d99f;
+  --color-accent-300: #efc070;
+  --color-accent-400: #e8a43d;
+  --color-accent-500: #d4820a;
+  --color-accent-600: #b36808;
+  --color-accent-700: #8c5006;
+  --color-accent-800: #663a04;
+  --color-accent-900: #402402;
+  --color-accent-950: #201201;
 }
 
 @font-face {
@@ -21,8 +48,6 @@
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -40,17 +65,9 @@ body {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   user-select: none;
-
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
   font-feature-settings: 'liga';
 }
 
@@ -68,14 +85,8 @@ body {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   user-select: none;
-
   -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
   font-feature-settings: 'liga';
 }

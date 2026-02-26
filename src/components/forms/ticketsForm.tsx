@@ -216,7 +216,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                   </button>
                 </div>
                 { values.products[props.index]?.product_variants.map((_: any, variant_index: any) => {
-                    return (<div className="flex px-2 border border-neutral-400 rounded-sm" key={variant_index}>
+                    return (<div className="flex px-2 border border-surface-300 rounded-sm" key={variant_index}>
                       <Field as='select' className=" px-2 w-full" name={`products.${props.index}.product_variants.${variant_index}.id`}
                         onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                           if (e.target.value) {
@@ -239,8 +239,8 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                             })
                           }
                       </Field>
-                      <Field className="border border-neutral-400 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.name`} type="text" />
-                      <Field className="border border-neutral-400 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.type`} type="text" />
+                      <Field className="border border-surface-300 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.name`} type="text" />
+                      <Field className="border border-surface-300 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.type`} type="text" />
                       <button className="flex justify-end ml-2" onClick={() => variantRemove(variant_index)}>x</button>
   
                     </div>)
@@ -257,7 +257,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
 
   return <>
     <div className="flex justify-end">
-      <button className="px-6 py-2 bg-neutral-400" onClick={() => sendCreate()}>Crear nota</button>
+      <button className="px-6 py-2 bg-surface-300" onClick={() => sendCreate()}>Crear nota</button>
     </div>
     {
       initialFormValues && <Formik
@@ -268,7 +268,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
           ({values, setFieldValue}) => (
             <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50">
               <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-                <DialogPanel className="max-w-lg space-y-4 border bg-neutral-100 p-12 shadow-2xl text-neutral-900">
+                <DialogPanel className="max-w-lg space-y-4 border bg-surface-50 p-12 shadow-2xl text-surface-900">
                   
                   <div className="flex justify-between gap-2">
                     <img className="w-52" src={logo.src} alt="" />
@@ -277,12 +277,12 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                   </div>
                   {/* form for tickets */}
                     <Form>
-                      <Field className="border border-neutral-400 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} />
-                      <Field className="border border-neutral-400 rounded-sm px-2 w-full hidden" id="date" name="date" type="datetime-locale" value={values.date} />
+                      <Field className="border border-surface-300 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} />
+                      <Field className="border border-surface-300 rounded-sm px-2 w-full hidden" id="date" name="date" type="datetime-locale" value={values.date} />
                       <div className="flex align-baseline">
 
                         <label htmlFor="client" className="p-2">Cliente: </label>
-                        <Field required as="select" className="border-b border-neutral-400 rounded-sm p-2 w-full" id="client" name="client" value={values.client}>
+                        <Field required as="select" className="border-b border-surface-300 rounded-sm p-2 w-full" id="client" name="client" value={values.client}>
                           <option value="">Cliente</option>
                           {
                             clients.map((client, index: number) => {
@@ -304,7 +304,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                               >
                                 Agregar +
                               </button>
-                              {/* <div className="w-full border border-neutral-300">
+                              {/* <div className="w-full border border-surface-200">
 
                                   </div> */}
                             </div>
@@ -314,7 +314,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                       <div key={`product=${index}`}>
                                         <div className="flex justify-between items-center">
 
-                                          <DisclosureButton className="py-2 px-2 w-full flex bg-neutral-200 justify-between">
+                                          <DisclosureButton className="py-2 px-2 w-full flex bg-surface-100 justify-between">
                                             <p className="mx-1 self-start">{ open ? 'A' : 'V' }</p>
                                             <p className="mx-1">{values.products[index].name ? values.products[index].name : ''}</p>
                                             <p className="mx-1">{
@@ -335,12 +335,12 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                           <button className="flex justify-end px-3 py-2 bg-red-800 text-white" onClick={() => remove(index)}>X</button>
                                         </div>
                                         <DisclosurePanel className="text-gray-500">
-                                          <div className="p-2 pt-0 border border-neutral-300 w-full" key={index}>
+                                          <div className="p-2 pt-0 border border-surface-200 w-full" key={index}>
                                             <div className="flex flex-col">
                                               <div className="flex  w-full">
                                                 <div className="flex flex-col w-full">
                                                   <label htmlFor="`products.${index}.product`">Producto</label>
-                                                  <Field as="select" className="border border-neutral-400 rounded-sm px-2 w-full" value={values.products[index].product} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                  <Field as="select" className="border border-surface-300 rounded-sm px-2 w-full" value={values.products[index].product} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                     // onProductChange(e.target.value)
                                                       const product = products?.filter((product: Product) => {
                                                         // console.log(product);
@@ -363,12 +363,12 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                 </div>
                                               </div>
                                               <div className="w-fullflex flex-col">
-                                                <VariantsField products={products} index={index} className="border border-neutral-400 rounded-sm px-2" name={`products.${index}.product_variants`} placeholder="variantes"/>
+                                                <VariantsField products={products} index={index} className="border border-surface-300 rounded-sm px-2" name={`products.${index}.product_variants`} placeholder="variantes"/>
                                               </div>
                                               <div className="w-full flex">
                                                 <div className="flex flex-col w-full px-1">
                                                   <label htmlFor={`products.${index}.quantity`}>Cantidad {values.products[index].unit ? `(${values.products[index].unit})` : ''}</label>
-                                                  <Field className="border border-neutral-400 rounded-sm px-2 w-full" name={`products.${index}.quantity`} type="number" placeholder="cantidad"
+                                                  <Field className="border border-surface-300 rounded-sm px-2 w-full" name={`products.${index}.quantity`} type="number" placeholder="cantidad"
                                                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                       const quantity = Number(e.target.value)
                                                       const price = Number(values.products[index].price)
@@ -379,11 +379,11 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                 </div>
                                                 <div className="flex flex-col w-full px-1">
                                                   <label htmlFor="">Precio</label>
-                                                  <Field className="border border-neutral-400 rounded-sm bg-neutral-300 px-2 w-full" name={`products.${index}.price`} disabled type="number" placeholder="precio" />
+                                                  <Field className="border border-surface-300 rounded-sm bg-surface-200 px-2 w-full" name={`products.${index}.price`} disabled type="number" placeholder="precio" />
                                                 </div>
                                                 <div className="flex flex-col w-full px-1">
                                                   <label htmlFor="">Monto</label>
-                                                  <Field className="border border-neutral-400 rounded-sm bg-neutral-300 px-2 w-full" name={`products.${index}.total`} disabled type="number" placeholder="total" />
+                                                  <Field className="border border-surface-300 rounded-sm bg-surface-200 px-2 w-full" name={`products.${index}.total`} disabled type="number" placeholder="total" />
                                                 </div>
                                               </div>
                                             </div>
@@ -401,15 +401,15 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                         <div className="my-4 w-1/2">
                           <div className="flex justify-between gap-x-4 my-2">
                             <label htmlFor="subtotal">Sub total</label>
-                            <SubtotalField className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="subtotal" name="subtotal" type="number" placeholder="sub total" />
+                            <SubtotalField className="border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200" disabled id="subtotal" name="subtotal" type="number" placeholder="sub total" />
                           </div>
                           <div className="flex justify-between gap-x-4 my-2">
                             <label htmlFor="shipping">Envío</label>
-                            <Field className="border border-neutral-400 rounded-sm px-2 w-1/2 " id="shipping" name="shipping" type="number" placeholder="Envio" />
+                            <Field className="border border-surface-300 rounded-sm px-2 w-1/2 " id="shipping" name="shipping" type="number" placeholder="Envio" />
                           </div>
                           <div className="flex justify-between gap-x-4 my-2">
                             <label htmlFor="total">Total</label>
-                            <TotalField required className="border border-neutral-400 rounded-sm px-2 w-1/2 bg-neutral-300" disabled id="total" name="total" type="number" placeholder="total" />
+                            <TotalField required className="border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200" disabled id="total" name="total" type="number" placeholder="total" />
                           </div>
                         </div>
                       </div>
@@ -417,7 +417,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                       
                       <div className="flex gap-4 justify-end">
                         <button className="bg-red-800 px-4 py-2 rounded-sm text-white" onClick={() => sendClose()}>Cancelar</button>
-                        <button className="bg-green-700 px-4 py-2 text-white" type="submit">{ editTicket ? 'Editar' : 'Crear'}</button>
+                        <button className="bg-primary-500 px-4 py-2 text-white" type="submit">{ editTicket ? 'Editar' : 'Crear'}</button>
                         {/* <button onClick={() => setIsOpen(false)}>Deactivate</button> */}
                       </div>
                     </Form>
