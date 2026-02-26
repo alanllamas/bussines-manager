@@ -54,16 +54,12 @@ export default function RootLayout({
                   Clientes
                 </li>
               </Link>
-              <Link className="px-4" href="/">
-                <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                  Compras
-                </li>
-              </Link>
-              <Link className="px-4" href="/">
-                <li className="font-bold bg-neutral-400 py-2 px-6 ">
-                  Analisis
-                </li>
-              </Link>
+              <li className="px-4 font-bold bg-neutral-300 py-2 px-6 text-neutral-400 cursor-not-allowed">
+                Compras
+              </li>
+              <li className="px-4 font-bold bg-neutral-300 py-2 px-6 text-neutral-400 cursor-not-allowed">
+                Analisis
+              </li>
             </ul>
             <ProfileAvatar />
           </nav>

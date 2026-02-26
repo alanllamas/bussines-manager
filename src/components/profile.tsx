@@ -5,9 +5,6 @@ import React from "react"
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 
 const ProfileAvatar: React.FC = () => {
-  // const { signIn } = useAuth();
-  // @ts-expect-error no type found
-
   const { user, signIn, logOut} = useAuth()
   // console.log('user: ', user)
   const handleLogout = () => {
