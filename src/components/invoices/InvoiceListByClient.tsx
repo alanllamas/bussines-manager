@@ -59,7 +59,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
 
   useEffect(() => {
     if (!invoicesError && !invoicesIsLoading && invoicesData?.data) {
-      setInvoices([...invoicesData.data].sort((a, b) => b.id - a.id))
+      setInvoices([...invoicesData.data].sort((a, b) => (b.id ?? 0) - (a.id ?? 0)))
     }
   }, [invoicesIsLoading, invoicesError])
 

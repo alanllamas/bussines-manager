@@ -2,10 +2,21 @@
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { Field, FieldArray, Form, Formik, useField, useFormikContext } from "formik"
+import * as Yup from "yup"
 import logo from "@/public/logo.png"
 import { Client } from "@/api/hooks/clients/getClient"
 import useGetProducts, { Product } from "@/api/hooks/getProducts"
 import useGetClients from "@/api/hooks/clients/getClients"
+
+const ticketSchema = Yup.object({
+  client: Yup.string().required('Selecciona un cliente'),
+  products: Yup.array().of(
+    Yup.object({
+      product: Yup.number().min(1, 'Selecciona un producto').required('Selecciona un producto'),
+      quantity: Yup.number().min(1, 'La cantidad debe ser mayor a 0').required('Cantidad requerida'),
+    })
+  ).min(1, 'Agrega al menos un producto'),
+})
 
 export type EProduct = {
   name: string;
@@ -53,7 +64,7 @@ export const emptyProduct: EProduct = {
 }
 
 
-const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit, isOpen, sendClose, editTicket, today}) => {
+const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit, isOpen, sendClose, editTicket, today, apiError}) => {
   
 
           
@@ -228,10 +239,11 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
     {
       initialFormValues && <Formik
         initialValues={initialFormValues || null}
+        validationSchema={ticketSchema}
         onSubmit={async (values: TicketInitialValues) => values ? handleSubmit(values): null}
       >
         {
-          ({values, setFieldValue}) => (
+          ({values, setFieldValue, errors, touched}) => (
             <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50">
               <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
                 <DialogPanel className="max-w-lg space-y-4 border bg-surface-50 p-12 shadow-2xl text-surface-900">
@@ -245,8 +257,8 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                     <Form>
                       <Field className="border border-surface-300 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} />
                       <Field className="border border-surface-300 rounded-sm px-2 w-full hidden" id="date" name="date" type="datetime-locale" value={values.date} />
-                      <div className="flex align-baseline">
-
+                      <div className="flex flex-col">
+                        <div className="flex align-baseline">
                         <label htmlFor="client" className="p-2">Cliente: </label>
                         <Field required as="select" className="field-select" id="client" name="client" value={values.client}>
                           <option value="">Cliente</option>
@@ -256,6 +268,8 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                             })
                           }
                         </Field>
+                        </div>
+                        {touched.client && errors.client && <p className="alert-field px-2">{errors.client as string}</p>}
                       </div>
                     
                       <FieldArray name="products">
@@ -281,10 +295,8 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                             <span className="material-symbols-outlined text-[16px] text-surface-400">{ open ? 'expand_less' : 'expand_more' }</span>
                                             <p className="mx-1">{values.products[index].name ? values.products[index].name : ''}</p>
                                             <p className="mx-1">{
-                                              values.products[index].product_variants[0]
-                                                ? values.products[index].product_variants.reduce((acc, variant) => {
-                                                  return `${acc} ${variant.name}`
-                                                }, '')
+                                              values.products[index].product_variants.length > 0
+                                                ? `${values.products[index].product_variants.length} variante(s)`
                                                 : ''
                                             }</p>
                                             <div className="flex">
@@ -309,7 +321,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                     // onProductChange(e.target.value)
                                                       const product = products?.filter((product: Product) => {
                                                         // console.log(product);
-                                                        
+
                                                         return Number(e.target.value) === product.id
                                                       })[0] || null
                                                       setFieldValue(`products.${index}.unit`, product?.measurement_unit)
@@ -325,6 +337,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                       })
                                                     }
                                                   </Field>
+                                                  {(touched as any).products?.[index]?.product && (errors as any).products?.[index]?.product && <p className="alert-field">{(errors as any).products[index].product}</p>}
                                                 </div>
                                               </div>
                                               <div className="w-fullflex flex-col">
@@ -341,6 +354,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                       setFieldValue(`products.${index}.total`, price * quantity)
                                                     }}
                                                   />
+                                                  {(touched as any).products?.[index]?.quantity && (errors as any).products?.[index]?.quantity && <p className="alert-field">{(errors as any).products[index].quantity}</p>}
                                                 </div>
                                                 <div className="flex flex-col w-full px-1">
                                                   <label htmlFor="">Precio</label>
@@ -374,6 +388,12 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                       </div>
 
                       
+                      {apiError && (
+                        <div className="alert-error mt-4">
+                          <span className="material-symbols-outlined text-[18px]">error</span>
+                          Error al guardar. Por favor intenta de nuevo.
+                        </div>
+                      )}
                       <div className="flex gap-4 justify-end mt-6">
                         <button className="btn-danger" onClick={() => sendClose()}>Cancelar</button>
                         <button className="btn-primary" type="submit">{ editTicket ? 'Editar' : 'Crear'}</button>

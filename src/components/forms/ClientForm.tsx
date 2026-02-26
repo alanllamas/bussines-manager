@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react"
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { Field, FieldArray, Form, Formik } from "formik"
+import * as Yup from "yup"
 import { Client, Contact, TaxingInfo } from "@/api/hooks/clients/getClient"
 import useCreateClient from "@/api/hooks/clients/useCreateClient"
 import useEditClient from "@/api/hooks/clients/useEditClient"
@@ -123,6 +124,21 @@ const PERIODOS = [
   { value: 30, label: '30 días' },
 ]
 
+const clientSchema = Yup.object({
+  name: Yup.string().required('El nombre es requerido'),
+  taxing_info: Yup.object({
+    taxing_RFC: Yup.string().matches(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i, 'RFC inválido').nullable(),
+    email: Yup.string().email('Correo inválido').nullable(),
+    zip_code: Yup.number().typeError('Debe ser un número').nullable(),
+  }),
+  contacts: Yup.array().of(
+    Yup.object({
+      name: Yup.string().required('Nombre requerido'),
+      email: Yup.string().email('Correo inválido').nullable(),
+    })
+  ),
+})
+
 const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ client, onSuccess }) => {
   const router = useRouter()
   const isEdit = !!client
@@ -184,18 +200,27 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
   }, [editLoading, editedClient, editError])
 
   const isSubmitting = createLoading || editLoading
+  const apiError = createError || editError
 
   return (
-    <Formik initialValues={initialFormValues} onSubmit={handleSubmit} enableReinitialize>
-      {({ values }) => (
+    <Formik initialValues={initialFormValues} onSubmit={handleSubmit} enableReinitialize validationSchema={clientSchema}>
+      {({ values, errors, touched }) => (
         <Form className="grid grid-cols-2 gap-x-12 w-full">
 
           {/* LEFT: Nombre + Contactos */}
           <div className="flex flex-col gap-6">
 
+            {apiError && (
+              <div className="alert-error col-span-2 mb-2">
+                <span className="material-symbols-outlined text-[18px]">error</span>
+                Error al guardar. Por favor intenta de nuevo.
+              </div>
+            )}
+
             <div className="field-group">
               <label className="field-label" htmlFor="name">Nombre</label>
               <Field className="field-input" id="name" name="name" type="text" />
+              {touched.name && errors.name && <p className="alert-field">{errors.name}</p>}
             </div>
             <h4 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Información fiscal</h4>
 
@@ -209,16 +234,19 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
               <div className="field-group">
                 <label className="field-label">RFC</label>
                 <Field className="field-input" name="taxing_info.taxing_RFC" type="text" />
+                {(touched as any).taxing_info?.taxing_RFC && (errors as any).taxing_info?.taxing_RFC && <p className="alert-field">{(errors as any).taxing_info.taxing_RFC}</p>}
               </div>
 
               <div className="field-group">
                 <label className="field-label">Código Postal</label>
                 <Field className="field-input" name="taxing_info.zip_code" type="text" />
+                {(touched as any).taxing_info?.zip_code && (errors as any).taxing_info?.zip_code && <p className="alert-field">{(errors as any).taxing_info.zip_code}</p>}
               </div>
 
               <div className="field-group">
                 <label className="field-label">Correo para Facturas</label>
                 <Field className="field-input" name="taxing_info.email" type="email" />
+                {(touched as any).taxing_info?.email && (errors as any).taxing_info?.email && <p className="alert-field">{(errors as any).taxing_info.email}</p>}
               </div>
 
               <div className="field-group col-span-2">
@@ -341,18 +369,23 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                               <DisclosurePanel>
                                 <div className="grid grid-cols-2 gap-3 p-4 border border-t-0 border-surface-200 rounded-b">
                                   {[
-                                    { label: 'Nombre', name: `contacts.${index}.name` },
-                                    { label: 'Área', name: `contacts.${index}.area` },
-                                    { label: 'Correo', name: `contacts.${index}.email` },
-                                    { label: 'Extensión', name: `contacts.${index}.extension` },
-                                    { label: 'Título laboral', name: `contacts.${index}.job_title` },
-                                    { label: 'Teléfono', name: `contacts.${index}.phone` },
-                                  ].map(({ label, name }) => (
-                                    <div key={name} className="field-group">
-                                      <label className="field-label">{label}</label>
-                                      <Field className="field-input" name={name} type="text" />
-                                    </div>
-                                  ))}
+                                    { label: 'Nombre', name: `contacts.${index}.name`, key: 'name' },
+                                    { label: 'Área', name: `contacts.${index}.area`, key: 'area' },
+                                    { label: 'Correo', name: `contacts.${index}.email`, key: 'email' },
+                                    { label: 'Extensión', name: `contacts.${index}.extension`, key: 'extension' },
+                                    { label: 'Título laboral', name: `contacts.${index}.job_title`, key: 'job_title' },
+                                    { label: 'Teléfono', name: `contacts.${index}.phone`, key: 'phone' },
+                                  ].map(({ label, name, key }) => {
+                                    const contactTouched = (touched as any).contacts?.[index]
+                                    const contactErrors = (errors as any).contacts?.[index]
+                                    return (
+                                      <div key={name} className="field-group">
+                                        <label className="field-label">{label}</label>
+                                        <Field className="field-input" name={name} type="text" />
+                                        {contactTouched?.[key] && contactErrors?.[key] && <p className="alert-field">{contactErrors[key]}</p>}
+                                      </div>
+                                    )
+                                  })}
                                 </div>
                               </DisclosurePanel>
                             </div>

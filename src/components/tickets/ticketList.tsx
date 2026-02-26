@@ -249,8 +249,10 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     );
   }
 
+  const apiError = TicketError || EditTicketError
+
   return <>
-    <TicketsForm sendCreate={sendCreate} initialFormValues={initialFormValues} handleSubmit={handleSubmit} isOpen={isOpen} sendClose={sendClose} editTicket={editTicket}/>
+    <TicketsForm sendCreate={sendCreate} initialFormValues={initialFormValues} handleSubmit={handleSubmit} isOpen={isOpen} sendClose={sendClose} editTicket={editTicket} apiError={apiError}/>
     <PaginatedItems itemsPerPage={10}/>
     { printTicket && <TicketPrintFormat ticket={printTicket} /> }
     

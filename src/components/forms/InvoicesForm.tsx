@@ -2,12 +2,21 @@
 import { generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
 import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
 import { Field, FieldArray, Form, Formik } from "formik"
+import * as Yup from "yup"
 import React, { ChangeEvent, useEffect, useState } from "react"
 import logo from "@/public/logo.png"
 import DatePicker from "react-datepicker"
 import { Client } from "@/api/hooks/clients/getClient"
 import { Ticket } from "@/api/hooks/invoices/getTicketsByClient"
 import "react-datepicker/dist/react-datepicker.css";
+
+const invoiceSchema = Yup.object({
+  client: Yup.string().required('Selecciona un cliente'),
+  initial_date: Yup.date().nullable().required('La fecha inicial es requerida'),
+  ending_date: Yup.date().nullable().required('La fecha final es requerida')
+    .min(Yup.ref('initial_date'), 'La fecha final debe ser posterior a la inicial'),
+  tickets: Yup.array().min(1, 'Agrega al menos una nota al corte'),
+})
 
 
 
@@ -27,7 +36,8 @@ const InvoicesForm: React.FC<any> = ({
     tickets: ticketsData,
     client: clientData,
     setClient,
-    blockClient = false
+    blockClient = false,
+    apiError = null
   } : {
     sendCreate: any,
     initialFormValues: InvoiceInitialValues,
@@ -45,6 +55,7 @@ const InvoicesForm: React.FC<any> = ({
     client: Client
     setClient: any,
     blockClient: boolean
+    apiError?: any
 
   }) => {
 
@@ -95,10 +106,11 @@ const InvoicesForm: React.FC<any> = ({
     {
       initialFormValues && <Formik
         initialValues={initialFormValues || null}
+        validationSchema={invoiceSchema}
         onSubmit={async (values: InvoiceInitialValues) => values ? handleSubmit(values): null}
       >
         {
-          ({values, setFieldValue}) => (
+          ({values, setFieldValue, errors, touched}) => (
             <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50 my-20">
               <div className="fixed inset-0 flex w-screen items-center justify-center">
                 <DialogPanel className="w-5/12 space-y-2 border bg-surface-50 p-8 shadow-2xl text-surface-900">
@@ -565,6 +577,16 @@ const InvoicesForm: React.FC<any> = ({
                       </div>
                     </div>
                     
+                    {apiError && (
+                      <div className="alert-error mb-2">
+                        <span className="material-symbols-outlined text-[18px]">error</span>
+                        Error al guardar. Por favor intenta de nuevo.
+                      </div>
+                    )}
+                    {touched.client && errors.client && <p className="alert-field mb-1">{errors.client as string}</p>}
+                    {touched.initial_date && errors.initial_date && <p className="alert-field mb-1">{errors.initial_date as string}</p>}
+                    {touched.ending_date && errors.ending_date && <p className="alert-field mb-1">{errors.ending_date as string}</p>}
+                    {(touched as any).tickets && errors.tickets && <p className="alert-field mb-1">{errors.tickets as string}</p>}
                     <div className="flex gap-4 justify-end">
                       <button className="btn-danger" onClick={() => sendClose()}>Cancelar</button>
                       <button disabled={values.tickets.length === 0} className="btn-primary disabled:opacity-50" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>

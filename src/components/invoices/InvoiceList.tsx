@@ -362,6 +362,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         tickets={tickets}
         client={client}
         editInvoice={editInvoice}
+        apiError={InvoiceError || EditInvoiceError}
       />
     }
     <PaginatedItems itemsPerPage={10}/>
