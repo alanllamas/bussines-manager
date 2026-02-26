@@ -323,7 +323,13 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
             </tr>
           </thead>
           <tbody>
-            <Items currentItems={currentItems} />
+            {invoices.length === 0
+              ? <tr><td colSpan={6} className="py-12 text-center">
+                  <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                  <p className="text-sm text-surface-400 mt-2">Sin cortes</p>
+                </td></tr>
+              : <Items currentItems={currentItems} />
+            }
           </tbody>
         </table>
         <ReactPaginate

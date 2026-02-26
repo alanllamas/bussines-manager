@@ -232,7 +232,13 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
             </tr>
           </thead>
           <tbody>
-            <Items currentItems={currentItems} />
+            {tickets.length === 0
+              ? <tr><td colSpan={hideClient ? 5 : 6} className="py-12 text-center">
+                  <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                  <p className="text-sm text-surface-400 mt-2">Sin notas</p>
+                </td></tr>
+              : <Items currentItems={currentItems} />
+            }
           </tbody>
         </table>
         <ReactPaginate

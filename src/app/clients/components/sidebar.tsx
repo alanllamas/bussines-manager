@@ -21,6 +21,9 @@ const ClientsSideBar: React.FC = () => {
         <h2 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Clientes</h2>
       </div>
       <nav className="flex-1 overflow-y-auto py-2">
+        {clients.length === 0 && !isLoading && (
+          <p className="px-4 py-6 text-sm text-surface-400 text-center">Sin clientes</p>
+        )}
         {clients.map((client) => {
           const active = path === `/clients/${client.documentId}`
           return (
