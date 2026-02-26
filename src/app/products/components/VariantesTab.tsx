@@ -4,8 +4,10 @@ import { TabPanel } from "@headlessui/react"
 import { Product } from "@/api/hooks/getProducts"
 import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
 import { fetcher } from "@/api/fetcher"
+import { useSWRConfig } from "swr"
 
 const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
+  const { mutate } = useSWRConfig()
   const { variants, isLoading } = useGetProductVariants()
   const [selectedId, setSelectedId] = useState('')
   const [saving, setSaving] = useState(false)
@@ -24,7 +26,8 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
       body: JSON.stringify({ data: { product_variants: newIds } }),
     })
     setSaving(false)
-    window.location.reload()
+    mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/products'))
+    setSelectedId('')
   }
 
   const handleAdd = () => {

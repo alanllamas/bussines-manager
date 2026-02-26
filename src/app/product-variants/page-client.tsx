@@ -4,14 +4,18 @@ import useGetProductVariants from "@/api/hooks/productVariants/getProductVariant
 import ProductVariantForm from "@/components/forms/ProductVariantForm"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import Spinner from "@/components/ui/Spinner"
+import { useSWRConfig } from "swr"
 
 const ProductVariantsPage: React.FC = () => {
   const { isLoading: authLoading } = useAuthGuard()
   const { variants, isLoading, error } = useGetProductVariants()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
+  const { mutate } = useSWRConfig()
 
-  const refresh = () => window.location.reload()
+  const refresh = () => mutate(
+    (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/product-variants')
+  )
 
   if (authLoading || isLoading) return <Spinner />
   if (error) return <p className="p-4 text-surface-700">Error al cargar variantes</p>

@@ -8,8 +8,14 @@ import useGetProductVariants from "@/api/hooks/productVariants/getProductVariant
 import useCreateProductVariant from "@/api/hooks/productVariants/useCreateProductVariant"
 import { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
 import { CreateProductReq } from "@/api/hooks/products/useCreateProduct"
+import { useSWRConfig } from "swr"
 
 const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
+  const { mutate } = useSWRConfig()
+  const invalidateProducts = () => mutate(
+    (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/products')
+  )
+
   const searchParams = useSearchParams()
   const [editing, setEditing] = useState(searchParams.get('edit') === '1')
   const [selectedId, setSelectedId] = useState('')
@@ -32,7 +38,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
       body: JSON.stringify({ data: { product_variants: newIds } }),
     })
     setSaving(false)
-    window.location.reload()
+    invalidateProducts()
   }
 
   const handleAdd = () => {
@@ -52,7 +58,8 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
       body: JSON.stringify({ data: values }),
     })
     setSaving(false)
-    window.location.reload()
+    setEditing(false)
+    invalidateProducts()
   }
 
   // After new variant is created, add it to the product

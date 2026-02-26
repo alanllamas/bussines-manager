@@ -12,8 +12,13 @@ import { Invoice } from "@/api/hooks/invoices/getInvoices"
 import InvoicePrintFormat from "./invoicePrintFormat"
 import InvoicesForm from "../forms/InvoicesForm"
 import useGetInvoicesByClient from "@/api/hooks/invoices/getInvoicesByClient"
+import { useSWRConfig } from "swr"
 
 const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
+  const { mutate } = useSWRConfig()
+  const invalidateInvoices = () => mutate(
+    (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/invoices') || key[0].includes('/api/tickets'))
+  )
 // ticket form functions
   const [totals, setTotals] = useState<Totals>({total: 0, sub_total:0, total_taxes: 0})
   const [resume, setResume] = useState<Resume>()
@@ -83,17 +88,15 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
     // make refresh
 
     if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
-      // console.log('InvoiceData: ', InvoiceData);
-      setTimeout(() => window.location.reload(), 500);
+      invalidateInvoices()
+      setNewInvoice(undefined)
     }
   }, [InvoiceIsLoading, InvoiceData, InvoiceError])
 
   useEffect(() => {
-    // make refresh
-
     if (EditInvoiceData && !EditInvoiceError && !EditInvoiceIsLoading) {
-      // console.log('EditInvoiceData: ', EditInvoiceData);
-      setTimeout(() => window.location.reload(), 500);
+      invalidateInvoices()
+      setNewEditInvoice(undefined)
       
 
       // setTicket(InvoiceData.data)

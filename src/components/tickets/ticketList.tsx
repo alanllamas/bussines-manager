@@ -8,8 +8,14 @@ import useCreateTicket from "@/api/hooks/tickets/useCreateTicket"
 import useGetTicketNumber from "@/api/hooks/tickets/getTicketNumber"
 import { isNumber } from "util"
 import TicketPrintFormat from "./ticketPrintFormat"
+import { useSWRConfig } from "swr"
 
 const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClient}) => {
+  const { mutate } = useSWRConfig()
+  const invalidateTickets = () => mutate(
+    (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/tickets') || key[0].includes('/api/clients'))
+  )
+
   // ticket form functions
   const [initialFormValues, setInitialFormValues] = useState<TicketInitialValues>()
   const [isOpen, setIsOpen] = useState(false)
@@ -48,8 +54,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     // make refresh
 
     if (!TicketError && !TicketIsLoading && TicketData) {
-      // console.log('TicketData: ', TicketData);
-      setTimeout(() => window.location.reload(), 500);
+      invalidateTickets()
+      setNewTicket(undefined)
       
 
       // setTicket(TicketData.data)
@@ -59,8 +65,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     // make refresh
 
     if (EditTicketData && !EditTicketError && !EditTicketIsLoading) {
-      // console.log('EditTicketData: ', EditTicketData);
-      setTimeout(() => window.location.reload(), 500);
+      invalidateTickets()
+      setNewEditTicket(undefined)
       
 
       // setTicket(TicketData.data)
