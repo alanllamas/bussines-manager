@@ -478,16 +478,16 @@ const InvoicesForm: React.FC<any> = ({
                           <div className="flex">
 
                             <div className="flex flex-col w-1/3 px-2">
-                              <label htmlFor="invoice_id">Folio de factura</label> 
-                              <Field type="text" name="invoice_id" value={values?.invoice_id}></Field>
+                              <label className="field-label" htmlFor="invoice_id">Folio de factura</label>
+                              <Field className="field-input" type="text" name="invoice_id" value={values?.invoice_id} />
                             </div>
                             <div className="flex flex-col w-1/3 px-2">
-                              <label htmlFor="payment_reference">Referencia de pago</label> 
-                              <Field type="text" name="payment_reference" value={values?.payment_reference}></Field>
+                              <label className="field-label" htmlFor="payment_reference">Referencia de pago</label>
+                              <Field className="field-input" type="text" name="payment_reference" value={values?.payment_reference} />
                             </div>
                             <div className="flex flex-col w-1/3 px-2">
-                              <label htmlFor="invoice_status">Estatus de corte</label>
-                              <Field as="select" name="invoice_status" value={values?.invoice_status}>
+                              <label className="field-label" htmlFor="invoice_status">Estatus de corte</label>
+                              <Field className="field-select" as="select" name="invoice_status" value={values?.invoice_status}>
                                 <option value="">Selecciona una opción</option>
                                 <option value="creado">Creado</option>
                                 <option value="enviado">Enviado</option>
