@@ -4,7 +4,6 @@ import useSWR from 'swr';
 import { Invoice } from './getInvoices';
 import { Client } from '../clients/getClient';
 import { TicketProduct, Ticket } from './getTicketsByClient';
-import { useReactToPrint } from 'react-to-print';
 
 export type Meta = {
   pagination?: {
@@ -41,7 +40,7 @@ export type InvoiceInitialValues = {
   proof_of_payment?: StrapiFile
   payment_supplement?: StrapiFile
   payment_reference?: string,
-  resume: {}
+  resume: Record<string, unknown>
 }
 
 export type createInvoiceReq = {
@@ -112,7 +111,7 @@ export const generateResume = (filteredTickets: InvoiceInitialValues['tickets'],
 
         if (acc[prod?.product?.name || ''] && acc[prod?.product?.name || '']?.price === prod?.price) {
           // console.log('prod.product_total: ', prod.product_total);
-          acc[prod?.product?.name || ''].total += prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total,
+          acc[prod?.product?.name || ''].total += prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total
           acc[prod?.product?.name || ''].sub_total += prod.product_total
           acc[prod?.product?.name || ''].quantity += prod.quantity
           acc[prod?.product?.name || ''].total_taxes += prod?.product?.taxes ? (prod?.product_total || 0) * (prod?.product?.taxes/100) : 0

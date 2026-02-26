@@ -23,7 +23,7 @@ export default function useGetTicketNumber() {
     GetTicketNumber,
   );
 
-  // @ts-ignore
+  // @ts-expect-error data is array at runtime
   const ticket_number = data?.data[0].ticket_number;
 
   return {

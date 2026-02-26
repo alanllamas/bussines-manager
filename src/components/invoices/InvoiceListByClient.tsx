@@ -58,56 +58,26 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
   } = useGetInvoicesByClient(clientId)
 
   useEffect(() => {
-    if ((!invoicesError && !invoicesIsLoading && invoicesData.data)) {
-      
-      // console.log('invoicesData.data: ', invoicesData.data);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
-      // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
-      //   const dateA: number = new Date(a.sale_date).valueOf();
-      //   const dateB: number = new Date(b.sale_date).valueOf()
-      //   return dateB - dateA;
-      // });
+    if (!invoicesError && !invoicesIsLoading && invoicesData?.data) {
       setInvoices(invoicesData.data)
     }
-  }, [invoicesIsLoading, invoicesData.data, invoicesError])
-   
-  useEffect(() => {
-    if ((invoicesData.data)) {
-      // console.log('invoicesData.data: ', invoicesData.data);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
-      // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
-      //   const dateA: number = new Date(a.sale_date).valueOf();
-      //   const dateB: number = new Date(b.sale_date).valueOf()
-      //   return dateB - dateA;
-      // });
-      setInvoices(invoicesData.data)
-    }
-  }, [])
+  }, [invoicesIsLoading, invoicesError])
 
   useEffect(() => {
     if (!ticketsError && !ticketsIsLoading) {
-      
-      // console.log('ticketsData.data: ', ticketsData.data);
-      // console.log('meta.pagination.total: ', productsData.meta.pagination.total);
-      
-      setTickets(ticketsData.data)
-      setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null))
+      setTickets(ticketsData?.data ?? [])
+      setAvailableTickets(ticketsData?.data?.filter(ticket => ticket.invoice === null) ?? [])
     }
-  }, [ticketsData.data, ticketsError, ticketsIsLoading])
+  }, [ticketsIsLoading, ticketsError])
 
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
-      
-      // console.log('clientsData.data: ', clientsData.data);
-      // console.log('meta.pagination.total: ', clientsData.meta.pagination.total);
-      // @ts-expect-error missing type
-      const clients = clientsData.data
-      const client = clients.filter((cli: Client) => cli.documentId === clientId)[0]
-      setClients(clients)
+      const allClients = clientsData?.data ?? []
+      const client = allClients.find((cli: Client) => cli.documentId === clientId)
+      setClients(allClients)
       setclient(client)
     }
-      // @ts-expect-error missing type
-  }, [clientsIsLoading, clientsData.data, clientsError])
+  }, [clientsIsLoading, clientsError])
         
   useEffect(() => {
     // make refresh
@@ -132,11 +102,8 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
 
   useEffect(() => {
     if (editInvoice) {
-      console.log('editInvoice: ', editInvoice);
-      console.log('editInvoice.tickets: ', editInvoice.tickets);
-      const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
-      console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
-      const { results, totals } = generateResume(editTickets, tickets, client)
+      const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`);
+      const { results, totals } = generateResume(editTickets, editInvoice.tickets, client)
       setResume(results)
       setTotals(totals)
       setInitialFormValues({
@@ -302,7 +269,6 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
               <button onClick={() => setEditInvoice(invoice)}><span>edit</span></button> | <button onClick={() => sendPrint(invoice)}><span>print</span></button>
             </td>
           </tr>
-          return <></>
         })}
       </>
     );
@@ -382,6 +348,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
       client={client}
       setCreate={setCreate}
       tickets={tickets}
+      editInvoice={editInvoice}
       blockClient={true}
     />
     <PaginatedItems itemsPerPage={10}/>

@@ -100,12 +100,10 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       
       // console.log('clientsData.data: ', clientsData.data);
       // console.log('meta.pagination.total: ', clientsData.meta.pagination.total);
-      // @ts-expect-error missing type
 
-      setClients(clientsData.data)
+      setClients(clientsData?.data ?? [])
     }
-      // @ts-expect-error missing type
-  }, [clientsIsLoading, clientsData.data, clientsError])
+  }, [clientsIsLoading, clientsData?.data, clientsError])
           
 
 
@@ -181,9 +179,6 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
     const [prod, setProd] = useState<Product>()
   
     useEffect(() => {
-      console.log('values.products[index].product: ', values.products[props.index]?.product);
-      console.log('products: ', props.products);
-      
       const product = props.products?.filter((prod: Product)=> {
         return prod.id === values.products[props.index]?.product
       })[0]
@@ -191,15 +186,9 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
     }, [values.products, props.index, props.products])
     useEffect(() => {
       if (prod) {
-        
-        console.log('prod: ', prod);
         setVariants(prod?.product_variants)
       }
     }, [prod])
-    useEffect(() => {
-      console.log('variants: ', variants);
-      
-    }, [variants])
       
   
       // console.log('variants: ', variants);
@@ -358,7 +347,6 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                         
                                                         return Number(e.target.value) === product.id
                                                       })[0] || null
-                                                      console.log(product);
                                                       setFieldValue(`products.${index}.unit`, product?.measurement_unit)
                                                       setFieldValue(`products.${index}.name`, product?.name)
                                                       setFieldValue(`products.${index}.product`, product?.id)

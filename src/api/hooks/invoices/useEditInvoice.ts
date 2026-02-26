@@ -2,13 +2,16 @@ import useSWR from 'swr';
 import { fetcher } from '../../fetcher';
 import { Invoice } from './getInvoices';
 
-export type EditInvoiceReq = {
-}
+export type EditInvoiceReq = Record<string, never>
 
 async function postInvoice([url, data]: [string, Invoice]) {
+  const { documentId, id, ...body } = data;
+  const tickets = Array.isArray(body.tickets)
+    ? body.tickets.map((t: any) => typeof t === 'object' ? t.documentId : t)
+    : body.tickets;
   return await fetcher<Invoice>(url, {
     method: 'PUT',
-    body: JSON.stringify({ data }),
+    body: JSON.stringify({ data: { ...body, tickets } }),
   });
 }
 

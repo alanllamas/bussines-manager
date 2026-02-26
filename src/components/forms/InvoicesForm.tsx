@@ -127,7 +127,7 @@ const InvoicesForm: React.FC<any> = ({
                         // console.log(e.target.value);
                         // console.log(clients);
                         
-                        let cli = clients.filter((client) => client.id === Number(e.target.value))[0]
+                        const cli = clients.filter((client) => client.id === Number(e.target.value))[0]
                         // console.log('cli: ', cli);
                         
                         setFieldValue("client", e.target.value)
@@ -216,7 +216,6 @@ const InvoicesForm: React.FC<any> = ({
                                 setResume(undefined)
                                 setFieldValue('resume', {} )
 
-                                console.log('tickets: ', tickets);
                                 const filteredTickets = tickets.reduce((acc: string[], curr: Ticket) => {
                                   const sale_date = new Date(curr.sale_date)
                                   // console.log('sale_date: ', sale_date);

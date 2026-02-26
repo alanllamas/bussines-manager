@@ -45,7 +45,7 @@ export const emptyContact: Contact = {
 
 const ClientsForm: React.FC<any> = () => {
 
-  const [clients, setClients] = useState<Client[]>([])
+  const [clients, setClients] = useState<string[]>([])
   const [newClient, setNewClient] = useState<createClientReq>()
 
   const {
@@ -83,7 +83,6 @@ const ClientsForm: React.FC<any> = () => {
   }
   const handleSubmit = (values: ClientInitialValues) => {
     // setIsOpen(false)
-    console.log(values);
     const { name, taxing_info, contacts } = values
     
     // if (editTicket) {
@@ -96,20 +95,11 @@ const ClientsForm: React.FC<any> = () => {
 
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
-      
-      // console.log('clientsData.data: ', clientsData.data);
-      // console.log('meta.pagination.total: ', clientsData.meta.pagination.total);
-      // @ts-expect-error missing type
-
-      setClients(clientsData.data.map(client => client.name))
+      setClients(clientsData?.data?.map(client => client.name) ?? [])
     }
-  }, [clientsIsLoading, clientsData, clientsError])
+  }, [clientsIsLoading, clientsError])
   useEffect(() => {
     if (!ClientError && !ClientIsLoading) {
-      
-      console.log('ClientData: ', ClientData);
-      // console.log('meta.pagination.total: ', ClientData.meta.pagination.total);
-
       // setClient(ClientData.data.map(Client => Client.name))
     }
   }, [ClientIsLoading, ClientData, ClientError])
