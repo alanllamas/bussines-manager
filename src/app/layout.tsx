@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import { AuthProvider } from '@/app/context/AuthUserContext';
 import ProfileAvatar from "@/components/profile";
+import NavProductsMenu from "@/components/NavProductsMenu";
 import logo from "@/public/logo.png";
 import Image from "next/image";
 
@@ -54,6 +55,7 @@ export default function RootLayout({
                   Clientes
                 </li>
               </Link>
+              <NavProductsMenu />
               <li className="px-4 font-bold bg-neutral-300 py-2 px-6 text-neutral-400 cursor-not-allowed">
                 Compras
               </li>

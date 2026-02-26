@@ -9,7 +9,7 @@ const headers = () => ({
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { searchParams } = new URL(request.url);
-  const res = await fetch(`${STRAPI_API}/clients/${id}?${searchParams.toString()}`, {
+  const res = await fetch(`${STRAPI_API}/products/${id}?${searchParams.toString()}`, {
     headers: headers(),
     cache: 'no-store',
   });
@@ -20,10 +20,20 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = await request.json();
-  const res = await fetch(`${STRAPI_API}/clients/${id}?populate=*`, {
+  const res = await fetch(`${STRAPI_API}/products/${id}`, {
     method: 'PUT',
     headers: headers(),
     body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  return Response.json(data, { status: res.status });
+}
+
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const res = await fetch(`${STRAPI_API}/products/${id}`, {
+    method: 'DELETE',
+    headers: headers(),
   });
   const data = await res.json();
   return Response.json(data, { status: res.status });

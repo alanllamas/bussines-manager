@@ -3,15 +3,19 @@ import { fetcher } from '../fetcher';
 import useSWR from 'swr';
 import { Meta } from './tickets/getTickets';
 
+export type ProductVariant = {
+  id: number;
+  documentId: string;
+  name: string;
+  type: string;
+}
+
 export type Product = {
   id: number;
+  documentId: string;
   name: string;
   price: number;
-  product_variants: {
-    name: string;
-    id: number;
-    type: string;
-  }[]
+  product_variants: ProductVariant[]
   total: number
   quantity: number
   measurement_unit: string;
