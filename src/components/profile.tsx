@@ -30,7 +30,7 @@ const ProfileAvatar: React.FC = () => {
               </MenuItem>
             </MenuItems>
           </Menu>
-        : <button className="px-4 py-2 bg-surface-300" onClick={signIn}>inicia sesión</button>
+        : <button className="btn-secondary" onClick={signIn}>inicia sesión</button>
     }
         </div>
 } 

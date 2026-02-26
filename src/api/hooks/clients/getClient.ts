@@ -56,7 +56,7 @@ async function GetClient([url]: [string]) {
 
 export default function useGetClient(id: string) {
   const url = id
-    ? `/api/clients/${id}?populate=contacts&populate=invoices&populate=taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants`
+    ? `/api/clients/${id}?populate=contacts&populate=invoices&populate=taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants&populate=tickets.invoice`
     : null;
 
   const { data, isLoading, error } = useSWR(

@@ -50,20 +50,12 @@ const InvoicesForm: React.FC<any> = ({
 
   const [client, setclient] = useState<Client>()
   const [tickets, setTickets] = useState<Ticket[]>([])
+  const [openPanel, setOpenPanel] = useState<string | null>(null)
+  const togglePanel = (name: string) => setOpenPanel(prev => prev === name ? null : name)
 
   useEffect(() => {
-      // console.log('clientData: ', clientData);
-    if ((clientData)) {
-      // console.log('clientData: ', clientData);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
-      // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
-      //   const dateA: number = new Date(a.sale_date).valueOf();
-      //   const dateB: number = new Date(b.sale_date).valueOf()
-      //   return dateB - dateA;
-      // });
-      setclient(clientData)
-      setClient(clientData)
-    }
+    setclient(clientData)
+    if (clientData) setClient(clientData)
   }, [clientData])
   useEffect(() => {
     if (client) {
@@ -95,7 +87,10 @@ const InvoicesForm: React.FC<any> = ({
   return <>
     <div className="flex justify-between">
       {/* <h2>{client?.name}</h2> */}
-      <button className="px-6 py-2 bg-surface-300" onClick={() => sendCreate()}>Crear corte</button>
+      <button className="btn-primary" onClick={() => sendCreate()}>
+        <span className="material-symbols-outlined text-[16px]">add</span>
+        Crear corte
+      </button>
     </div>
     {
       initialFormValues && <Formik
@@ -122,7 +117,7 @@ const InvoicesForm: React.FC<any> = ({
 
                       <label htmlFor="client" className="p-2">Cliente: </label>
 
-                      <Field required as="select" disabled={blockClient} className="border-b border-surface-300 rounded-sm p-2 w-full" id="client" name="client" value={values.client}
+                      <Field required as="select" disabled={blockClient} className="field-select" id="client" name="client" value={values.client}
                       onChange={(e: any) => {
                         // console.log(e.target.value);
                         // console.log(clients);
@@ -143,13 +138,11 @@ const InvoicesForm: React.FC<any> = ({
 
                     </div>
 
-                    <div className="flex py-2 justify-around">
-                      <div className="flex flex-col">
-
-                        <label htmlFor="">Fecha inicial</label>
-
+                    <div className="flex py-2 gap-4">
+                      <div className="flex flex-col flex-1">
+                        <label className="field-label">Fecha inicial</label>
                         <DatePicker
-                          className="py-1"
+                          className="field-input"
                           disabled={!client}
                           onChange={(e: any) => {
                             // console.log(e);
@@ -197,10 +190,10 @@ const InvoicesForm: React.FC<any> = ({
                           placeholderText="fecha inicial"
                         />
                       </div>
-                      <div className="flex flex-col">
-                        <label htmlFor="">Fecha final</label>
+                      <div className="flex flex-col flex-1">
+                        <label className="field-label" htmlFor="">Fecha final</label>
                         <DatePicker
-                          className="py-1"
+                          className="field-input"
                           disabled={!client}
                           onChange={(e: any) => {
                             // console.log(e);
@@ -260,22 +253,20 @@ const InvoicesForm: React.FC<any> = ({
                         />
                       </div>
                     </div>
-                    <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
+                    <Disclosure as="div" open={openPanel === 'notas'}>
+                      <DisclosureButton onClick={() => togglePanel('notas')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         Notas
+                        <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'notas' ? 'expand_less' : 'expand_more'}</span>
                       </DisclosureButton>
                       <DisclosurePanel>
                         <FieldArray name="tickets">
                           {({ remove, push }) => (
                             <div>
-                              <div className="flex justify-between p-2">
-                                <h4>Notas</h4>
-                                <button
-                                  type="button"
-                                  className="secondary"
-                                  onClick={() => push(0)}
-                                >
-                                  Agregar +
+                              <div className="flex justify-between items-center p-2">
+                                <h4 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Notas</h4>
+                                <button type="button" className="btn-secondary" onClick={() => push(0)}>
+                                  <span className="material-symbols-outlined text-[14px]">add</span>
+                                  Agregar
                                 </button>
                               </div>
                               <div className="max-h-64 overflow-hidden overflow-y-scroll">
@@ -318,7 +309,7 @@ const InvoicesForm: React.FC<any> = ({
                                                 }
 
                                               </DisclosureButton>
-                                              <button type="button" className="flex justify-end px-3 py-1 bg-red-800 text-white" onClick={() => {
+                                              <button type="button" className="btn-danger" onClick={() => {
                                                 remove(index)
                                                 const newtickets = values.tickets.filter((_, i: number) => { return index !== i})
                                                 const res = generateResume(newtickets, tickets, client)
@@ -339,7 +330,7 @@ const InvoicesForm: React.FC<any> = ({
                                                 <div className="flex flex-col w-full">
 
                                                   <label htmlFor="`tickets.${index}`">Nota</label>
-                                                  <Field as="select" className="border border-surface-300 rounded-sm px-2 w-full" value={values.tickets[index]}
+                                                  <Field as="select" className="field-select" value={values.tickets[index]}
                                                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                       const newtickets = [...values.tickets, e.target.value]
                                                       setFieldValue(`tickets.${index}`, e.target.value)
@@ -377,14 +368,15 @@ const InvoicesForm: React.FC<any> = ({
                         </FieldArray>
                       </DisclosurePanel>
                     </Disclosure>
-                    <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
+                    <Disclosure as="div" open={openPanel === 'comentarios'}>
+                      <DisclosureButton onClick={() => togglePanel('comentarios')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         Comentarios
+                        <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'comentarios' ? 'expand_less' : 'expand_more'}</span>
                       </DisclosureButton>
                       <DisclosurePanel>
                         <div className="flex flex-col p-4 gap-2">
-                          <Field as="textarea" className="border border-surface-200 p-2" type="text" name="comments" value={values.comments} rows="3" placeholder="Comentarios para el cliente"></Field>
-                          <Field as="textarea" className="border border-surface-200 p-2" type="text" name="inner_comments" value={values.inner_comments} rows="3" placeholder="Comentarios internos"></Field>
+                          <Field as="textarea" className="field-textarea" type="text" name="comments" value={values.comments} rows="3" placeholder="Comentarios para el cliente"></Field>
+                          <Field as="textarea" className="field-textarea" type="text" name="inner_comments" value={values.inner_comments} rows="3" placeholder="Comentarios internos"></Field>
                         </div>
                         {/* 
                           expected_payment_date
@@ -396,9 +388,10 @@ const InvoicesForm: React.FC<any> = ({
                         */}
                       </DisclosurePanel>
                     </Disclosure>
-                    <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
+                    <Disclosure as="div" open={openPanel === 'resumen'}>
+                      <DisclosureButton onClick={() => togglePanel('resumen')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         Resumen
+                        <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'resumen' ? 'expand_less' : 'expand_more'}</span>
                       </DisclosureButton>
                       <DisclosurePanel>
                         <div className="flex flex-col">
@@ -463,9 +456,10 @@ const InvoicesForm: React.FC<any> = ({
                         </div>
                       </DisclosurePanel>
                     </Disclosure>
-                    <Disclosure>
-                      <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
+                    <Disclosure as="div" open={openPanel === 'fechas'}>
+                      <DisclosureButton onClick={() => togglePanel('fechas')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         Fechas y referencias
+                        <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'fechas' ? 'expand_less' : 'expand_more'}</span>
                       </DisclosureButton>
                       <DisclosurePanel>
                       
@@ -492,9 +486,9 @@ const InvoicesForm: React.FC<any> = ({
                           </div>
                           <div className="flex">
                             <div className="flex flex-col w-1/3 px-2">
-                              <label htmlFor="invoice_send_date">Fecha de envio</label>
+                              <label className="field-label" htmlFor="invoice_send_date">Fecha de envio</label>
                               <DatePicker
-                                className="py-1 w-10/12"
+                                className="field-input"
                                 onChange={(e: any) => {
                                   // console.log(e);
                                   
@@ -516,9 +510,9 @@ const InvoicesForm: React.FC<any> = ({
                               />
                             </div>
                             <div className="flex flex-col w-1/3 px-2">
-                              <label htmlFor="">Fecha de pago</label>
+                              <label className="field-label" htmlFor="">Fecha de pago</label>
                               <DatePicker
-                                className="py-1 w-10/12"
+                                className="field-input"
                                 onChange={(e: any) => {
                                   const payment_date = new Date(e)
                                   setFieldValue("payment_date", payment_date)
@@ -528,9 +522,9 @@ const InvoicesForm: React.FC<any> = ({
                               />
                             </div>
                             <div className="flex flex-col w-1/3 px-2">
-                              <label htmlFor="">Fecha vencimiento</label> 
+                              <label className="field-label" htmlFor="">Fecha vencimiento</label>
                               <DatePicker
-                                className="py-1 w-10/12"
+                                className="field-input"
                                 onChange={(e: any) => {
                                   const expected_payment_date = new Date(e)
                                   setFieldValue("expected_payment_date", expected_payment_date)
@@ -572,8 +566,8 @@ const InvoicesForm: React.FC<any> = ({
                     </div>
                     
                     <div className="flex gap-4 justify-end">
-                      <button className="bg-red-800 px-4 py-2 rounded-sm text-white" onClick={() => sendClose()}>Cancelar</button>
-                      <button disabled={values.tickets.length === 0} className=" disabled:bg-green-300 bg-primary-500 px-4 py-2 text-white" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
+                      <button className="btn-danger" onClick={() => sendClose()}>Cancelar</button>
+                      <button disabled={values.tickets.length === 0} className="btn-primary disabled:opacity-50" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
                     </div>
                   </Form>
                 </DialogPanel>

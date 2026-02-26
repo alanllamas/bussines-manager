@@ -47,8 +47,9 @@ const ProductVariantsPage: React.FC = () => {
                   <td className="px-4 py-2">
                     <button
                       onClick={() => setEditingId(v.documentId)}
-                      className="text-xs px-2 py-1 bg-surface-200 hover:bg-surface-300"
+                      className="btn-secondary"
                     >
+                      <span className="material-symbols-outlined text-[14px]">edit</span>
                       Editar
                     </button>
                   </td>
@@ -69,7 +70,7 @@ const ProductVariantsPage: React.FC = () => {
       ) : (
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-surface-200 hover:bg-surface-300 text-sm"
+          className="btn-secondary"
         >
           + Nueva variante
         </button>

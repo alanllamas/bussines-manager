@@ -9,8 +9,6 @@ import useCreateProductVariant from "@/api/hooks/productVariants/useCreateProduc
 import { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
 import { CreateProductReq } from "@/api/hooks/products/useCreateProduct"
 
-const fieldClass = "border border-surface-300 rounded-sm px-2 text-sm"
-
 const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
   const searchParams = useSearchParams()
   const [editing, setEditing] = useState(searchParams.get('edit') === '1')
@@ -121,33 +119,34 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
               enableReinitialize
             >
               {() => (
-                <Form className="flex flex-col gap-2 text-sm">
-                  <div className="flex justify-between gap-2">
-                    <label className="w-36 text-surface-500">Nombre</label>
-                    <Field className={fieldClass + ' flex-1'} name="name" type="text" />
+                <Form className="flex flex-col gap-4">
+                  <div className="field-group">
+                    <label className="field-label">Nombre</label>
+                    <Field className="field-input" name="name" type="text" />
                   </div>
-                  <div className="flex justify-between gap-2">
-                    <label className="w-36 text-surface-500">Precio</label>
-                    <Field className={fieldClass + ' flex-1'} name="price" type="number" step="0.01" min="0" />
+                  <div className="field-group">
+                    <label className="field-label">Precio</label>
+                    <Field className="field-input" name="price" type="number" step="0.01" min="0" />
                   </div>
-                  <div className="flex justify-between gap-2">
-                    <label className="w-36 text-surface-500">Unidad de medida</label>
-                    <Field as="select" className={fieldClass + ' flex-1 bg-white'} name="measurement_unit">
+                  <div className="field-group">
+                    <label className="field-label">Unidad de medida</label>
+                    <Field as="select" className="field-select" name="measurement_unit">
                       <option value="">-- Unidad --</option>
                       <option value="kg">Kg</option>
                       <option value="pza">Pza</option>
                       <option value="lt">Lt</option>
                     </Field>
                   </div>
-                  <div className="flex justify-between gap-2">
-                    <label className="w-36 text-surface-500">Impuestos (%)</label>
-                    <Field className={fieldClass + ' flex-1'} name="taxes" type="number" step="0.01" min="0" />
+                  <div className="field-group">
+                    <label className="field-label">Impuestos (%)</label>
+                    <Field className="field-input" name="taxes" type="number" step="0.01" min="0" />
                   </div>
-                  <div className="flex gap-2 mt-2">
-                    <button type="submit" disabled={saving} className="px-4 py-2 bg-primary-500 text-white text-sm disabled:opacity-50">
+                  <div className="flex gap-2 pt-2">
+                    <button type="submit" disabled={saving} className="btn-primary">
+                      <span className="material-symbols-outlined text-[16px]">save</span>
                       {saving ? 'Guardando...' : 'Guardar'}
                     </button>
-                    <button type="button" onClick={() => setEditing(false)} className="px-4 py-2 bg-surface-200 text-sm">
+                    <button type="button" onClick={() => setEditing(false)} className="btn-secondary">
                       Cancelar
                     </button>
                   </div>
@@ -177,7 +176,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
                 <select
                   value={selectedId}
                   onChange={e => setSelectedId(e.target.value)}
-                  className="border border-surface-300 rounded-sm px-2 py-1 text-sm bg-white"
+                  className="field-select"
                 >
                   <option value="">-- Agregar variante --</option>
                   {available.map(v => (
@@ -186,7 +185,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
                     </option>
                   ))}
                 </select>
-                <button onClick={handleAdd} disabled={!selectedId || saving} className="px-3 py-1 bg-surface-200 hover:bg-surface-300 text-sm disabled:opacity-50">
+                <button onClick={handleAdd} disabled={!selectedId || saving} className="btn-secondary">
                   Agregar
                 </button>
               </div>
@@ -200,17 +199,17 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
               >
                 {() => (
                   <Form className="flex gap-2 items-center">
-                    <Field className={fieldClass} name="name" type="text" placeholder="Nombre" />
-                    <Field as="select" className={fieldClass + ' bg-white'} name="type">
+                    <Field className="field-input" name="name" type="text" placeholder="Nombre" />
+                    <Field as="select" className="field-select" name="type">
                       <option value="">-- Tipo --</option>
                       <option value="color">Color</option>
                       <option value="tamano">Tamaño</option>
                       <option value="empaque">Empaque</option>
                     </Field>
-                    <button type="submit" disabled={creatingVariant} className="px-3 py-1 bg-primary-500 text-white text-sm disabled:opacity-50">
+                    <button type="submit" disabled={creatingVariant} className="btn-primary">
                       {creatingVariant ? '...' : 'Crear'}
                     </button>
-                    <button type="button" onClick={() => setShowNewVariant(false)} className="px-3 py-1 bg-surface-200 text-sm">
+                    <button type="button" onClick={() => setShowNewVariant(false)} className="btn-secondary">
                       ×
                     </button>
                   </Form>
@@ -226,7 +225,8 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
       )}
 
       {!editing && (
-        <button className="mt-4 px-4 py-2 bg-surface-200 hover:bg-surface-300 text-sm" onClick={() => setEditing(true)}>
+        <button className="btn-secondary mt-4" onClick={() => setEditing(true)}>
+          <span className="material-symbols-outlined text-[16px]">edit</span>
           Editar
         </button>
       )}

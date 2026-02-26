@@ -42,7 +42,7 @@ export type Meta = {
   }
 }
 
-const TICKETS_URL = `/api/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants&sort=id:desc&pagination[limit]=10000`;
+const TICKETS_URL = `/api/tickets?populate=client&populate=products&populate=products.product&populate=products.product_variants&populate=invoice&sort=id:desc&pagination[limit]=10000`;
 
 async function GetTickets([url]: [string]) {
   return await fetcher<{ data: Ticket[], meta: Meta}>(url, { method: 'GET' });

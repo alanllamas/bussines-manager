@@ -59,7 +59,7 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
 
   useEffect(() => {
     if (!invoicesError && !invoicesIsLoading && invoicesData?.data) {
-      setInvoices(invoicesData.data)
+      setInvoices([...invoicesData.data].sort((a, b) => b.id - a.id))
     }
   }, [invoicesIsLoading, invoicesError])
 
@@ -258,15 +258,14 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
         {currentItems &&
           currentItems?.map((invoice: Invoice, index: number) => {
           // console.log('invoice: ', invoice);
-          return <tr className="border-b border-surface-200" key={`invoice-${index}`}>
-
-            <td className="py-2"><a href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
-            <td className="py-2">{invoice.client?.name}</td>
-            <td className="py-2">{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
-            <td className="py-2">{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
-            <td className="py-2">$ {invoice.total}</td>
-            <td className="py-2">
-              <button onClick={() => setEditInvoice(invoice)}><span>edit</span></button> | <button onClick={() => sendPrint(invoice)}><span>print</span></button>
+          return <tr key={`invoice-${index}`}>
+            <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
+            <td>{invoice.client?.name}</td>
+            <td>{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
+            <td>{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
+            <td className="font-medium">$ {invoice.total}</td>
+            <td>
+              <div className="flex gap-1"><button className="btn-icon" onClick={() => setEditInvoice(invoice)}><span className="material-symbols-outlined text-[16px]">edit</span></button><button className="btn-icon" onClick={() => sendPrint(invoice)}><span className="material-symbols-outlined text-[16px]">print</span></button></div>
             </td>
           </tr>
         })}
@@ -297,15 +296,15 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
     };
       return (
       <section className="w-full flex flex-col items-center">
-        <table className="w-full p-4 text-center mt-8">
+        <table className="data-table mt-6">
           <thead>
-            <tr className="border-b border-neutral-500">
+            <tr>
               <th>Folio</th>
-              <th>cliente</th>
-              <th>fecha inicial</th>
-              <th>fecha final</th>
-              <th>monto</th>
-              <th>acciones</th>
+              <th>Cliente</th>
+              <th>Fecha inicial</th>
+              <th>Fecha final</th>
+              <th>Monto</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -313,15 +312,13 @@ const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
           </tbody>
         </table>
         <ReactPaginate
-          className="flex gap-3 p-4 w-1/4 self-center items-center"
-          breakLabel="..."
-          pageClassName="bg-surface-200 px-2 py-1"
-          activeClassName="bg-surface-500 text-white"
-          nextLabel="next >"
+          className="paginator"
+          breakLabel="…"
+          nextLabel="siguiente ›"
+          previousLabel="‹ anterior"
           onPageChange={handlePageChange}
           pageRangeDisplayed={5}
           pageCount={pageCount}
-          previousLabel="< previous"
           renderOnZeroPageCount={null}
         />
       </section>

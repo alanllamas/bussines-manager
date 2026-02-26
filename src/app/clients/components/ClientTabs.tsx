@@ -12,15 +12,13 @@ const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: C
   return (
     <TabGroup className="text-surface-700 p-4">
       <TabList>
-        <Tab className="px-6 py-3 bg-surface-100 hover:bg-surface-200 hover:text-surface-900 mr-2" >Cliente</Tab>
+        <Tab className="px-6 py-3 bg-surface-100 hover:bg-surface-200 hover:text-surface-900 mr-2" >{client?.name}</Tab>
         <Tab className="px-6 py-3 bg-surface-100 hover:bg-surface-200 hover:text-surface-900 mx-2" >Contactos</Tab>
         <Tab className="px-6 py-3 bg-surface-100 hover:bg-surface-200 hover:text-surface-900 mx-2" >Notas</Tab>
         <Tab className="px-6 py-3 bg-surface-100 hover:bg-surface-200 hover:text-surface-900 mx-2" >Cortes</Tab>
         <Tab className="px-6 py-3 bg-surface-100 hover:bg-surface-200 hover:text-surface-900 mx-2" >Editar</Tab>
       </TabList>
-      <TabPanels>
-        <h2 className="font-bold p-4">{client?.name}</h2>
-
+      <TabPanels className="p-2">
         <ClientTab client={client}/>
         <ContactsTab client={client}/>
         <TicketsTab tickets={client?.tickets} clientId={client?.id}/>

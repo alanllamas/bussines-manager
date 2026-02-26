@@ -7,18 +7,13 @@ import { Client } from "@/api/hooks/clients/getClient"
 import useGetProducts, { Product } from "@/api/hooks/getProducts"
 import useGetClients from "@/api/hooks/clients/getClients"
 
-export type EVariant = {
-  name: string;
-  type: string;
-  id: number
-}
 export type EProduct = {
   name: string;
   product: number;
   price: number;
   quantity: number;
   total: number
-  product_variants: EVariant[]
+  product_variants: string[]
   unit: string;
   subtotal?: number;
 }
@@ -47,16 +42,11 @@ export type createTicketReq = {
   }[]
 }
 
-export const emptyVariant: EVariant = {
-  name: "",
-  type: "",
-  id: 0
-}
 export const emptyProduct: EProduct = {
   name: '',
   product: 0,
   price: 0,
-  product_variants: [emptyVariant],
+  product_variants: [],
   quantity: 0,
   total: 0,
   unit: ''
@@ -169,95 +159,71 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       </>
     );
   };
-  const VariantsField = (props: {products?: Product[], index: number, className: string, name: string, placeholder: string, disabled?: boolean}) => {
-    const {
-      values,
-      setFieldValue,
-    } = useFormikContext<TicketInitialValues>();
-    const [field, meta] = useField(props);
-    const [variants, setVariants] = useState<Product["product_variants"]>([])
-    const [prod, setProd] = useState<Product>()
-  
-    useEffect(() => {
-      const product = props.products?.filter((prod: Product)=> {
-        return prod.id === values.products[props.index]?.product
-      })[0]
-      setProd(product)
-    }, [values.products, props.index, props.products])
-    useEffect(() => {
-      if (prod) {
-        setVariants(prod?.product_variants)
-      }
-    }, [prod])
-      
-  
-      // console.log('variants: ', variants);
-    // }
+  const VariantsField = ({ products: allProducts, index }: { products?: Product[], index: number }) => {
+    const { values } = useFormikContext<TicketInitialValues>();
+
+    const currentProduct = allProducts?.find(p => p.id === values.products[index]?.product)
+    const allVariants = currentProduct?.product_variants ?? []
+    const selectedDocIds: string[] = values.products[index]?.product_variants ?? []
+    const selectedDocIdSet = new Set(selectedDocIds)
+    const availableVariants = allVariants.filter(v => v.documentId && !selectedDocIdSet.has(v.documentId))
+
     return (
-      <>
-        <FieldArray {...props} {...field} name={`products.${props.index}.product_variants`}>
-          {({ remove: variantRemove, push: variantpush }) => {
-            
-            // if (values.products[0] && props.products[0]) {
-  
-              return <div>
-                <div className="flex justify-between">
-  
-                  <label htmlFor="`products.${index}.product`">Variantes</label>
-                  <button
-                    type="button"
-                    className="secondary"
-                    onClick={() => {
-  
-                      variantpush(emptyVariant)
-                    }}
-                  >
-                   Agregar +
-                  </button>
-                </div>
-                { values.products[props.index]?.product_variants.map((_: any, variant_index: any) => {
-                    return (<div className="flex px-2 border border-surface-300 rounded-sm" key={variant_index}>
-                      <Field as='select' className=" px-2 w-full" name={`products.${props.index}.product_variants.${variant_index}.id`}
-                        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                          if (e.target.value) {
-                            setFieldValue(`products.${props.index}.product_variants.${variant_index}.id`, e.target.value || '')
-                            const variant = variants.filter((variant) => variant.id === Number(e.target.value))[0]
-                            if (variant.name) setFieldValue(`products.${props.index}.product_variants.${variant_index}.name`, variant.name || '')
-                            if (variant.type) setFieldValue(`products.${props.index}.product_variants.${variant_index}.type`, variant.type || '')
-                            
-                          } else {
-  
-                            setFieldValue(`products.${props.index}.product_variants.${variant_index}.id`, '')
-                          }
-                          
-                        }}
-                      >
-                          <option value="">Variante</option>
-                          {
-                            variants.map((variant, index: number) => {
-                              return <option key={`variant-${index}`} value={variant.id || ''}>{variant.name}</option>
-                            })
-                          }
-                      </Field>
-                      <Field className="border border-surface-300 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.name`} type="text" />
-                      <Field className="border border-surface-300 rounded-sm px-2 hidden" name={`products.${props.index}.product_variants.${variant_index}.type`} type="text" />
-                      <button className="flex justify-end ml-2" onClick={() => variantRemove(variant_index)}>x</button>
-  
-                    </div>)
-                  })
-                }
+      <FieldArray name={`products.${index}.product_variants`}>
+        {({ remove: variantRemove, push: variantPush }) => (
+          <div className="mt-2">
+            <label className="field-label mb-1">Variantes</label>
+
+            {/* Selected chips */}
+            {selectedDocIds.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-2">
+                {selectedDocIds.map((docId, vi) => {
+                  const variant = allVariants.find(v => v.documentId === docId)
+                  return (
+                    <span key={vi} className="flex items-center gap-1 bg-primary-50 border border-primary-200 text-primary-700 px-2 py-0.5 rounded-full text-xs">
+                      {variant?.name ?? docId}
+                      <button type="button" onClick={() => variantRemove(vi)} className="hover:text-red-600 leading-none">×</button>
+                    </span>
+                  )
+                })}
               </div>
-          }}
-        </FieldArray>
-        {!!meta.touched && !!meta.error && <div>{meta.error}</div>}
-      </>
+            )}
+
+            {/* Add select */}
+            {allVariants.length > 0 ? (
+              availableVariants.length > 0 ? (
+                <select
+                  className="field-select"
+                  value=""
+                  onChange={(e) => {
+                    if (!e.target.value) return
+                    variantPush(e.target.value)
+                  }}
+                >
+                  <option value="">+ Agregar variante</option>
+                  {availableVariants.map((v, i) => (
+                    <option key={i} value={v.documentId}>{v.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-xs text-surface-400">Todas las variantes agregadas</p>
+              )
+            ) : (
+              currentProduct && <p className="text-xs text-surface-400">Sin variantes para este producto</p>
+            )}
+          </div>
+        )}
+      </FieldArray>
     );
   }
   
 
   return <>
     <div className="flex justify-end">
-      <button className="px-6 py-2 bg-surface-300" onClick={() => sendCreate()}>Crear nota</button>
+      <button className="btn-primary" onClick={() => sendCreate()}>
+        <span className="material-symbols-outlined text-[16px]">add</span>
+        Crear nota
+      </button>
     </div>
     {
       initialFormValues && <Formik
@@ -273,7 +239,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                   <div className="flex justify-between gap-2">
                     <img className="w-52" src={logo.src} alt="" />
 
-                    <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {values.ticket_number}</span><span>Fecha: {new Date(today).toLocaleDateString() }</span></DialogTitle>
+                    <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {values.ticket_number}</span><span>Fecha: {new Date().toLocaleDateString()}</span></DialogTitle>
                   </div>
                   {/* form for tickets */}
                     <Form>
@@ -282,7 +248,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                       <div className="flex align-baseline">
 
                         <label htmlFor="client" className="p-2">Cliente: </label>
-                        <Field required as="select" className="border-b border-surface-300 rounded-sm p-2 w-full" id="client" name="client" value={values.client}>
+                        <Field required as="select" className="field-select" id="client" name="client" value={values.client}>
                           <option value="">Cliente</option>
                           {
                             clients.map((client, index: number) => {
@@ -295,14 +261,11 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                       <FieldArray name="products">
                         {({ remove, push }) => (
                           <div>
-                            <div className="flex justify-between p-2">
-                              <h4>Productos</h4>
-                              <button
-                                type="button"
-                                className="secondary"
-                                onClick={() => push(emptyProduct)}
-                              >
-                                Agregar +
+                            <div className="flex justify-between items-center p-2">
+                              <h4 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Productos</h4>
+                              <button type="button" className="btn-secondary" onClick={() => push(emptyProduct)}>
+                                <span className="material-symbols-outlined text-[14px]">add</span>
+                                Agregar
                               </button>
                               {/* <div className="w-full border border-surface-200">
 
@@ -314,8 +277,8 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                       <div key={`product=${index}`}>
                                         <div className="flex justify-between items-center">
 
-                                          <DisclosureButton className="py-2 px-2 w-full flex bg-surface-100 justify-between">
-                                            <p className="mx-1 self-start">{ open ? 'A' : 'V' }</p>
+                                          <DisclosureButton className="py-2 px-2 w-full flex bg-surface-100 justify-between items-center">
+                                            <span className="material-symbols-outlined text-[16px] text-surface-400">{ open ? 'expand_less' : 'expand_more' }</span>
                                             <p className="mx-1">{values.products[index].name ? values.products[index].name : ''}</p>
                                             <p className="mx-1">{
                                               values.products[index].product_variants[0]
@@ -332,7 +295,9 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                             <p className="mx-1">{values.products[index].total ? `$ ${values.products[index].total}` : ''}</p>
 
                                           </DisclosureButton>
-                                          <button className="flex justify-end px-3 py-2 bg-red-800 text-white" onClick={() => remove(index)}>X</button>
+                                          <button className="btn-danger" onClick={() => remove(index)}>
+                                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                                          </button>
                                         </div>
                                         <DisclosurePanel className="text-gray-500">
                                           <div className="p-2 pt-0 border border-surface-200 w-full" key={index}>
@@ -340,7 +305,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                               <div className="flex  w-full">
                                                 <div className="flex flex-col w-full">
                                                   <label htmlFor="`products.${index}.product`">Producto</label>
-                                                  <Field as="select" className="border border-surface-300 rounded-sm px-2 w-full" value={values.products[index].product} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                  <Field as="select" className="field-select" value={values.products[index].product} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                     // onProductChange(e.target.value)
                                                       const product = products?.filter((product: Product) => {
                                                         // console.log(product);
@@ -363,12 +328,12 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                 </div>
                                               </div>
                                               <div className="w-fullflex flex-col">
-                                                <VariantsField products={products} index={index} className="border border-surface-300 rounded-sm px-2" name={`products.${index}.product_variants`} placeholder="variantes"/>
+                                                <VariantsField products={products} index={index} />
                                               </div>
                                               <div className="w-full flex">
                                                 <div className="flex flex-col w-full px-1">
                                                   <label htmlFor={`products.${index}.quantity`}>Cantidad {values.products[index].unit ? `(${values.products[index].unit})` : ''}</label>
-                                                  <Field className="border border-surface-300 rounded-sm px-2 w-full" name={`products.${index}.quantity`} type="number" placeholder="cantidad"
+                                                  <Field className="field-input" name={`products.${index}.quantity`} type="number" placeholder="cantidad"
                                                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                       const quantity = Number(e.target.value)
                                                       const price = Number(values.products[index].price)
@@ -379,11 +344,11 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                 </div>
                                                 <div className="flex flex-col w-full px-1">
                                                   <label htmlFor="">Precio</label>
-                                                  <Field className="border border-surface-300 rounded-sm bg-surface-200 px-2 w-full" name={`products.${index}.price`} disabled type="number" placeholder="precio" />
+                                                  <Field className="field-input bg-surface-100" name={`products.${index}.price`} disabled type="number" placeholder="precio" />
                                                 </div>
                                                 <div className="flex flex-col w-full px-1">
                                                   <label htmlFor="">Monto</label>
-                                                  <Field className="border border-surface-300 rounded-sm bg-surface-200 px-2 w-full" name={`products.${index}.total`} disabled type="number" placeholder="total" />
+                                                  <Field className="field-input bg-surface-100" name={`products.${index}.total`} disabled type="number" placeholder="total" />
                                                 </div>
                                               </div>
                                             </div>
@@ -397,27 +362,21 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                           </div>
                         )}
                       </FieldArray>
-                      <div className="flex justify-end">
-                        <div className="my-4 w-1/2">
-                          <div className="flex justify-between gap-x-4 my-2">
-                            <label htmlFor="subtotal">Sub total</label>
-                            <SubtotalField className="border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200" disabled id="subtotal" name="subtotal" type="number" placeholder="sub total" />
-                          </div>
-                          <div className="flex justify-between gap-x-4 my-2">
-                            <label htmlFor="shipping">Envío</label>
-                            <Field className="border border-surface-300 rounded-sm px-2 w-1/2 " id="shipping" name="shipping" type="number" placeholder="Envio" />
-                          </div>
-                          <div className="flex justify-between gap-x-4 my-2">
-                            <label htmlFor="total">Total</label>
-                            <TotalField required className="border border-surface-300 rounded-sm px-2 w-1/2 bg-surface-200" disabled id="total" name="total" type="number" placeholder="total" />
-                          </div>
+                      <div className="flex justify-end mt-4">
+                        <div className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 w-1/2">
+                          <label htmlFor="subtotal" className="text-sm text-right">Subtotal</label>
+                          <SubtotalField className="field-input bg-surface-100" disabled id="subtotal" name="subtotal" type="number" placeholder="subtotal" />
+                          <label htmlFor="shipping" className="text-sm text-right">Envío</label>
+                          <Field className="field-input" id="shipping" name="shipping" type="number" placeholder="Envío" />
+                          <label htmlFor="total" className="text-sm font-semibold text-right">Total</label>
+                          <TotalField required className="field-input bg-surface-100 font-semibold" disabled id="total" name="total" type="number" placeholder="total" />
                         </div>
                       </div>
 
                       
-                      <div className="flex gap-4 justify-end">
-                        <button className="bg-red-800 px-4 py-2 rounded-sm text-white" onClick={() => sendClose()}>Cancelar</button>
-                        <button className="bg-primary-500 px-4 py-2 text-white" type="submit">{ editTicket ? 'Editar' : 'Crear'}</button>
+                      <div className="flex gap-4 justify-end mt-6">
+                        <button className="btn-danger" onClick={() => sendClose()}>Cancelar</button>
+                        <button className="btn-primary" type="submit">{ editTicket ? 'Editar' : 'Crear'}</button>
                         {/* <button onClick={() => setIsOpen(false)}>Deactivate</button> */}
                       </div>
                     </Form>

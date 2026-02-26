@@ -5,8 +5,6 @@ import { ProductVariant } from "@/api/hooks/getProducts"
 import useCreateProductVariant, { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
 import useEditProductVariant from "@/api/hooks/productVariants/useEditProductVariant"
 
-const fieldClass = "border border-surface-300 rounded-sm px-2"
-
 const ProductVariantForm: React.FC<{
   variant?: ProductVariant;
   onSuccess?: () => void;
@@ -51,22 +49,18 @@ const ProductVariantForm: React.FC<{
     <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
       {() => (
         <Form className="flex gap-2 items-center">
-          <Field className={fieldClass} name="name" type="text" placeholder="Nombre" />
-          <Field as="select" className={fieldClass + ' bg-white'} name="type">
+          <Field className="field-input" name="name" type="text" placeholder="Nombre" />
+          <Field as="select" className="field-select" name="type">
             <option value="">-- Tipo --</option>
             <option value="color">Color</option>
             <option value="tamano">Tamaño</option>
             <option value="empaque">Empaque</option>
           </Field>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-primary-500 px-3 py-1 text-white text-sm disabled:opacity-50"
-          >
+          <button type="submit" disabled={isSubmitting} className="btn-primary">
             {isSubmitting ? '...' : isEdit ? 'Guardar' : 'Agregar'}
           </button>
           {onCancel && (
-            <button type="button" onClick={onCancel} className="px-3 py-1 text-sm bg-surface-200">
+            <button type="button" onClick={onCancel} className="btn-secondary">
               Cancelar
             </button>
           )}
