@@ -110,19 +110,18 @@ const InvoicesForm: React.FC<any> = ({
         onSubmit={async (values: InvoiceInitialValues) => values ? handleSubmit(values): null}
       >
         {
-          ({values, setFieldValue, errors, touched}) => (
+          ({values, setFieldValue, errors, touched, isValid, dirty}) => (
             <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50 my-20">
               <div className="fixed inset-0 flex w-screen items-center justify-center">
-                <DialogPanel className="w-5/12 space-y-2 border bg-surface-50 p-8 shadow-2xl text-surface-900">
-                  
+                <DialogPanel className="w-5/12 border bg-surface-50 shadow-2xl text-surface-900 flex flex-col h-[90vh]">
+                  <Form className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex-1 overflow-y-auto p-8 space-y-2">
 
 
                     <DialogTitle className="font-bold flex flex-col">
                       <img className="w-36" src={logo.src} alt="" />
-                      
+
                     </DialogTitle>
-                  {/* form for invoices */}
-                  <Form className="flex flex-col gap-y-4">
                     {/* <Field className="border border-surface-300 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} /> */}
                     {/* <Field className="border border-surface-300 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
                     <div className="flex align-baseline">
@@ -577,20 +576,23 @@ const InvoicesForm: React.FC<any> = ({
                       </div>
                     </div>
                     
+                  </div>
+                  <div className="px-8 py-4 border-t border-surface-200 bg-surface-50 flex flex-col gap-2">
                     {apiError && (
-                      <div className="alert-error mb-2">
+                      <div className="alert-error">
                         <span className="material-symbols-outlined text-[18px]">error</span>
                         Error al guardar. Por favor intenta de nuevo.
                       </div>
                     )}
-                    {touched.client && errors.client && <p className="alert-field mb-1">{errors.client as string}</p>}
-                    {touched.initial_date && errors.initial_date && <p className="alert-field mb-1">{errors.initial_date as string}</p>}
-                    {touched.ending_date && errors.ending_date && <p className="alert-field mb-1">{errors.ending_date as string}</p>}
-                    {(touched as any).tickets && errors.tickets && <p className="alert-field mb-1">{errors.tickets as string}</p>}
+                    {touched.client && errors.client && <p className="alert-field">{errors.client as string}</p>}
+                    {touched.initial_date && errors.initial_date && <p className="alert-field">{errors.initial_date as string}</p>}
+                    {touched.ending_date && errors.ending_date && <p className="alert-field">{errors.ending_date as string}</p>}
+                    {(touched as any).tickets && errors.tickets && <p className="alert-field">{errors.tickets as string}</p>}
                     <div className="flex gap-4 justify-end">
                       <button className="btn-danger" onClick={() => sendClose()}>Cancelar</button>
-                      <button disabled={values.tickets.length === 0} className="btn-primary disabled:opacity-50" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
+                      <button disabled={!isValid || !dirty} className="btn-primary disabled:opacity-50" type="submit">{ editInvoice ? 'Editar' : 'Crear'}</button>
                     </div>
+                  </div>
                   </Form>
                 </DialogPanel>
               </div>

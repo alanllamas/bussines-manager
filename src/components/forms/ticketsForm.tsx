@@ -243,7 +243,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
         onSubmit={async (values: TicketInitialValues) => values ? handleSubmit(values): null}
       >
         {
-          ({values, setFieldValue, errors, touched}) => (
+          ({values, setFieldValue, errors, touched, isValid, dirty}) => (
             <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50">
               <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
                 <DialogPanel className="max-w-lg space-y-4 border bg-surface-50 p-12 shadow-2xl text-surface-900">
@@ -295,9 +295,12 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                             <span className="material-symbols-outlined text-[16px] text-surface-400">{ open ? 'expand_less' : 'expand_more' }</span>
                                             <p className="mx-1">{values.products[index].name ? values.products[index].name : ''}</p>
                                             <p className="mx-1">{
-                                              values.products[index].product_variants.length > 0
-                                                ? `${values.products[index].product_variants.length} variante(s)`
-                                                : ''
+                                              (() => {
+                                                const docIds = values.products[index].product_variants
+                                                if (!docIds.length) return ''
+                                                const allVariants = products?.find(p => p.id === values.products[index].product)?.product_variants ?? []
+                                                return docIds.map(id => allVariants.find(v => v.documentId === id)?.name ?? id).join(', ')
+                                              })()
                                             }</p>
                                             <div className="flex">
 
@@ -396,7 +399,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                       )}
                       <div className="flex gap-4 justify-end mt-6">
                         <button className="btn-danger" onClick={() => sendClose()}>Cancelar</button>
-                        <button className="btn-primary" type="submit">{ editTicket ? 'Editar' : 'Crear'}</button>
+                        <button className="btn-primary disabled:opacity-50" type="submit" disabled={!isValid || !dirty}>{ editTicket ? 'Editar' : 'Crear'}</button>
                         {/* <button onClick={() => setIsOpen(false)}>Deactivate</button> */}
                       </div>
                     </Form>

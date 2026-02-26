@@ -204,7 +204,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
 
   return (
     <Formik initialValues={initialFormValues} onSubmit={handleSubmit} enableReinitialize validationSchema={clientSchema}>
-      {({ values, errors, touched }) => (
+      {({ values, errors, touched, isValid, dirty }) => (
         <Form className="grid grid-cols-2 gap-x-12 w-full">
 
           {/* LEFT: Nombre + Contactos */}
@@ -402,7 +402,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                 <Field as="textarea" className="field-textarea" name="taxing_info.comments" />
               </div>
             <div className="flex justify-end pt-2">
-              <button className="btn-primary" type="submit" disabled={isSubmitting}>
+              <button className="btn-primary disabled:opacity-50" type="submit" disabled={isSubmitting || !isValid || !dirty}>
                 <span className="material-symbols-outlined text-[16px]">save</span>
                 {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear'}
               </button>
