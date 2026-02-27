@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from "react"
+import { usePaginatedData } from "@/hooks/usePaginatedData"
 import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import TicketsForm, { createTicketReq, emptyProduct, EProduct, TicketInitialValues } from "../forms/ticketsForm"
@@ -11,7 +12,8 @@ import TicketPrintFormat from "./ticketPrintFormat"
 import { useSWRConfig } from "swr"
 import { toast } from "sonner"
 
-const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClient}) => {
+interface TicketListProps { ticketData?: Ticket[]; itemsPerPage?: number; clientId?: string | number; hideClient?: boolean }
+const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, clientId, hideClient}) => {
   const { mutate } = useSWRConfig()
   const invalidateTickets = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/tickets') || key[0].includes('/api/clients'))
@@ -120,7 +122,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     setNewEditTicket(undefined)
     setInitialFormValues({
       date: today,
-      client: clientId ? clientId : "",
+      client: clientId ? String(clientId) : "",
       ticket_number:  ticket_number !== undefined && isNumber(ticket_number) ? ticket_number + 1 : 0,
       products: [emptyProduct],
       shipping: 0,
@@ -204,21 +206,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   }
 
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
-    // Here we use item offsets; we could also use page offsets
-    // following the API or data you're working with.
-    const [itemOffset, setItemOffset] = useState(0);
-
-    // Simulate fetching items from another resources.
-    // (This could be items from props; or items loaded in a local state
-    // from an API endpoint with useEffect and useState)
-    const endOffset = itemOffset + itemsPerPage;
-    const currentItems = tickets?.length > 0 ? tickets?.slice(itemOffset, endOffset) : []
-    const pageCount = Math.ceil(tickets?.length / itemsPerPage);
-
-    const handlePageChange = (event: { selected: number }) => {
-      const newOffset = (event.selected * itemsPerPage) % tickets.length;
-      setItemOffset(newOffset);
-    };
+    const { currentItems, pageCount, handlePageChange } = usePaginatedData(tickets, itemsPerPage);
       return (
       <section className="w-full flex flex-col items-center">
         <table className="data-table mt-6">

@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from "react"
+import { usePaginatedData } from "@/hooks/usePaginatedData"
 import { Ticket } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient"
@@ -305,26 +306,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
   }
 
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
-    // Here we use item offsets; we could also use page offsets
-    // following the API or data you're working with.
-    const [itemOffset, setItemOffset] = useState(0);
-
-    // Simulate fetching items from another resources.
-    // (This could be items from props; or items loaded in a local state
-    // from an API endpoint with useEffect and useState)
-    const endOffset = itemOffset + itemsPerPage;
-    // console.log(`Loading items from ${itemOffset} to ${endOffset}`);
-    const currentItems = invoices?.slice(itemOffset, endOffset);
-    const pageCount = Math.ceil(invoices.length / itemsPerPage);
-
-    // Invoke when user click to request another page.
-    const handlePageChange = (event: { selected: number }) => {
-      const newOffset = (event.selected * itemsPerPage) % invoices.length;
-      // console.log(
-      //   `User requested page number ${event.selected}, which is offset ${newOffset}`
-      // );
-      setItemOffset(newOffset);
-    };
+    const { currentItems, pageCount, handlePageChange } = usePaginatedData(invoices, itemsPerPage);
       return (
       <section className="w-full flex flex-col items-center">
         <table className="data-table mt-6">
