@@ -16,6 +16,7 @@ const ticketSchema = Yup.object({
       quantity: Yup.number().min(1, 'La cantidad debe ser mayor a 0').required('Cantidad requerida'),
     })
   ).min(1, 'Agrega al menos un producto'),
+  shipping: Yup.number().min(0, 'El envío no puede ser negativo').required('Ingresa el envío (0 si no aplica)'),
 })
 
 export type EProduct = {
@@ -295,7 +296,12 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                             <span className="material-symbols-outlined text-[16px] text-surface-400">{ open ? 'expand_less' : 'expand_more' }</span>
                                             <p className="mx-1 flex items-center gap-1">
                                               {values.products[index].name ? values.products[index].name : 'Nuevo producto'}
-                                              {(touched as any).products?.[index] && (errors as any).products?.[index] && <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />}
+                                              {(touched as any).products?.[index] && (errors as any).products?.[index] && (
+                                                <>
+                                                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+                                                  <span className="text-xs text-red-500">Revisa este producto</span>
+                                                </>
+                                              )}
                                             </p>
                                             <p className="mx-1">{
                                               (() => {
@@ -388,6 +394,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                           <SubtotalField className="field-input bg-surface-100" disabled id="subtotal" name="subtotal" type="number" placeholder="subtotal" />
                           <label htmlFor="shipping" className="text-sm text-right">Envío</label>
                           <Field className="field-input" id="shipping" name="shipping" type="number" placeholder="Envío" />
+                          {touched.shipping && errors.shipping && <p className="alert-field col-span-2 text-right">{errors.shipping as string}</p>}
                           <label htmlFor="total" className="text-sm font-semibold text-right">Total</label>
                           <TotalField required className="field-input bg-surface-100 font-semibold" disabled id="total" name="total" type="number" placeholder="total" />
                         </div>

@@ -269,7 +269,12 @@ const InvoicesForm: React.FC<any> = ({
                       <DisclosureButton onClick={() => togglePanel('notas')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         <span className="flex items-center gap-2">
                           Notas
-                          {(touched as any).tickets && errors.tickets && <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />}
+                          {(touched as any).tickets && errors.tickets && (
+                            <>
+                              <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+                              <span className="text-xs text-red-500">Agrega al menos una nota</span>
+                            </>
+                          )}
                         </span>
                         <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'notas' ? 'expand_less' : 'expand_more'}</span>
                       </DisclosureButton>

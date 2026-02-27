@@ -1,12 +1,20 @@
 'use client'
 import React, { useEffect, useState } from "react"
 import { Field, Form, Formik } from "formik"
+import * as Yup from "yup"
 import { Product } from "@/api/hooks/getProducts"
 import useCreateProduct, { CreateProductReq } from "@/api/hooks/products/useCreateProduct"
 import useEditProduct from "@/api/hooks/products/useEditProduct"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useSWRConfig } from "swr"
+
+const productSchema = Yup.object({
+  name: Yup.string().required('El nombre es requerido'),
+  price: Yup.number().min(0, 'El precio no puede ser negativo').required('El precio es requerido'),
+  measurement_unit: Yup.string().required('La unidad de medida es requerida'),
+  taxes: Yup.number().min(0, 'Los impuestos no pueden ser negativos'),
+})
 
 const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ product, onSuccess }) => {
   const router = useRouter()
@@ -58,16 +66,18 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
   const isSubmitting = createLoading || editLoading
 
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
-      {() => (
+    <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize validationSchema={productSchema}>
+      {({ errors, touched, isValid }) => (
         <Form className="flex flex-col gap-4 w-full max-w-sm">
           <div className="field-group">
             <label className="field-label">Nombre</label>
             <Field className="field-input" name="name" type="text" />
+            {touched.name && errors.name && <p className="alert-field">{errors.name}</p>}
           </div>
           <div className="field-group">
             <label className="field-label">Precio</label>
             <Field className="field-input" name="price" type="number" step="0.01" min="0" />
+            {touched.price && errors.price && <p className="alert-field">{errors.price}</p>}
           </div>
           <div className="field-group">
             <label className="field-label">Unidad de medida</label>
@@ -77,13 +87,15 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
               <option value="pza">Pza</option>
               <option value="lt">Lt</option>
             </Field>
+            {touched.measurement_unit && errors.measurement_unit && <p className="alert-field">{errors.measurement_unit}</p>}
           </div>
           <div className="field-group">
             <label className="field-label">Impuestos (%)</label>
             <Field className="field-input" name="taxes" type="number" step="0.01" min="0" />
+            {touched.taxes && errors.taxes && <p className="alert-field">{errors.taxes}</p>}
           </div>
           <div className="flex justify-end pt-2">
-            <button type="submit" disabled={isSubmitting} className="btn-primary">
+            <button type="submit" disabled={isSubmitting || !isValid} className="btn-primary disabled:opacity-50">
               <span className="material-symbols-outlined text-[16px]">save</span>
               {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear producto'}
             </button>

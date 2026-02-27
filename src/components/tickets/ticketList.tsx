@@ -60,6 +60,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
       toast.success('Nota creada')
       invalidateTickets()
       setNewTicket(undefined)
+      sendClose()
       
 
       // setTicket(TicketData.data)
@@ -74,6 +75,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
       toast.success('Nota actualizada')
       invalidateTickets()
       setNewEditTicket(undefined)
+      sendClose()
       
 
       // setTicket(TicketData.data)
@@ -82,7 +84,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   useEffect(() => {
     // console.log('editTicket: ', editTicket);
     if (editTicket) {
-      
+      setNewTicket(undefined)
+      setNewEditTicket(undefined)
       setInitialFormValues({
         client: editTicket?.client?.id?.toString() || clientId?.toString() || "",
         date: new Date(editTicket?.sale_date || '').valueOf(),
@@ -114,7 +117,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   const today: number = new Date().valueOf()
 
   const sendCreate = () => {
-    
+    setNewTicket(undefined)
+    setNewEditTicket(undefined)
     setInitialFormValues({
       date: today,
       client: clientId ? clientId : "",
@@ -133,7 +137,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   }
   
   const handleSubmit = async (values: TicketInitialValues) => {
-    setIsOpen(false)
     console.log(values);
     const { date, client, shipping, subtotal, products, ticket_number, total } = values
     const data = {

@@ -362,7 +362,12 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                             <div>
                               <div className="flex items-center">
                                 <DisclosureButton className="flex-1 flex justify-between items-center px-3 py-2 bg-surface-50 border border-surface-200 rounded text-sm text-surface-700">
-                                  <span className="font-medium">{values.contacts[index].name || 'Contacto sin nombre'}</span>
+                                  <span className="font-medium flex items-center gap-2">
+                                    {values.contacts[index].name || 'Contacto sin nombre'}
+                                    {(touched as any).contacts?.[index] && (errors as any).contacts?.[index] && Object.keys((errors as any).contacts[index]).length > 0 && (
+                                      <span className="text-xs text-red-500">Revisa los campos</span>
+                                    )}
+                                  </span>
                                   <span className="text-surface-400 text-xs">{values.contacts[index].phone}</span>
                                   <span className="material-symbols-outlined text-[16px] text-surface-400">
                                     {open ? 'expand_less' : 'expand_more'}
