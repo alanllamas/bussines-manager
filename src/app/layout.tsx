@@ -23,12 +23,12 @@ export default function RootLayout({
       <AuthProvider>
         <body className="antialiased bg-surface-50 text-surface-900">
 
-          <nav className="flex justify-between items-center bg-white border-b border-surface-200 px-8 shadow-sm h-20">
+          <nav className="flex justify-between items-center bg-white border-b border-surface-200 px-4 sm:px-6 lg:px-8 shadow-sm h-20">
             <Link href="/" className="flex items-center shrink-0 py-2">
               <Image width={162} height={81} src={logo.src} alt="El Itacate logo" />
             </Link>
             <NavLinks />
-            <div className="shrink-0 pl-6">
+            <div className="hidden lg:flex shrink-0 pl-6">
               <ProfileAvatar />
             </div>
           </nav>

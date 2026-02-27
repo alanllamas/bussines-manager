@@ -24,7 +24,7 @@ const ClientTickets: React.FC = () => {
 
   return (
     <section className="w-full flex flex-col items-center">
-      <section className="w-9/12 py-12 px-8 bg-surface-50 text-surface-900">
+      <section className="w-full py-6 px-4 sm:w-11/12 sm:py-8 sm:px-6 lg:w-9/12 lg:py-12 lg:px-8 bg-surface-50 text-surface-900">
         {ticketsIsLoading
           ? <Spinner className="w-full py-24" />
           : <TicketList ticketData={tickets} itemsPerPage={10} />
