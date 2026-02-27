@@ -1,6 +1,6 @@
 # ADR-004 — Agregar Error Boundary y manejo de errores centralizado
 
-**Estado:** Pendiente
+**Estado:** Resuelto
 **Prioridad:** Alta
 **Depende de:** ADR-003 (los tipos de error deben estar definidos antes de tipar el contexto de auth con `authError`)
 
