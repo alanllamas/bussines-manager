@@ -1,4 +1,5 @@
 'use-client'
+import React from 'react';
 import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Invoice } from './getInvoices';
@@ -68,7 +69,7 @@ export type createInvoiceReq = {
   resume: string
 }
 
-export const PrintInvoiceFormat = (contentRef: any,client_name: any,initial_date: any,ending_date: any) => ({
+export const PrintInvoiceFormat = (contentRef: React.RefObject<HTMLDivElement | null>, client_name: string | undefined, initial_date: string, ending_date: string) => ({
   contentRef,
   documentTitle: `Corte-${client_name}-${initial_date}-${ending_date}`
 });
