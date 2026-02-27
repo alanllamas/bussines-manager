@@ -44,7 +44,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     // make refresh
 
     if (!ticketNumberError && !ticketNumberIsLoading && ticket_number) {
-      console.log('ticket_number: ', ticket_number);
       // setTimeout(() => window.location.reload(), 500);
       
 
@@ -137,7 +136,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   }
   
   const handleSubmit = async (values: TicketInitialValues) => {
-    console.log(values);
     const { date, client, shipping, subtotal, products, ticket_number, total } = values
     const data = {
       sale_date: new Date(date),
@@ -214,16 +212,11 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     // (This could be items from props; or items loaded in a local state
     // from an API endpoint with useEffect and useState)
     const endOffset = itemOffset + itemsPerPage;
-    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
     const currentItems = tickets?.length > 0 ? tickets?.slice(itemOffset, endOffset) : []
     const pageCount = Math.ceil(tickets?.length / itemsPerPage);
 
-    // Invoke when user click to request another page.
     const handlePageChange = (event: { selected: number }) => {
       const newOffset = (event.selected * itemsPerPage) % tickets.length;
-      console.log(
-        `User requested page number ${event.selected}, which is offset ${newOffset}`
-      );
       setItemOffset(newOffset);
     };
       return (

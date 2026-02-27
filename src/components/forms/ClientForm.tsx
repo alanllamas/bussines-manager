@@ -215,8 +215,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
 
   return (
     <Formik initialValues={initialFormValues} onSubmit={handleSubmit} enableReinitialize validationSchema={clientSchema}>
-      {({ values, errors, touched, isValid, dirty }) => { console.log(errors);
-       return (
+      {({ values, errors, touched, isValid, dirty }) => (
         <Form className="grid grid-cols-2 gap-x-12 w-full">
 
           {/* LEFT: Nombre + Contactos */}
@@ -428,7 +427,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
           </div>
 
         </Form>
-      )}}
+      )}
     </Formik>
   )
 }
