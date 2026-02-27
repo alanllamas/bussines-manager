@@ -395,8 +395,8 @@ const InvoicesForm: React.FC<any> = ({
                       </DisclosureButton>
                       <DisclosurePanel>
                         <div className="flex flex-col p-4 gap-2">
-                          <Field as="textarea" className="field-textarea" type="text" name="comments" value={values.comments} rows="3" placeholder="Comentarios para el cliente"></Field>
-                          <Field as="textarea" className="field-textarea" type="text" name="inner_comments" value={values.inner_comments} rows="3" placeholder="Comentarios internos"></Field>
+                          <Field as="textarea" className="field-textarea" type="text" name="comments" rows="3" placeholder="Comentarios para el cliente"></Field>
+                          <Field as="textarea" className="field-textarea" type="text" name="inner_comments" rows="3" placeholder="Comentarios internos"></Field>
                         </div>
                         {/* 
                           expected_payment_date

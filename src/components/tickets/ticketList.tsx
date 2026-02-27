@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from "react"
-import { ProductVariant, Ticket, TicketProduct} from "@/api/hooks/tickets/getTickets"
+import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import TicketsForm, { createTicketReq, emptyProduct, EProduct, TicketInitialValues } from "../forms/ticketsForm"
 import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket"
@@ -170,14 +170,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   const [printTicket, setPrintTicket] = useState<Ticket | null>()
 
   const sendPrint = (ticket:Ticket) => {
-    console.log(ticket);
-    
-    const emptyTicket: TicketProduct = {
-      id: 0
-    }
-    while (ticket?.products.length < 10) {
-      ticket?.products.push(emptyTicket)
-    }
     setPrintTicket(ticket)
     unsetPrintTicket()
   }

@@ -27,26 +27,36 @@ const TicketBaseFormat: React.FC<any> = ({ticket, date}) => {
         <table className="print:text-sm">
           <thead>
             <tr>
-              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Producto</th>
-              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Variantes</th>
-              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Cantidad</th>
-              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Precio</th>
-              <th className="px-2 py-1 border  border-surface-200 print:border-neutral-100">Importe</th>
+              <th className="px-2 py-1 border border-surface-200 print:border-gray-200">Producto</th>
+              <th className="px-2 py-1 border border-surface-200 print:border-gray-200">Variantes</th>
+              <th className="px-2 py-1 border border-surface-200 print:border-gray-200">Cantidad</th>
+              <th className="px-2 py-1 border border-surface-200 print:border-gray-200">Precio</th>
+              <th className="px-2 py-1 border border-surface-200 print:border-gray-200">Importe</th>
             </tr>
           </thead>
           <tbody>
             {
               ticket?.products?.map((product: TicketProduct, index: number) => {
                 return <tr key={index} className="">
-                  <td className="px-2 border  border-surface-200 print:border-neutral-100">{ product?.product?.name|| ''}</td>
-                  <td className="px-2 border  border-surface-200 print:border-neutral-100">{ product?.product_variants?.map((variant: ProductVariant) => variant.name ).join(' | ') || ''}</td>
-                  <td className="px-2 border  border-surface-200 print:border-neutral-100 text-right">{ product?.quantity } {product?.product?.measurement_unit|| ''}</td>
-                  <td className="px-2 border  border-surface-200 print:border-neutral-100 text-right h-8">{ product?.price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
-                  <td className="px-2 border  border-surface-200 print:border-neutral-100 text-right h-8">{ product?.product_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200">{ product?.product?.name|| ''}</td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200">{ product?.product_variants?.map((variant: ProductVariant) => variant.name ).join(' | ') || ''}</td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200 text-right">{ product?.quantity } {product?.product?.measurement_unit|| ''}</td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200 text-right h-8">{ product?.price?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200 text-right h-8">{ product?.product_total?.toLocaleString("es-MX", {style:"currency", currency:"MXN"})}</td>
                 </tr>
               })
             }
-            
+            {
+              Array.from({ length: Math.max(0, 10 - (ticket?.products?.length ?? 0)) }).map((_, i) => (
+                <tr key={`empty-${i}`} className="h-8">
+                  <td className="px-2 border border-surface-200 print:border-gray-200">&nbsp;</td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200"></td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200"></td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200"></td>
+                  <td className="px-2 border border-surface-200 print:border-gray-200"></td>
+                </tr>
+              ))
+            }
           </tbody>
 
         </table>
