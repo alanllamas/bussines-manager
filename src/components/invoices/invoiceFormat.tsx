@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react"
-import useGetInvoice, { generateResume, PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
+import useGetInvoice, { PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
 import { Invoice } from "@/api/hooks/invoices/getInvoices";
 import { useReactToPrint } from "react-to-print";
 import InvoiceBaseFormat from "./invoiceBaseFormat";
@@ -18,11 +18,6 @@ const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
   useEffect(() => {
     if (invoiceData &&!invoiceError && !invoiceIsLoading) {
       const data = invoiceData.data
-      console.log(data);
-      const { client, tickets } = data
-      
-      const { results, totals } = generateResume(tickets.map(ticket => `${ticket.id}`), tickets, client)
-      console.log(results);
       setInvoice(data)
       
     }
@@ -32,7 +27,7 @@ const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
 
   const initial_date = new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
   const ending_date = new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
-  const send_date = (invoice?.invoice_send_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
+  const send_date = invoice?.invoice_send_date ? new Date(invoice.invoice_send_date).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'}) : ''
   const client_name = invoice?.client?.name?.toLocaleUpperCase()
   const PrintInvoice = useReactToPrint(PrintInvoiceFormat(contentRef, client_name, initial_date, ending_date));
    
@@ -40,7 +35,7 @@ const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
     <div className="w-full pb-4 px-32 flex justify-end">
       <button className="px-4 py-2 bg-surface-200" onClick={() => PrintInvoice()}>Imprimir</button>
     </div>
-    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-3 shadow-xl border text-sm">
+    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-3 shadow-xl border border-gray-300 print:border-none print:shadow-none text-sm">
     { invoice && <InvoiceBaseFormat invoiceData={invoice} initial_date={initial_date} ending_date={ending_date} send_date={send_date}/>}
 
     </section>

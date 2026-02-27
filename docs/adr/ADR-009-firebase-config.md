@@ -1,6 +1,6 @@
 # ADR-009 — Consolidar configuración de Firebase y validar credenciales al iniciar
 
-**Estado:** Pendiente
+**Estado:** Resuelto
 **Prioridad:** Media
 **Depende de:** — (independiente, se puede hacer en paralelo con los ADRs de Alta)
 

@@ -1,5 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react"
+import { usePaginatedData } from "@/hooks/usePaginatedData"
+import { ActionButtons } from "@/components/ui"
 import { Ticket } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient"
@@ -15,7 +17,8 @@ import InvoicesForm from "../forms/InvoicesForm"
 import { useSWRConfig } from "swr"
 import { toast } from "sonner"
 
-const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
+interface InvoiceListProps { itemsPerPage?: number }
+const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
   const { mutate } = useSWRConfig()
   const invalidateInvoices = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/invoices') || key[0].includes('/api/tickets'))
@@ -30,7 +33,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   const [create, setCreate] = useState(false)
   const [editInvoice, setEditInvoice] = useState<Invoice>()
   const [newInvoice, setNewInvoice] = useState<createInvoiceReq>()
-  const [newEditInvoice, setNewEditInvoice] = useState<{invoice: Invoice, documentId: string}>()
+  const [newEditInvoice, setNewEditInvoice] = useState<{invoice: createInvoiceReq, documentId: string}>()
   const [initialFormValues, setInitialFormValues] = useState<InvoiceInitialValues>()
   const [client, setClient] = useState<Client>()
   const [printInvoice, setPrintInvoice] = useState<Invoice>()
@@ -73,8 +76,6 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if ((invoicesData.data)) {
-      // console.log('invoicesData.data: ', invoicesData.data);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
       //   const dateB: number = new Date(b.sale_date).valueOf()
@@ -125,10 +126,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if (editInvoice) {
-      // console.log('editInvoice: ', editInvoice);
-      // console.log('editInvoice.tickets: ', editInvoice.tickets);
       const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
-      // console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
       setTickets(editInvoice.tickets)
       const { results, totals } = generateResume(editTickets, editInvoice.tickets, client)
       setResume(results)
@@ -140,8 +138,8 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         shipping: editInvoice?.shipping_price || 0,
         total: editInvoice?.total || 0,
         taxes: editInvoice.taxes,
-        comments: editInvoice.comments,
-        inner_comments: editInvoice.inner_comments,
+        comments: editInvoice.comments || '',
+        inner_comments: editInvoice.inner_comments || '',
         ending_date: editInvoice.ending_date,
         expected_payment_date: editInvoice.expected_payment_date,
         initial_date: editInvoice.initial_date,
@@ -259,7 +257,6 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
   const handleSubmit = async (values: InvoiceInitialValues) => {
     setIsOpen(false)
-    // console.log(values);
     const data = {
       ...values,
       client: [values.client],
@@ -287,7 +284,6 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
       <>
         {currentItems &&
           currentItems?.map((invoice: Invoice, index: number) => {
-          // console.log('invoice: ', invoice);
           return <tr key={`invoice-${index}`}>
             <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_number ?? '').padStart(5, '0')}</a></td>
             <td>{invoice.client?.name}</td>
@@ -295,7 +291,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
             <td>{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
             <td className="font-medium">$ {invoice.total}</td>
             <td>
-              <div className="flex gap-1"><button className="btn-icon" onClick={() => (setClient(invoice.client),setEditInvoice(invoice))}><span className="material-symbols-outlined text-[16px]">edit</span></button><button className="btn-icon" onClick={() => sendPrint(invoice)}><span className="material-symbols-outlined text-[16px]">print</span></button></div>
+              <ActionButtons onEdit={() => { setClient(invoice.client); setEditInvoice(invoice) }} onPrint={() => sendPrint(invoice)} />
             </td>
           </tr>
         })}
@@ -304,26 +300,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   }
 
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
-    // Here we use item offsets; we could also use page offsets
-    // following the API or data you're working with.
-    const [itemOffset, setItemOffset] = useState(0);
-
-    // Simulate fetching items from another resources.
-    // (This could be items from props; or items loaded in a local state
-    // from an API endpoint with useEffect and useState)
-    const endOffset = itemOffset + itemsPerPage;
-    // console.log(`Loading items from ${itemOffset} to ${endOffset}`);
-    const currentItems = invoices?.slice(itemOffset, endOffset);
-    const pageCount = Math.ceil(invoices.length / itemsPerPage);
-
-    // Invoke when user click to request another page.
-    const handlePageChange = (event: { selected: number }) => {
-      const newOffset = (event.selected * itemsPerPage) % invoices.length;
-      // console.log(
-      //   `User requested page number ${event.selected}, which is offset ${newOffset}`
-      // );
-      setItemOffset(newOffset);
-    };
+    const { currentItems, pageCount, handlePageChange } = usePaginatedData(invoices, itemsPerPage);
       return (
       <section className="w-full flex flex-col items-center">
         <table className="data-table mt-6">

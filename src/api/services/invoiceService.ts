@@ -1,5 +1,4 @@
-import { Client } from '../hooks/clients/getClient'
-import { Ticket, TicketProduct } from '../hooks/invoices/getTicketsByClient'
+import { Client, Ticket, TicketProduct } from '@/types'
 
 export type ResumeData = {
   price?: number

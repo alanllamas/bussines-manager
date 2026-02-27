@@ -7,14 +7,13 @@ const firebaseCredentials = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
 };
 
-Object.keys(firebaseCredentials).forEach((key) => {
-  const configValue = firebaseCredentials[key] + "";
-  if (configValue.charAt(0) === '"') {
-    firebaseCredentials[key] = configValue.substring(1, configValue.length - 1);
+const requiredKeys = ['apiKey', 'authDomain', 'projectId'] as const;
+requiredKeys.forEach(key => {
+  if (!firebaseCredentials[key]) {
+    throw new Error(`Firebase config missing: ${key}`);
   }
 });
 
 export const firebaseConfig = firebaseCredentials;
-
-export const firebaseApp =initializeApp(firebaseConfig)
+export const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);

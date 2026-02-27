@@ -6,7 +6,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 
 const ProfileAvatar: React.FC = () => {
   const { user, signIn, logOut} = useAuth()
-  // console.log('user: ', user)
   const handleLogout = () => {
     logOut()
     setTimeout(() => window.location.reload(), 500);

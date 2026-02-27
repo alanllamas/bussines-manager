@@ -19,7 +19,6 @@ const ClientPage: React.FC<{id: string}> = ({ id }: {id: string}) => {
   useEffect(() => {
     if (!isLoading && !error) {
       
-      console.log('clientData: ', clientData.data);
       setClient(clientData.data)
     }
   }, [isLoading, error, clientData])

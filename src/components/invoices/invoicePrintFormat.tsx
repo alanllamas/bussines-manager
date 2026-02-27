@@ -6,7 +6,8 @@ import InvoiceBaseFormat from "./invoiceBaseFormat";
 import { PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
 
 
-const InvoicePrintFormat: React.FC<any> = ({ invoiceData }) => {
+interface InvoicePrintFormatProps { invoiceData: Invoice }
+const InvoicePrintFormat: React.FC<InvoicePrintFormatProps> = ({ invoiceData }) => {
  
   const [invoice, setInvoice] = useState<Invoice>()
 
@@ -14,20 +15,18 @@ const InvoicePrintFormat: React.FC<any> = ({ invoiceData }) => {
 
   const initial_date = new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
   const ending_date = new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
-  const send_date = (invoice?.invoice_send_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
+  const send_date = invoice?.invoice_send_date ? new Date(invoice.invoice_send_date).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'}) : ''
   const client_name = invoice?.client?.name?.toLocaleUpperCase()
   const PrintInvoice = useReactToPrint(PrintInvoiceFormat(contentRef, client_name, initial_date, ending_date));
 
   useEffect(() => {
     if (invoiceData) {
-      // console.log('invoiceData: ', invoiceData);
       setInvoice(invoiceData)
     }
   },[invoiceData])
 
 
   useEffect(() => {
-    // console.log(interval);
     if (invoice) {
       setTimeout(() => {
         PrintInvoice()

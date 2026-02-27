@@ -92,6 +92,10 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.05em;
   color: var(--color-surface-500);
 }
+.field-label.required::after {
+  content: ' *';
+  color: #dc2626;
+}
 
 .field-input {
   height: 2.5rem;

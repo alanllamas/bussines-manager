@@ -40,7 +40,7 @@ export const emptyContact: Contact = {
   name: '',
   area: '',
   email: '',
-  extension: '',
+  extension: '0',
   job_title: '',
   phone: ''
 }
@@ -136,7 +136,8 @@ const clientSchema = Yup.object({
   contacts: Yup.array().of(
     Yup.object({
       name: Yup.string().required('Nombre requerido'),
-      email: Yup.string().email('Correo inválido').nullable(),
+      email: Yup.string().email('Correo inválido').required('Correo requerido'),
+      extension: Yup.number().min(0, 'Extensión inválida').required('Extensión requerida').transform((v, o) => o === '' ? 0 : v),
     })
   ),
 })
@@ -158,7 +159,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
       name: c.name ?? '',
       area: c.area ?? '',
       email: c.email ?? '',
-      extension: c.extension ?? '',
+      extension: c.extension ?? '0',
       job_title: c.job_title ?? '',
       phone: c.phone ?? '',
     })) ?? [],
@@ -228,7 +229,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
             )}
 
             <div className="field-group">
-              <label className="field-label" htmlFor="name">Nombre</label>
+              <label className="field-label required" htmlFor="name">Nombre</label>
               <Field className="field-input" id="name" name="name" type="text" />
               {touched.name && errors.name && <p className="alert-field">{errors.name}</p>}
             </div>
@@ -384,18 +385,18 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                               <DisclosurePanel>
                                 <div className="grid grid-cols-2 gap-3 p-4 border border-t-0 border-surface-200 rounded-b">
                                   {[
-                                    { label: 'Nombre', name: `contacts.${index}.name`, key: 'name' },
-                                    { label: 'Área', name: `contacts.${index}.area`, key: 'area' },
-                                    { label: 'Correo', name: `contacts.${index}.email`, key: 'email' },
-                                    { label: 'Extensión', name: `contacts.${index}.extension`, key: 'extension' },
-                                    { label: 'Título laboral', name: `contacts.${index}.job_title`, key: 'job_title' },
-                                    { label: 'Teléfono', name: `contacts.${index}.phone`, key: 'phone' },
-                                  ].map(({ label, name, key }) => {
+                                    { label: 'Nombre', name: `contacts.${index}.name`, key: 'name', required: true },
+                                    { label: 'Área', name: `contacts.${index}.area`, key: 'area', required: false },
+                                    { label: 'Correo', name: `contacts.${index}.email`, key: 'email', required: true },
+                                    { label: 'Extensión', name: `contacts.${index}.extension`, key: 'extension', required: true },
+                                    { label: 'Título laboral', name: `contacts.${index}.job_title`, key: 'job_title', required: false },
+                                    { label: 'Teléfono', name: `contacts.${index}.phone`, key: 'phone', required: false },
+                                  ].map(({ label, name, key, required }) => {
                                     const contactTouched = (touched as any).contacts?.[index]
                                     const contactErrors = (errors as any).contacts?.[index]
                                     return (
                                       <div key={name} className="field-group">
-                                        <label className="field-label">{label}</label>
+                                        <label className={`field-label${required ? ' required' : ''}`}>{label}</label>
                                         <Field className="field-input" name={name} type="text" />
                                         {contactTouched?.[key] && contactErrors?.[key] && <p className="alert-field">{contactErrors[key]}</p>}
                                       </div>
@@ -417,7 +418,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                 <Field as="textarea" className="field-textarea" name="taxing_info.comments" />
               </div>
             <div className="flex justify-end pt-2">
-              <button className="btn-primary disabled:opacity-50" type="submit" disabled={isSubmitting || !isValid || !dirty}>
+              <button className="btn-primary disabled:opacity-50" type="submit" disabled={isSubmitting || !dirty || !isValid}>
                 <span className="material-symbols-outlined text-[16px]">save</span>
                 {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear'}
               </button>

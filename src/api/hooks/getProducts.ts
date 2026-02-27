@@ -1,25 +1,15 @@
 'use-client'
 import { fetcher } from '../fetcher';
 import useSWR from 'swr';
-import { Meta } from './tickets/getTickets';
+export type { ProductVariant, Product } from '@/types'
+import type { Product } from '@/types'
 
-export type ProductVariant = {
-  id: number;
-  documentId: string;
-  name: string;
-  type: string;
-}
-
-export type Product = {
-  id: number;
-  documentId: string;
-  name: string;
-  price: number;
-  product_variants: ProductVariant[]
-  total: number
-  quantity: number
-  measurement_unit: string;
-  taxes?: number
+export type Meta = {
+  pagination: {
+    total: number;
+    page: number;
+    count: number;
+  }
 }
 
 const PRODUCTS_URL = `/api/products?populate=*`;

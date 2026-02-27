@@ -2,8 +2,10 @@
 import React from "react";
 import { TabPanel } from '@headlessui/react'
 import TicketList from "@/components/tickets/ticketList";
+import { Ticket } from "@/types";
 
-const TicketsTab: React.FC<any> = ({tickets, clientId}) => {
+interface TicketsTabProps { tickets?: Ticket[]; clientId?: string | number }
+const TicketsTab: React.FC<TicketsTabProps> = ({tickets, clientId}) => {
   return (
     <TabPanel className="px-4 q">
       <TicketList ticketData={tickets} itemsPerPage={10} clientId={clientId} hideClient />

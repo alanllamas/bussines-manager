@@ -1,6 +1,8 @@
 'use client'
 import React, { useEffect, useState } from "react"
-import { ProductVariant, Ticket, TicketProduct} from "@/api/hooks/tickets/getTickets"
+import { usePaginatedData } from "@/hooks/usePaginatedData"
+import { ActionButtons } from "@/components/ui"
+import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import TicketsForm, { createTicketReq, emptyProduct, EProduct, TicketInitialValues } from "../forms/ticketsForm"
 import useEditTicket, { EditTicketReq } from "@/api/hooks/tickets/useEditTicket"
@@ -11,7 +13,8 @@ import TicketPrintFormat from "./ticketPrintFormat"
 import { useSWRConfig } from "swr"
 import { toast } from "sonner"
 
-const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClient}) => {
+interface TicketListProps { ticketData?: Ticket[]; itemsPerPage?: number; clientId?: string | number; hideClient?: boolean }
+const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, clientId, hideClient}) => {
   const { mutate } = useSWRConfig()
   const invalidateTickets = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/tickets') || key[0].includes('/api/clients'))
@@ -44,7 +47,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     // make refresh
 
     if (!ticketNumberError && !ticketNumberIsLoading && ticket_number) {
-      console.log('ticket_number: ', ticket_number);
       // setTimeout(() => window.location.reload(), 500);
       
 
@@ -82,7 +84,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     }
   }, [EditTicketData, EditTicketError, EditTicketIsLoading])
   useEffect(() => {
-    // console.log('editTicket: ', editTicket);
     if (editTicket) {
       setNewTicket(undefined)
       setNewEditTicket(undefined)
@@ -109,7 +110,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     
   }, [editTicket])
   useEffect(() => {
-    // console.log('initialFormValues: ', initialFormValues);
     setIsOpen(true)
     
   }, [initialFormValues])
@@ -121,7 +121,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     setNewEditTicket(undefined)
     setInitialFormValues({
       date: today,
-      client: clientId ? clientId : "",
+      client: clientId ? String(clientId) : "",
       ticket_number:  ticket_number !== undefined && isNumber(ticket_number) ? ticket_number + 1 : 0,
       products: [emptyProduct],
       shipping: 0,
@@ -137,7 +137,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   }
   
   const handleSubmit = async (values: TicketInitialValues) => {
-    console.log(values);
     const { date, client, shipping, subtotal, products, ticket_number, total } = values
     const data = {
       sale_date: new Date(date),
@@ -170,14 +169,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   const [printTicket, setPrintTicket] = useState<Ticket | null>()
 
   const sendPrint = (ticket:Ticket) => {
-    console.log(ticket);
-    
-    const emptyTicket: TicketProduct = {
-      id: 0
-    }
-    while (ticket?.products.length < 10) {
-      ticket?.products.push(emptyTicket)
-    }
     setPrintTicket(ticket)
     unsetPrintTicket()
   }
@@ -187,7 +178,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
     }, 1000);
   }
   useEffect(() => {
-    // console.log(interval);
     if (ticketData) {
       setTickets([...ticketData].sort((a, b) => b.id - a.id))
     }
@@ -198,14 +188,13 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
       <>
         {currentItems &&
           currentItems?.map((ticket: Ticket, index: number) => {
-          // console.log('ticket: ', ticket);
           return <tr key={`ticket-${index}`}>
             <td><a className="text-primary-600 hover:underline font-medium" href={`/tickets/${ticket.documentId}`}>{String(ticket.ticket_number ?? '').padStart(5, '0')}</a></td>
             {!hideClient && <td>{ticket.client?.name}</td>}
             <td>{new Date(ticket.sale_date).toLocaleDateString()}</td>
             <td className="font-medium">$ {ticket.total}</td>
             <td>{ticket.invoice ? <span className="material-symbols-outlined text-[18px] text-primary-500">check_circle</span> : <span className="material-symbols-outlined text-[18px] text-surface-300">radio_button_unchecked</span>}</td>
-            <td><div className="flex gap-1"><button className="btn-icon" onClick={() => setEditTicket(ticket)}><span className="material-symbols-outlined text-[16px]">edit</span></button><button className="btn-icon" onClick={() => sendPrint(ticket)}><span className="material-symbols-outlined text-[16px]">print</span></button></div></td>
+            <td><ActionButtons onEdit={() => setEditTicket(ticket)} onPrint={() => sendPrint(ticket)} /></td>
             
           </tr>
         })}
@@ -214,26 +203,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
   }
 
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
-    // Here we use item offsets; we could also use page offsets
-    // following the API or data you're working with.
-    const [itemOffset, setItemOffset] = useState(0);
-
-    // Simulate fetching items from another resources.
-    // (This could be items from props; or items loaded in a local state
-    // from an API endpoint with useEffect and useState)
-    const endOffset = itemOffset + itemsPerPage;
-    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
-    const currentItems = tickets?.length > 0 ? tickets?.slice(itemOffset, endOffset) : []
-    const pageCount = Math.ceil(tickets?.length / itemsPerPage);
-
-    // Invoke when user click to request another page.
-    const handlePageChange = (event: { selected: number }) => {
-      const newOffset = (event.selected * itemsPerPage) % tickets.length;
-      console.log(
-        `User requested page number ${event.selected}, which is offset ${newOffset}`
-      );
-      setItemOffset(newOffset);
-    };
+    const { currentItems, pageCount, handlePageChange } = usePaginatedData(tickets, itemsPerPage);
       return (
       <section className="w-full flex flex-col items-center">
         <table className="data-table mt-6">

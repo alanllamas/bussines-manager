@@ -1,8 +1,8 @@
 'use-client'
+import React from 'react';
 import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
 import { Ticket } from './getTickets';
-import { useReactToPrint } from 'react-to-print';
 
 export type Meta = {
   pagination?: {
@@ -11,7 +11,7 @@ export type Meta = {
     count:number;
   }
 }
-export const PrintTicketFormat = (contentRef: any, ticket: any) => ({ contentRef, documentTitle: `Nota-${ticket?.ticket_number}-${ticket?.client?.name?.toLocaleUpperCase()}-${new Date(ticket?.sale_date || '').toLocaleDateString()}` })
+export const PrintTicketFormat = (contentRef: React.RefObject<HTMLDivElement | null>, ticket: Ticket) => ({ contentRef, documentTitle: `Nota-${ticket?.ticket_number}-${ticket?.client?.name?.toLocaleUpperCase()}-${new Date(ticket?.sale_date || '').toLocaleDateString()}` })
 
 async function GetTicket([url]: [string]) {
   return await fetcher<{data: Ticket, meta: Meta}>(url, { method: 'GET' });

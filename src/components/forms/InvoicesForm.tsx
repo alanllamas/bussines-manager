@@ -1,6 +1,7 @@
 'use client'
 import { generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
-import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
+import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
+import { FormDialog } from "@/components/ui"
 import { Field, FieldArray, Form, Formik } from "formik"
 import * as Yup from "yup"
 import React, { ChangeEvent, useEffect, useState } from "react"
@@ -70,8 +71,6 @@ const InvoicesForm: React.FC<any> = ({
   }, [clientData])
   useEffect(() => {
     if (client) {
-      // console.log('client: ', client);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
       //   const dateB: number = new Date(b.sale_date).valueOf()
@@ -83,8 +82,6 @@ const InvoicesForm: React.FC<any> = ({
   }, [client])
   useEffect(() => {
     if (ticketsData) {
-      // console.log('ticketsData: ', ticketsData);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
       //   const dateB: number = new Date(b.sale_date).valueOf()
@@ -96,7 +93,7 @@ const InvoicesForm: React.FC<any> = ({
   }, [ticketsData])
 
   return <>
-    <div className="flex justify-between">
+    <div className="flex justify-end">
       {/* <h2>{client?.name}</h2> */}
       <button className="btn-primary" onClick={() => sendCreate()}>
         <span className="material-symbols-outlined text-[16px]">add</span>
@@ -112,9 +109,7 @@ const InvoicesForm: React.FC<any> = ({
       >
         {
           ({values, setFieldValue, errors, touched, isValid, dirty}) => (
-            <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50 my-20">
-              <div className="fixed inset-0 flex w-screen items-center justify-center">
-                <DialogPanel className="w-5/12 border bg-surface-50 shadow-2xl text-surface-900 flex flex-col h-[90vh]">
+            <FormDialog isOpen={isOpen} onClose={() => sendClose()} dialogClassName="my-20" panelClassName="w-5/12 border bg-surface-50 shadow-2xl text-surface-900 flex flex-col h-[90vh]">
                   <Form className="flex flex-col flex-1 overflow-hidden">
                   <div className="flex-1 overflow-y-auto p-8 space-y-2">
 
@@ -127,15 +122,12 @@ const InvoicesForm: React.FC<any> = ({
                     {/* <Field className="border border-surface-300 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
                     <div className="flex align-baseline">
 
-                      <label htmlFor="client" className="p-2">Cliente: </label>
+                      <label htmlFor="client" className="p-2">Cliente: <span className="text-red-500">*</span></label>
 
                       <Field required as="select" disabled={blockClient} className="field-select" id="client" name="client" value={values.client}
                       onChange={(e: any) => {
-                        // console.log(e.target.value);
-                        // console.log(clients);
                         
                         const cli = clients.filter((client) => client.id === Number(e.target.value))[0]
-                        // console.log('cli: ', cli);
                         
                         setFieldValue("client", e.target.value)
                         setclient(cli)
@@ -152,12 +144,11 @@ const InvoicesForm: React.FC<any> = ({
 
                     <div className="flex py-2 gap-4">
                       <div className="flex flex-col flex-1">
-                        <label className="field-label">Fecha inicial</label>
+                        <label className="field-label required">Fecha inicial</label>
                         <DatePicker
                           className="field-input"
                           disabled={!client}
                           onChange={(e: any) => {
-                            // console.log(e);
                             const initial_date = new Date(new Date(e).setHours(0, 0 , 0, 0))
                             setFieldValue("initial_date", initial_date)
                             // setFieldValue("ending_date", values.ending_date)
@@ -172,16 +163,11 @@ const InvoicesForm: React.FC<any> = ({
 
                                 const filteredTickets = tickets.filter(ticket => {
                                   const sale_date = new Date(ticket.sale_date)
-                                  // console.log('sale_date: ', sale_date);
-                                  // console.log('initial_date: ', initial_date);
-                                  // console.log('ending_date: ', ending_date);
-                                  // console.log();
                                   return sale_date > initial_date && sale_date < ending_date
                                 }).map(ticket => `${ticket.id}`)
                                 // const filteredTickets = tickets.filter(ticket => {
                                 //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
                                 // }).map(ticket => `${ticket.id}`)
-                                // console.log('filteredTickets: ', filteredTickets);
                                 setFieldValue('tickets', filteredTickets)
                                 setTimeout(() => {
                                   const { results, totals } = generateResume(filteredTickets, tickets, client)
@@ -203,15 +189,12 @@ const InvoicesForm: React.FC<any> = ({
                         />
                       </div>
                       <div className="flex flex-col flex-1">
-                        <label className="field-label" htmlFor="">Fecha final</label>
+                        <label className="field-label required" htmlFor="">Fecha final</label>
                         <DatePicker
                           className="field-input"
                           disabled={!client}
                           onChange={(e: any) => {
-                            // console.log(e);
-                            // console.log("ending date", e)
 
-                            // console.log("values.initial_date", values.initial_date)
                             const ending_date = new Date(new Date(e).setHours(23, 59 , 59, 999))
                             setFieldValue("ending_date", ending_date)
                             if (values.initial_date) {
@@ -223,10 +206,6 @@ const InvoicesForm: React.FC<any> = ({
 
                                 const filteredTickets = tickets.reduce((acc: string[], curr: Ticket) => {
                                   const sale_date = new Date(curr.sale_date)
-                                  // console.log('sale_date: ', sale_date);
-                                  // console.log('initial_date: ', initial_date);
-                                  // console.log('ending_date: ', ending_date);
-                                  // console.log();
                                   if ((sale_date > initial_date && sale_date < ending_date) && !curr.invoice) {
                                     acc = [...acc, `${curr.id}`]
                                   } 
@@ -245,7 +224,6 @@ const InvoicesForm: React.FC<any> = ({
                                 // const filteredTickets = tickets.filter(ticket => {
                                 //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
                                 // }).map(ticket => `${ticket.id}`)
-                                // console.log('filteredTickets: ', filteredTickets);
                                 setFieldValue('tickets', filteredTickets)
                                 setTimeout(() => {
                                   const { results, totals } = generateResume(filteredTickets, tickets, client)
@@ -395,8 +373,8 @@ const InvoicesForm: React.FC<any> = ({
                       </DisclosureButton>
                       <DisclosurePanel>
                         <div className="flex flex-col p-4 gap-2">
-                          <Field as="textarea" className="field-textarea" type="text" name="comments" value={values.comments} rows="3" placeholder="Comentarios para el cliente"></Field>
-                          <Field as="textarea" className="field-textarea" type="text" name="inner_comments" value={values.inner_comments} rows="3" placeholder="Comentarios internos"></Field>
+                          <Field as="textarea" className="field-textarea" type="text" name="comments" rows="3" placeholder="Comentarios para el cliente"></Field>
+                          <Field as="textarea" className="field-textarea" type="text" name="inner_comments" rows="3" placeholder="Comentarios internos"></Field>
                         </div>
                         {/* 
                           expected_payment_date
@@ -510,11 +488,8 @@ const InvoicesForm: React.FC<any> = ({
                               <DatePicker
                                 className="field-input"
                                 onChange={(e: any) => {
-                                  // console.log(e);
                                   
                                   const invoice_send_date = new Date(e)
-                                  // console.log('client: ', client);
-                                  // console.log('client?.taxing_info: ', client?.taxing_info);
                                   
                                   if (client?.taxing_info) {
                                     // payment_period
@@ -603,9 +578,7 @@ const InvoicesForm: React.FC<any> = ({
                     </div>
                   </div>
                   </Form>
-                </DialogPanel>
-              </div>
-            </Dialog>
+            </FormDialog>
           )
         }
       </Formik>
