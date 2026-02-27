@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
+import { ActionButtons } from "@/components/ui"
 import { Ticket } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient"
@@ -282,7 +283,7 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
             <td>{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
             <td className="font-medium">$ {invoice.total}</td>
             <td>
-              <div className="flex gap-1"><button className="btn-icon" onClick={() => setEditInvoice(invoice)}><span className="material-symbols-outlined text-[16px]">edit</span></button><button className="btn-icon" onClick={() => sendPrint(invoice)}><span className="material-symbols-outlined text-[16px]">print</span></button></div>
+              <ActionButtons onEdit={() => setEditInvoice(invoice)} onPrint={() => sendPrint(invoice)} />
             </td>
           </tr>
         })}

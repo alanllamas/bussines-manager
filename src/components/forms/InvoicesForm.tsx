@@ -1,6 +1,7 @@
 'use client'
 import { generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
-import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
+import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
+import { FormDialog } from "@/components/ui"
 import { Field, FieldArray, Form, Formik } from "formik"
 import * as Yup from "yup"
 import React, { ChangeEvent, useEffect, useState } from "react"
@@ -112,9 +113,7 @@ const InvoicesForm: React.FC<any> = ({
       >
         {
           ({values, setFieldValue, errors, touched, isValid, dirty}) => (
-            <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50 my-20">
-              <div className="fixed inset-0 flex w-screen items-center justify-center">
-                <DialogPanel className="w-5/12 border bg-surface-50 shadow-2xl text-surface-900 flex flex-col h-[90vh]">
+            <FormDialog isOpen={isOpen} onClose={() => sendClose()} dialogClassName="my-20" panelClassName="w-5/12 border bg-surface-50 shadow-2xl text-surface-900 flex flex-col h-[90vh]">
                   <Form className="flex flex-col flex-1 overflow-hidden">
                   <div className="flex-1 overflow-y-auto p-8 space-y-2">
 
@@ -603,9 +602,7 @@ const InvoicesForm: React.FC<any> = ({
                     </div>
                   </div>
                   </Form>
-                </DialogPanel>
-              </div>
-            </Dialog>
+            </FormDialog>
           )
         }
       </Formik>

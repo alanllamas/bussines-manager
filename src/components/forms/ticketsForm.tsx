@@ -1,6 +1,7 @@
 'use client'
 import React, { ChangeEvent, useEffect, useState } from "react"
-import { Dialog, DialogPanel, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
+import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
+import { FormDialog } from '@/components/ui'
 import { Field, FieldArray, Form, Formik, useField, useFormikContext } from "formik"
 import * as Yup from "yup"
 import logo from "@/public/logo.png"
@@ -245,9 +246,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       >
         {
           ({values, setFieldValue, errors, touched, isValid, dirty}) => (
-            <Dialog open={isOpen} onClose={() => sendClose()} className="relative z-50">
-              <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-                <DialogPanel className="max-w-lg space-y-4 border bg-surface-50 p-12 shadow-2xl text-surface-900">
+            <FormDialog isOpen={isOpen} onClose={() => sendClose()} panelClassName="max-w-lg space-y-4 border bg-surface-50 p-12 shadow-2xl text-surface-900">
                   
                   <div className="flex justify-between gap-2">
                     <img className="w-52" src={logo.src} alt="" />
@@ -415,9 +414,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                         {/* <button onClick={() => setIsOpen(false)}>Deactivate</button> */}
                       </div>
                     </Form>
-                </DialogPanel>
-              </div>
-            </Dialog>
+            </FormDialog>
           )
         }
       </Formik>

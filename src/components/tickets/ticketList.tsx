@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
+import { ActionButtons } from "@/components/ui"
 import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import TicketsForm, { createTicketReq, emptyProduct, EProduct, TicketInitialValues } from "../forms/ticketsForm"
@@ -197,7 +198,7 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
             <td>{new Date(ticket.sale_date).toLocaleDateString()}</td>
             <td className="font-medium">$ {ticket.total}</td>
             <td>{ticket.invoice ? <span className="material-symbols-outlined text-[18px] text-primary-500">check_circle</span> : <span className="material-symbols-outlined text-[18px] text-surface-300">radio_button_unchecked</span>}</td>
-            <td><div className="flex gap-1"><button className="btn-icon" onClick={() => setEditTicket(ticket)}><span className="material-symbols-outlined text-[16px]">edit</span></button><button className="btn-icon" onClick={() => sendPrint(ticket)}><span className="material-symbols-outlined text-[16px]">print</span></button></div></td>
+            <td><ActionButtons onEdit={() => setEditTicket(ticket)} onPrint={() => sendPrint(ticket)} /></td>
             
           </tr>
         })}
