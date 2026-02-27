@@ -1,17 +1,47 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-heading: 'Roboto', sans-serif;
+  --font-body: 'Roboto', sans-serif;
+  /* Primary — brand teal from logo */
+  --color-primary-50:  #f0fafa;
+  --color-primary-100: #cceaea;
+  --color-primary-200: #99d5d5;
+  --color-primary-300: #66c0c0;
+  --color-primary-400: #33abab;
+  --color-primary-500: #1e6b6b;
+  --color-primary-600: #1a5e5e;
+  --color-primary-700: #145050;
+  --color-primary-800: #0e3b3b;
+  --color-primary-900: #082626;
+  --color-primary-950: #041313;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Surface — neutral with a slight teal tint */
+  --color-surface-50:  #f7fafa;
+  --color-surface-100: #edf2f2;
+  --color-surface-200: #d9e4e4;
+  --color-surface-300: #bccece;
+  --color-surface-400: #91aeae;
+  --color-surface-500: #6b8e8e;
+  --color-surface-600: #4f6e6e;
+  --color-surface-700: #3a5252;
+  --color-surface-800: #273838;
+  --color-surface-900: #161f1f;
+  --color-surface-950: #0b1010;
+
+  /* Accent — warm amber, complements teal */
+  --color-accent-50:  #fdf8ee;
+  --color-accent-100: #faeccf;
+  --color-accent-200: #f5d99f;
+  --color-accent-300: #efc070;
+  --color-accent-400: #e8a43d;
+  --color-accent-500: #d4820a;
+  --color-accent-600: #b36808;
+  --color-accent-700: #8c5006;
+  --color-accent-800: #663a04;
+  --color-accent-900: #402402;
+  --color-accent-950: #201201;
 }
 
 @font-face {
@@ -21,9 +51,11 @@
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 .material-symbols-outlined {
@@ -40,18 +72,236 @@ body {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   user-select: none;
-
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
   font-feature-settings: 'liga';
+}
+
+/* ── Form system ── */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-surface-500);
+}
+
+.field-input {
+  height: 2.5rem;
+  width: 100%;
+  border: 1px solid var(--color-surface-300);
+  border-radius: 0.375rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-surface-900);
+  background: white;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field-input:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+.field-input:disabled {
+  background: var(--color-surface-100);
+  color: var(--color-surface-400);
+  cursor: not-allowed;
+}
+
+.field-select {
+  height: 2.5rem;
+  width: 100%;
+  border: 1px solid var(--color-surface-300);
+  border-radius: 0.375rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-surface-900);
+  background: white;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field-select:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+.field-textarea {
+  width: 100%;
+  min-height: 5rem;
+  border: 1px solid var(--color-surface-300);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-surface-900);
+  background: white;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field-textarea:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px var(--color-primary-100);
+}
+
+/* ── Alerts ── */
+.alert-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+.alert-field {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+}
+
+/* ── Button system ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  background: var(--color-primary-500);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--color-primary-600); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  background: white;
+  color: var(--color-surface-700);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-surface-300);
+  transition: background 0.15s;
+}
+.btn-secondary:hover { background: var(--color-surface-50); }
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  background: #991b1b;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: background 0.15s;
+}
+.btn-danger:hover { background: #7f1d1d; }
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  background: white;
+  color: var(--color-surface-600);
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-surface-300);
+  transition: background 0.15s, color 0.15s;
+}
+.btn-icon:hover { background: var(--color-surface-100); color: var(--color-surface-900); }
+
+/* ── Data table ── */
+.data-table {
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: collapse;
+}
+.data-table thead tr {
+  background: var(--color-surface-100);
+  border-bottom: 2px solid var(--color-surface-200);
+}
+.data-table thead th {
+  padding: 0.625rem 1rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-surface-500);
+}
+.data-table tbody tr:nth-child(odd)  { background: white; }
+.data-table tbody tr:nth-child(even) { background: var(--color-surface-50); }
+.data-table tbody tr:hover { background: var(--color-primary-50); }
+.data-table tbody td {
+  padding: 0.625rem 1rem;
+  color: var(--color-surface-700);
+  border-bottom: 1px solid var(--color-surface-100);
+}
+
+/* ── Paginator ── */
+.paginator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 1rem 0;
+  font-size: 0.875rem;
+  color: var(--color-surface-600);
+}
+.paginator li a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+.paginator li a:hover {
+  background: var(--color-surface-100);
+  border-color: var(--color-surface-200);
+}
+.paginator li.selected a {
+  background: var(--color-primary-500);
+  color: white;
+  border-color: var(--color-primary-500);
+}
+.paginator li.disabled a {
+  color: var(--color-surface-300);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.paginator li.previous a,
+.paginator li.next a {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-surface-500);
+  border-color: var(--color-surface-200);
 }
 
 .material-icons {
@@ -68,14 +318,8 @@ body {
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   user-select: none;
-
   -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
   font-feature-settings: 'liga';
 }

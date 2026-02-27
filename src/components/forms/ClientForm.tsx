@@ -2,10 +2,13 @@
 import React, { useEffect, useState } from "react"
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { Field, FieldArray, Form, Formik } from "formik"
+import * as Yup from "yup"
 import { Client, Contact, TaxingInfo } from "@/api/hooks/clients/getClient"
 import useCreateClient from "@/api/hooks/clients/useCreateClient"
 import useEditClient from "@/api/hooks/clients/useEditClient"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { useSWRConfig } from "swr"
 
 export type EVariant = {
   name: string;
@@ -92,13 +95,11 @@ const SAT_CFDI_USOS = [
   'CN01 - Nómina',
 ]
 
-// Métodos de Pago CFDI (PUE / PPD)
 const SAT_METODOS_PAGO = [
   'PUE - Pago en una sola exhibición',
   'PPD - Pago en parcialidades o diferido',
 ]
 
-// Formas de Pago SAT
 const SAT_FORMAS_PAGO = [
   '01 - Efectivo',
   '02 - Cheque nominativo',
@@ -112,7 +113,6 @@ const SAT_FORMAS_PAGO = [
   '99 - Por definir',
 ]
 
-// Forma de pago interna (no SAT)
 const FORMAS_PAGO_INTERNAS = [
   { value: 'efectivo', label: 'Efectivo' },
   { value: 'transferencia', label: 'Transferencia' },
@@ -126,11 +126,24 @@ const PERIODOS = [
   { value: 30, label: '30 días' },
 ]
 
-const selectClass = "border border-neutral-400 rounded-sm px-2 bg-white"
-const fieldClass = "border border-neutral-400 rounded-sm px-2"
+const clientSchema = Yup.object({
+  name: Yup.string().required('El nombre es requerido'),
+  taxing_info: Yup.object({
+    taxing_RFC: Yup.string().matches(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i, 'RFC inválido').nullable(),
+    email: Yup.string().email('Correo inválido').nullable(),
+    zip_code: Yup.number().typeError('Debe ser un número').nullable(),
+  }),
+  contacts: Yup.array().of(
+    Yup.object({
+      name: Yup.string().required('Nombre requerido'),
+      email: Yup.string().email('Correo inválido').nullable(),
+    })
+  ),
+})
 
 const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ client, onSuccess }) => {
   const router = useRouter()
+  const { mutate } = useSWRConfig()
   const isEdit = !!client
 
   const [newClient, setNewClient] = useState<createClientReq>()
@@ -141,7 +154,14 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
 
   const initialFormValues: ClientInitialValues = {
     name: client?.name ?? '',
-    contacts: client?.contacts ?? [],
+    contacts: client?.contacts?.map(c => ({
+      name: c.name ?? '',
+      area: c.area ?? '',
+      email: c.email ?? '',
+      extension: c.extension ?? '',
+      job_title: c.job_title ?? '',
+      phone: c.phone ?? '',
+    })) ?? [],
     taxing_info: {
       billing_period: client?.taxing_info?.billing_period ?? 0,
       taxing_company_name: client?.taxing_info?.taxing_company_name ?? '',
@@ -169,7 +189,10 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
   }
 
   useEffect(() => {
-    if (!createError && !createLoading && createdClient) {
+    if (createError && !createLoading) {
+      toast.error('Error al crear el cliente')
+    } else if (!createError && !createLoading && createdClient) {
+      toast.success('Cliente creado')
       const id = (createdClient as any)?.data?.documentId
       if (id) router.push(`/clients/${id}`)
       else if (onSuccess) onSuccess()
@@ -177,133 +200,100 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
   }, [createLoading, createdClient, createError])
 
   useEffect(() => {
-    if (!editError && !editLoading && editedClient) {
+    if (editError && !editLoading) {
+      toast.error('Error al guardar el cliente')
+    } else if (!editError && !editLoading && editedClient) {
+      toast.success('Cliente guardado')
+      mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/clients'))
       if (onSuccess) onSuccess()
     }
   }, [editLoading, editedClient, editError])
 
   const isSubmitting = createLoading || editLoading
+  const apiError = createError || editError
 
   return (
-    <Formik
-      initialValues={initialFormValues}
-      onSubmit={handleSubmit}
-      enableReinitialize
-    >
-      {({ values }) => (
-        <Form className="text-neutral-600 w-2/4">
-          <div className="flex w-full justify-between mb-2">
-            <label htmlFor="name" className="px-2">Nombre: </label>
-            <Field className={fieldClass} id="name" name="name" type="text" />
-          </div>
+    <Formik initialValues={initialFormValues} onSubmit={handleSubmit} enableReinitialize validationSchema={clientSchema}>
+      {({ values, errors, touched, isValid, dirty }) => (
+        <Form className="grid grid-cols-2 gap-x-12 w-full">
 
-          {/* Contactos */}
-          <div className="flex w-full flex-col mb-2">
-            <FieldArray name="contacts">
-              {({ remove, push }) => (
-                <>
-                  <div className="flex justify-between px-2 mb-1">
-                    <h4>Contactos</h4>
-                    <button type="button" onClick={() => push(emptyContact)}>Agregar +</button>
-                  </div>
-                  {values.contacts.map((_, index) => (
-                    <Disclosure key={index}>
-                      {({ open }) => (
-                        <div>
-                          <div className="flex justify-between items-center">
-                            <DisclosureButton className="py-2 px-2 w-full flex bg-neutral-200 justify-between">
-                              <p className="mx-1">{open ? 'A' : 'V'}</p>
-                              <p className="mx-1">{values.contacts[index].name || ''}</p>
-                              <p className="mx-1">{values.contacts[index].phone}</p>
-                            </DisclosureButton>
-                            <button className="flex justify-end px-3 py-2 bg-red-800 text-white" type="button" onClick={() => remove(index)}>X</button>
-                          </div>
-                          <DisclosurePanel className="text-gray-500">
-                            <div className="px-2 pt-0 border border-neutral-300 w-full">
-                              {[
-                                { label: 'Nombre', name: `contacts.${index}.name` },
-                                { label: 'Área', name: `contacts.${index}.area` },
-                                { label: 'Correo', name: `contacts.${index}.email` },
-                                { label: 'Extensión', name: `contacts.${index}.extension` },
-                                { label: 'Título laboral', name: `contacts.${index}.job_title` },
-                                { label: 'Teléfono', name: `contacts.${index}.phone` },
-                              ].map(({ label, name }) => (
-                                <div key={name} className="flex w-full justify-between">
-                                  <label className="w-3/12">{label}</label>
-                                  <Field className={`${fieldClass} w-9/12`} name={name} type="text" />
-                                </div>
-                              ))}
-                            </div>
-                          </DisclosurePanel>
-                        </div>
-                      )}
-                    </Disclosure>
-                  ))}
-                </>
-              )}
-            </FieldArray>
-          </div>
+          {/* LEFT: Nombre + Contactos */}
+          <div className="flex flex-col gap-6">
 
-          {/* Información fiscal */}
-          <div className="mb-2">
-            <p className="font-medium mb-1">Información fiscal</p>
-            <div className="flex flex-col gap-1">
-              <div className="flex w-full justify-between">
-                <label className="px-2">Razón Social: </label>
-                <Field className={fieldClass} name="taxing_info.taxing_company_name" type="text" />
+            {apiError && (
+              <div className="alert-error col-span-2 mb-2">
+                <span className="material-symbols-outlined text-[18px]">error</span>
+                Error al guardar. Por favor intenta de nuevo.
               </div>
-              <div className="flex w-full justify-between">
-                <label className="px-2">RFC: </label>
-                <Field className={fieldClass} name="taxing_info.taxing_RFC" type="text" />
-              </div>
-              <div className="flex w-full justify-between">
-                <label className="px-2">Código Postal: </label>
-                <Field className={fieldClass} name="taxing_info.zip_code" type="text" />
+            )}
+
+            <div className="field-group">
+              <label className="field-label" htmlFor="name">Nombre</label>
+              <Field className="field-input" id="name" name="name" type="text" />
+              {touched.name && errors.name && <p className="alert-field">{errors.name}</p>}
+            </div>
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Información fiscal</h4>
+
+            <div className="grid grid-cols-2 gap-4">
+
+              <div className="field-group">
+                <label className="field-label">Razón Social</label>
+                <Field className="field-input" name="taxing_info.taxing_company_name" type="text" />
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Régimen Fiscal: </label>
-                <Field as="select" className={selectClass} name="taxing_info.taxing_regime">
+              <div className="field-group">
+                <label className="field-label">RFC</label>
+                <Field className="field-input" name="taxing_info.taxing_RFC" type="text" />
+                {(touched as any).taxing_info?.taxing_RFC && (errors as any).taxing_info?.taxing_RFC && <p className="alert-field">{(errors as any).taxing_info.taxing_RFC}</p>}
+              </div>
+
+              <div className="field-group">
+                <label className="field-label">Código Postal</label>
+                <Field className="field-input" name="taxing_info.zip_code" type="text" />
+                {(touched as any).taxing_info?.zip_code && (errors as any).taxing_info?.zip_code && <p className="alert-field">{(errors as any).taxing_info.zip_code}</p>}
+              </div>
+
+              <div className="field-group">
+                <label className="field-label">Correo para Facturas</label>
+                <Field className="field-input" name="taxing_info.email" type="email" />
+                {(touched as any).taxing_info?.email && (errors as any).taxing_info?.email && <p className="alert-field">{(errors as any).taxing_info.email}</p>}
+              </div>
+
+              <div className="field-group col-span-2">
+                <label className="field-label">Régimen Fiscal</label>
+                <Field as="select" className="field-select" name="taxing_info.taxing_regime">
                   <option value="">-- Seleccionar --</option>
-                  {SAT_REGIMENES.map((v) => (
-                    <option key={v} value={v}>{v}</option>
-                  ))}
+                  {SAT_REGIMENES.map((v) => <option key={v} value={v}>{v}</option>)}
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Uso de CFDI: </label>
-                <Field as="select" className={selectClass} name="taxing_info.taxing_CFDI_use">
+              <div className="field-group">
+                <label className="field-label">Uso de CFDI</label>
+                <Field as="select" className="field-select" name="taxing_info.taxing_CFDI_use">
                   <option value="">-- Seleccionar --</option>
-                  {SAT_CFDI_USOS.map((v) => (
-                    <option key={v} value={v}>{v}</option>
-                  ))}
+                  {SAT_CFDI_USOS.map((v) => <option key={v} value={v}>{v}</option>)}
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Método de Pago (CFDI): </label>
-                <Field as="select" className={selectClass} name="taxing_info.taxing_payment_method">
+              <div className="field-group">
+                <label className="field-label">Método de Pago (CFDI)</label>
+                <Field as="select" className="field-select" name="taxing_info.taxing_payment_method">
                   <option value="">-- Seleccionar --</option>
-                  {SAT_METODOS_PAGO.map((v) => (
-                    <option key={v} value={v}>{v}</option>
-                  ))}
+                  {SAT_METODOS_PAGO.map((v) => <option key={v} value={v}>{v}</option>)}
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Forma de Pago (SAT): </label>
-                <Field as="select" className={selectClass} name="taxing_info.taxing_method_of_payment">
+              <div className="field-group">
+                <label className="field-label">Forma de Pago (SAT)</label>
+                <Field as="select" className="field-select" name="taxing_info.taxing_method_of_payment">
                   <option value="">-- Seleccionar --</option>
-                  {SAT_FORMAS_PAGO.map((v) => (
-                    <option key={v} value={v}>{v}</option>
-                  ))}
+                  {SAT_FORMAS_PAGO.map((v) => <option key={v} value={v}>{v}</option>)}
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Forma de Pago: </label>
-                <Field as="select" className={selectClass} name="taxing_info.payment_method">
+              <div className="field-group">
+                <label className="field-label">Forma de Pago</label>
+                <Field as="select" className="field-select" name="taxing_info.payment_method">
                   <option value="">-- Seleccionar --</option>
                   {FORMAS_PAGO_INTERNAS.map(({ value, label }) => (
                     <option key={value} value={value}>{label}</option>
@@ -311,55 +301,130 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Periodo de Cortes: </label>
-                <Field as="select" className={selectClass} name="taxing_info.billing_period">
+              <div className="field-group">
+                <label className="field-label">Periodo de Cortes</label>
+                <Field as="select" className="field-select" name="taxing_info.billing_period">
                   {PERIODOS.map(({ value, label }) => (
                     <option key={value} value={value}>{label}</option>
                   ))}
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Periodo de Facturación: </label>
-                <Field as="select" className={selectClass} name="taxing_info.invoice_period">
+              <div className="field-group">
+                <label className="field-label">Periodo de Facturación</label>
+                <Field as="select" className="field-select" name="taxing_info.invoice_period">
                   {PERIODOS.map(({ value, label }) => (
                     <option key={value} value={value}>{label}</option>
                   ))}
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Periodo de Pago: </label>
-                <Field as="select" className={selectClass} name="taxing_info.payment_period">
+              <div className="field-group">
+                <label className="field-label">Periodo de Pago</label>
+                <Field as="select" className="field-select" name="taxing_info.payment_period">
                   {PERIODOS.map(({ value, label }) => (
                     <option key={value} value={value}>{label}</option>
                   ))}
                 </Field>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Factura Envíos: </label>
-                <Field name="taxing_info.shipping_invoice" type="checkbox" />
+             
+
+              <div className="flex items-center gap-2 col-span-2">
+                <Field name="taxing_info.shipping_invoice" type="checkbox" id="shipping_invoice" />
+                <label htmlFor="shipping_invoice" className="text-sm text-surface-700">Factura Envíos</label>
               </div>
 
-              <div className="flex w-full justify-between">
-                <label className="px-2">Correo para Facturas: </label>
-                <Field className={fieldClass} name="taxing_info.email" type="email" />
-              </div>
-
-              <div className="flex w-full justify-between">
-                <label className="px-2">Comentarios: </label>
-                <Field as="textarea" className={fieldClass} name="taxing_info.comments" />
-              </div>
             </div>
+            
+
           </div>
 
-          <div className="flex gap-4 justify-end">
-            <button className="bg-green-700 px-4 py-2 text-white disabled:opacity-50" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear'}
-            </button>
+          {/* RIGHT: Información fiscal + Save */}
+          <div className="flex flex-col gap-4">
+
+
+<div>
+              <FieldArray name="contacts">
+                {({ remove, push }) => (
+                  <>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Contactos</h4>
+                      <button type="button" onClick={() => push(emptyContact)} className="btn-secondary">
+                        <span className="material-symbols-outlined text-[14px]">add</span>
+                        Agregar
+                      </button>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      {values.contacts.map((_, index) => (
+                        <Disclosure key={index}>
+                          {({ open }) => (
+                            <div>
+                              <div className="flex items-center">
+                                <DisclosureButton className="flex-1 flex justify-between items-center px-3 py-2 bg-surface-50 border border-surface-200 rounded text-sm text-surface-700">
+                                  <span className="font-medium flex items-center gap-2">
+                                    {values.contacts[index].name || 'Contacto sin nombre'}
+                                    {(touched as any).contacts?.[index] && (errors as any).contacts?.[index] && Object.keys((errors as any).contacts[index]).length > 0 && (
+                                      <span className="text-xs text-red-500">Revisa los campos</span>
+                                    )}
+                                  </span>
+                                  <span className="text-surface-400 text-xs">{values.contacts[index].phone}</span>
+                                  <span className="material-symbols-outlined text-[16px] text-surface-400">
+                                    {open ? 'expand_less' : 'expand_more'}
+                                  </span>
+                                </DisclosureButton>
+                                <button
+                                  type="button"
+                                  onClick={() => remove(index)}
+                                  className="btn-danger rounded-l-none ml-1"
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">delete</span>
+                                </button>
+                              </div>
+                              <DisclosurePanel>
+                                <div className="grid grid-cols-2 gap-3 p-4 border border-t-0 border-surface-200 rounded-b">
+                                  {[
+                                    { label: 'Nombre', name: `contacts.${index}.name`, key: 'name' },
+                                    { label: 'Área', name: `contacts.${index}.area`, key: 'area' },
+                                    { label: 'Correo', name: `contacts.${index}.email`, key: 'email' },
+                                    { label: 'Extensión', name: `contacts.${index}.extension`, key: 'extension' },
+                                    { label: 'Título laboral', name: `contacts.${index}.job_title`, key: 'job_title' },
+                                    { label: 'Teléfono', name: `contacts.${index}.phone`, key: 'phone' },
+                                  ].map(({ label, name, key }) => {
+                                    const contactTouched = (touched as any).contacts?.[index]
+                                    const contactErrors = (errors as any).contacts?.[index]
+                                    return (
+                                      <div key={name} className="field-group">
+                                        <label className="field-label">{label}</label>
+                                        <Field className="field-input" name={name} type="text" />
+                                        {contactTouched?.[key] && contactErrors?.[key] && <p className="alert-field">{contactErrors[key]}</p>}
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </DisclosurePanel>
+                            </div>
+                          )}
+                        </Disclosure>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </FieldArray>
+            </div>
+              <div className="field-group col-span-2">
+                <label className="field-label">Comentarios</label>
+                <Field as="textarea" className="field-textarea" name="taxing_info.comments" />
+              </div>
+            <div className="flex justify-end pt-2">
+              <button className="btn-primary disabled:opacity-50" type="submit" disabled={isSubmitting || !isValid || !dirty}>
+                <span className="material-symbols-outlined text-[16px]">save</span>
+                {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear'}
+              </button>
+            </div>
+
           </div>
+
         </Form>
       )}
     </Formik>

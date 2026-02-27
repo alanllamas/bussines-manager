@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(///wsl.localhost/Ubuntu/home/alanllamas/Sites/bussines-manager/src/api/**)",
+      "Read(///wsl.localhost/Ubuntu/home/alanllamas/Sites/bussines-manager/src/api/hooks/**)",
+      "Read(///wsl.localhost/Ubuntu/home/alanllamas/Sites/bussines-manager/**)",
+      "Read(///wsl.localhost/Ubuntu/home/alanllamas/Sites/**)",
+      "Bash(wsl -d Ubuntu -e bash -c \"cd ~/Sites/bussines-manager && npm run build 2>&1\")",
+      "Bash(wsl -d Ubuntu -u alanllamas -e bash -c \"cd ~/Sites/bussines-manager && npm run build 2>&1\")"
+    ],
+    "additionalDirectories": [
+      "\\home\\alanllamas\\Sites\\bussines-manager",
+      "\\\\wsl.localhost\\Ubuntu\\home\\alanllamas\\Sites\\bussines-manager"
+    ]
+  }
+}

@@ -4,11 +4,14 @@ import { TabPanel } from "@headlessui/react"
 import { Product } from "@/api/hooks/getProducts"
 import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
 import { fetcher } from "@/api/fetcher"
+import { useSWRConfig } from "swr"
+import { toast } from "sonner"
 
 const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
+  const { mutate } = useSWRConfig()
   const { variants, isLoading } = useGetProductVariants()
-  const [selectedId, setSelectedId] = useState('')
   const [saving, setSaving] = useState(false)
+  const [, setSelectedId] = useState('')
 
   const allVariants = variants?.data ?? []
   const current = product.product_variants ?? []
@@ -19,17 +22,23 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
 
   const updateVariants = async (newIds: number[]) => {
     setSaving(true)
-    await fetcher(`/api/products/${product.documentId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ data: { product_variants: newIds } }),
-    })
-    setSaving(false)
-    window.location.reload()
+    try {
+      await fetcher(`/api/products/${product.documentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ data: { product_variants: newIds } }),
+      })
+      mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/products'))
+      setSelectedId('')
+      toast.success('Variantes actualizadas')
+    } catch {
+      toast.error('Error al actualizar variantes')
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleAdd = () => {
-    if (!selectedId) return
-    const toAdd = allVariants.find(v => String(v.id) === selectedId)
+  const handleAdd = (id: string) => {
+    const toAdd = allVariants.find(v => String(v.id) === id)
     if (!toAdd) return
     updateVariants([...current.map(v => v.id), toAdd.id])
   }
@@ -65,27 +74,19 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
 
       {/* Add from global list */}
       {!isLoading && available.length > 0 && (
-        <div className="flex gap-2 items-center">
-          <select
-            value={selectedId}
-            onChange={e => setSelectedId(e.target.value)}
-            className="border border-neutral-400 rounded-sm px-2 py-1 text-sm bg-white"
-          >
-            <option value="">-- Seleccionar variante --</option>
-            {available.map(v => (
-              <option key={v.id} value={String(v.id)}>
-                {v.name}{v.type ? ` (${v.type})` : ''}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleAdd}
-            disabled={!selectedId || saving}
-            className="px-3 py-1 bg-neutral-300 hover:bg-neutral-400 text-sm disabled:opacity-50"
-          >
-            {saving ? '...' : 'Agregar'}
-          </button>
-        </div>
+        <select
+          value=""
+          onChange={e => { if (e.target.value) handleAdd(e.target.value) }}
+          disabled={saving}
+          className="border border-neutral-400 rounded-sm px-2 py-1 text-sm bg-white disabled:opacity-50"
+        >
+          <option value="">-- Agregar variante --</option>
+          {available.map(v => (
+            <option key={v.id} value={String(v.id)}>
+              {v.name}{v.type ? ` (${v.type})` : ''}
+            </option>
+          ))}
+        </select>
       )}
     </TabPanel>
   )

@@ -8,27 +8,29 @@ import TicketsTab from "./TicketsTab";
 import InvoicesTab from "./InvoicesTab";
 import EditClientTab from "./EditClientTab";
 
+const tabClass = "px-5 py-2.5 text-sm font-medium text-surface-500 border-b-2 border-transparent transition-colors hover:text-surface-900 data-[selected]:text-primary-600 data-[selected]:border-primary-500"
+
 const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
   return (
-    <TabGroup className="text-neutral-700 p-4">
-      <TabList>
-        <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mr-2" >Cliente</Tab>
-        <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Contactos</Tab>
-        <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Notas</Tab>
-        <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Cortes</Tab>
-        <Tab className="px-6 py-3 bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-900 mx-2" >Editar</Tab>
-      </TabList>
-      <TabPanels>
-        <h2 className="font-bold p-4">{client?.name}</h2>
-
-        <ClientTab client={client}/>
-        <ContactsTab client={client}/>
-        <TicketsTab tickets={client?.tickets} clientId={client?.id}/>
-        <InvoicesTab invoices={client?.invoices} clientId={client?.documentId}/>
-        <EditClientTab client={client}/>
-        <TabPanel>Content 6</TabPanel>
-      </TabPanels>
-    </TabGroup>
+    <div className="text-surface-700">
+      <TabGroup>
+        <TabList className="flex px-6 border-b border-surface-200 h-11 items-center">
+          <Tab className={tabClass}>{client?.name}</Tab>
+          <Tab className={tabClass}>Contactos</Tab>
+          <Tab className={tabClass}>Notas</Tab>
+          <Tab className={tabClass}>Cortes</Tab>
+          <Tab className={tabClass}>Editar</Tab>
+        </TabList>
+        <TabPanels className="p-6">
+          <ClientTab client={client}/>
+          <ContactsTab client={client}/>
+          <TicketsTab tickets={client?.tickets} clientId={client?.id}/>
+          <InvoicesTab invoices={client?.invoices} clientId={client?.documentId}/>
+          <EditClientTab client={client}/>
+          <TabPanel>Content 6</TabPanel>
+        </TabPanels>
+      </TabGroup>
+    </div>
   )
 }
- export default ClientTabs
+export default ClientTabs

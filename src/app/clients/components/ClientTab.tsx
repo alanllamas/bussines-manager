@@ -4,80 +4,63 @@ import { TabPanel } from '@headlessui/react'
 import { Client } from "@/api/hooks/clients/getClient";
 
 const ClientTab: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
-  const copyParam = (param: string) => {
-      navigator.clipboard.writeText(param)
-  }
-  const generateCell = (data: any) => {
-    return <div className="flex justify-between px-4 pt-1">
-        {
-          data
-            ? ( <>
-                  <p className="w-10/12 truncate">{ data === true ? 'si' : data === false ? 'no' : data }</p>
-                  <button onClick={() => copyParam(data)}><span className="material-symbols-outlined text-xs text-neutral-500">content_copy</span></button>
-                </>
-            )
-            : <p className="text-neutral-300">No disponible</p>
-        }
-        </div>
-  }
+  const copyParam = (param: string) => navigator.clipboard.writeText(param)
+
+  const Row = ({ label, value }: { label: string; value: any }) => (
+    <div className="grid grid-cols-[200px_1fr] items-start py-2.5 border-b border-surface-100 last:border-0">
+      <span className="text-xs font-semibold uppercase tracking-widest text-surface-400">{label}</span>
+      {value !== undefined && value !== null && value !== ''
+        ? <div className="flex items-center gap-2">
+            <span className="text-sm text-surface-800 truncate">
+              {value === true ? 'Sí' : value === false ? 'No' : value}
+            </span>
+            <button className="btn-icon flex-shrink-0" onClick={() => copyParam(String(value))}>
+              <span className="material-symbols-outlined text-[14px]">content_copy</span>
+            </button>
+          </div>
+        : <span className="text-sm text-surface-400">No disponible</span>
+      }
+    </div>
+  )
 
   return (
     <TabPanel>
-      {/* <h3>Informacion Fiscal</h3> */}
-      {
-        client?.taxing_info 
-        ? ( <div className="flex-col px-4">
- 
-              <div className=" flex gap-4">
-                  <div className="w-2/12">
-                    <p className="font-semibold pt-1">Régimen Fiscal: </p>
-                    <p className="font-semibold pt-1">RFC: </p>
-                    <p className="font-semibold pt-1">Razón Social: </p>
-                    <p className="font-semibold pt-1">Dirección: </p>
-                    <p className="font-semibold pt-1">Código Postal: </p>
-                    <p className="font-semibold pt-1">uso de CFDI: </p>
-                    <p className="font-semibold pt-1">Correo Electronico: </p>
-                    <p className="font-semibold pt-1">Forma de Pago: </p>
-                    <p className="font-semibold pt-1">Metodo de Pago:</p>
-                    <p className="font-semibold pt-1">Tipo de Pago: </p>
-                    <p className="font-semibold pt-1">Factura Envíos: </p>
-                    <p className="font-semibold pt-1">Periodo de Cortes: </p>
-                    <p className="font-semibold pt-1">Periodo de Facturas: </p>
-                    <p className="font-semibold pt-1">Periodo de pagos: </p>
-                  </div>
-                  <div className="w-6/12">
-                    { generateCell(client?.taxing_info?.taxing_regime) }
-                    { generateCell(client?.taxing_info?.taxing_RFC) }
-                    { generateCell(client?.taxing_info?.taxing_company_name) }
-                    { generateCell(client?.taxing_info?.zip_code) }
-                    { generateCell(client?.taxing_info?.zip_code) }
-                    { generateCell(client?.taxing_info?.taxing_CFDI_use) }
-                    { generateCell(client?.taxing_info?.email) }
-                    { generateCell(client?.taxing_info?.payment_method) }
-                    { generateCell(client?.taxing_info?.taxing_payment_method) }
-                    { generateCell(client?.taxing_info?.taxing_method_of_payment) }
-                    { generateCell(client?.taxing_info?.shipping_invoice) }
-                    { generateCell(client?.taxing_info?.billing_period) }
-                    { generateCell(client?.taxing_info?.invoice_period) }
-                    { generateCell(client?.taxing_info?.payment_period) }
-                  </div>
-                  
+      {client?.taxing_info
+        ? (
+          <div>
+            <div className="grid grid-cols-2 gap-x-12">
+              <div>
+                <Row label="RFC"               value={client.taxing_info.taxing_RFC} />
+                <Row label="Razón Social"      value={client.taxing_info.taxing_company_name} />
+                <Row label="Código Postal"     value={client.taxing_info.zip_code} />
+                <Row label="Régimen Fiscal"    value={client.taxing_info.taxing_regime} />
+                <Row label="Uso de CFDI"       value={client.taxing_info.taxing_CFDI_use} />
+                <Row label="Correo"            value={client.taxing_info.email} />
               </div>
-              <div className="pt-6">
-                <p className="w-full font-semibold">Comentarios</p>
-                <div className="p-4 border b-neutral-200 rounded w-8/12">
+              <div>
+                <Row label="Forma de Pago"     value={client.taxing_info.payment_method} />
+                <Row label="Método de Pago"    value={client.taxing_info.taxing_payment_method} />
+                <Row label="Tipo de Pago"      value={client.taxing_info.taxing_method_of_payment} />
+                <Row label="Factura Envíos"    value={client.taxing_info.shipping_invoice} />
+                <Row label="Periodo de Cortes" value={client.taxing_info.billing_period} />
+                <Row label="Periodo Facturas"  value={client.taxing_info.invoice_period} />
+                <Row label="Periodo de Pagos"  value={client.taxing_info.payment_period} />
+              </div>
+            </div>
 
-                  { client?.taxing_info?.comments }
+            {client.taxing_info.comments && (
+              <div className="mt-6">
+                <p className="text-xs font-semibold uppercase tracking-widest text-surface-400 mb-2">Comentarios</p>
+                <div className="p-4 border border-surface-200 rounded text-sm text-surface-700 bg-surface-50">
+                  {client.taxing_info.comments}
                 </div>
-
               </div>
-            </div>)
-        : ( <div className="flex">
-              <h3 className="font-bold">Favor de capturar la data fiscal del cliente</h3>
-            </div>)
+            )}
+          </div>
+        )
+        : <p className="text-sm text-surface-400">Favor de capturar la información fiscal del cliente.</p>
       }
-      
     </TabPanel>
   )
 }
- export default ClientTab
+export default ClientTab

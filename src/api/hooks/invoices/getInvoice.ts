@@ -22,6 +22,7 @@ export type StrapiFile = {
 
 export type InvoiceInitialValues = {
   payment_date?: Date | null;
+  invoice_number?: number;
   invoice_id: string;
   client: string;
   tickets: string[];
@@ -45,6 +46,7 @@ export type InvoiceInitialValues = {
 
 export type createInvoiceReq = {
   payment_date?: Date | null;
+  invoice_number?: number;
   invoice_id: string;
   client: string[];
   tickets: string[];

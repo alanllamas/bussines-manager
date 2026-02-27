@@ -7,6 +7,7 @@ import { Invoice } from './getInvoices';
 export type ProductVariant = {
   name: string;
   id: number;
+  documentId: string;
   type: string;
 }
 

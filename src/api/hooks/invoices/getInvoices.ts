@@ -54,6 +54,7 @@ export type Invoice = {
   id?: number
   documentId?: string
   payment_date?: Date | null;
+  invoice_number?: number;
   invoice_id: string;
   client: Client | any;
   tickets: any[];
