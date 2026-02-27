@@ -1,6 +1,6 @@
 # ADR-003 — Definir tipos TypeScript globales y eliminar `any`
 
-**Estado:** Pendiente
+**Estado:** Resuelto
 **Prioridad:** Alta
 **Depende de:** — (fundación para todos los ADRs siguientes)
 
