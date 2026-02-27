@@ -1,5 +1,5 @@
 'use client'
-import React from "react"
+import React, { useState } from "react"
 import { TabPanel } from "@headlessui/react"
 import { Product } from "@/api/hooks/getProducts"
 import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
@@ -11,6 +11,7 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
   const { mutate } = useSWRConfig()
   const { variants, isLoading } = useGetProductVariants()
   const [saving, setSaving] = useState(false)
+  const [, setSelectedId] = useState('')
 
   const allVariants = variants?.data ?? []
   const current = product.product_variants ?? []
