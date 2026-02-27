@@ -1,6 +1,6 @@
 # ADR-002 — Centralizar guardia de autenticación en un custom hook
 
-**Estado:** Pendiente
+**Estado:** Resuelto
 **Prioridad:** Crítica
 **Depende de:** ADR-003 (requiere `isLoading` en `AuthContext`, que se define al tipar el contexto)
 

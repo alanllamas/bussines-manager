@@ -15,8 +15,8 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | Orden | ADR | Tema | Prioridad | Estado | Depende de |
 |---|---|---|---|---|---|
 | 1 | [ADR-001](adr/ADR-001-server-side-token.md) | Tokens en variables privadas | Crítica | ✅ Completado | — |
-| 2 | [ADR-002](adr/ADR-002-auth-guard.md) | Hook `useAuthGuard` | Crítica | Pendiente | ADR-003 |
-| 3 | [ADR-003](adr/ADR-003-typescript-types.md) | Tipos TypeScript globales | Alta | Pendiente | — |
+| 2 | [ADR-002](adr/ADR-002-auth-guard.md) | Hook `useAuthGuard` | Crítica | ✅ Completado | ADR-003 |
+| 3 | [ADR-003](adr/ADR-003-typescript-types.md) | Tipos TypeScript globales | Alta | ✅ Completado | — |
 | 4 | [ADR-004](adr/ADR-004-error-boundary.md) | Error Boundary y manejo de errores | Alta | Pendiente | ADR-003 |
 | 5 | [ADR-005](adr/ADR-005-service-layer.md) | Capa de servicios para cálculos | Alta | ✅ Completado | ADR-003 |
 | 6 | [ADR-006](adr/ADR-006-paginated-data.md) | Hook `usePaginatedData` | Alta | Pendiente | ADR-003 |
