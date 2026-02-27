@@ -1,20 +1,26 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
-type User = { email: string | null, uid: string | null }
-// @ts-expect-error no type found
-const AuthContext = createContext();
+type AuthContextType = {
+  user: User | null;
+  isLoading: boolean;
+  signIn: () => Promise<unknown>;
+  logOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const [user, setUser] = useState<User>(); 
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // ts-expect-error no type for user
-      if(user) setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser ?? null);
+      setIsLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -24,17 +30,19 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     return signInWithPopup(auth, provider);
   };
 
-  const logOut = () => {    
+  const logOut = () => {
     return signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, signIn, logOut }}>
+    <AuthContext.Provider value={{ user, isLoading, signIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  return ctx;
 }

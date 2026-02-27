@@ -3,37 +3,16 @@ import { fetcher } from '../../fetcher';
 import { createClientReq } from '@/components/forms/ClientForm';
 import { Client } from './getClient';
 
-
-async function postClient([
-  url,
-  token,
-  data
-]: [string, string, number, string, string]) {
-  return await fetcher<Client>(
-    url,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': token,
-      },
-      body: JSON.stringify({ data }),
-    }
-  );
+async function postClient([url, data]: [string, createClientReq]) {
+  return await fetcher<Client>(url, {
+    method: 'POST',
+    body: JSON.stringify({ data }),
+  });
 }
 
-export default function useCreateClient(
-  data?: createClientReq,
-) {
-    const WEBHOOK_CLIENTS_API = `${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API}/clients?populate=*`;
-    const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
-    const { data: client, error, isLoading } = useSWR(
-    data
-      ? [
-          WEBHOOK_CLIENTS_API,
-          token,
-          data
-        ]
-      : null,
+export default function useCreateClient(data?: createClientReq) {
+  const { data: client, error, isLoading } = useSWR(
+    data ? ['/api/clients', data] : null,
     postClient,
     {
       revalidateOnFocus: false,

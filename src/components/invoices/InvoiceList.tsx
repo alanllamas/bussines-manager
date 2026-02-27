@@ -6,13 +6,20 @@ import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient"
 import useGetClients from "@/api/hooks/clients/getClients"
 import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice"
 import useEditInvoice from "@/api/hooks/invoices/useEditInvoice"
+import useGetInvoiceNumber from "@/api/hooks/invoices/getInvoiceNumber"
 import { createInvoiceReq, generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
 import { Client } from "@/api/hooks/clients/getClient"
 import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices"
 import InvoicePrintFormat from "./invoicePrintFormat"
 import InvoicesForm from "../forms/InvoicesForm"
+import { useSWRConfig } from "swr"
+import { toast } from "sonner"
 
 const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
+  const { mutate } = useSWRConfig()
+  const invalidateInvoices = () => mutate(
+    (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/invoices') || key[0].includes('/api/tickets'))
+  )
 // ticket form functions
   const [totals, setTotals] = useState<Totals>({total: 0, sub_total:0, total_taxes: 0})
   const [resume, setResume] = useState<Resume>()
@@ -27,6 +34,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   const [initialFormValues, setInitialFormValues] = useState<InvoiceInitialValues>()
   const [client, setClient] = useState<Client>()
   const [printInvoice, setPrintInvoice] = useState<Invoice>()
+  const [printKey, setPrintKey] = useState(0)
 
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
@@ -55,21 +63,14 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
     error: invoicesError,
     isLoading: invoicesIsLoading,
   } = useGetInvoices()
+  const { invoice_number } = useGetInvoiceNumber()
 
   useEffect(() => {
-    if ((!invoicesError && !invoicesIsLoading && invoicesData.data)) {
-      
-      // console.log('invoicesData.data: ', invoicesData.data);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
-      // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
-      //   const dateA: number = new Date(a.sale_date).valueOf();
-      //   const dateB: number = new Date(b.sale_date).valueOf()
-      //   return dateB - dateA;
-      // });
+    if (!invoicesError && !invoicesIsLoading && invoicesData?.data) {
       setInvoices(invoicesData.data)
     }
-  }, [invoicesIsLoading, invoicesData.data, invoicesError])
-   
+  }, [invoicesIsLoading, invoicesError, invoicesData])
+
   useEffect(() => {
     if ((invoicesData.data)) {
       // console.log('invoicesData.data: ', invoicesData.data);
@@ -85,49 +86,37 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if (!ticketsError && !ticketsIsLoading) {
-      
-      // console.log('ticketsData.data: ', ticketsData.data);
-      // console.log('meta.pagination.total: ', productsData.meta.pagination.total);
-      
-      setTickets(ticketsData.data)
-      // if (client) {
-      //   setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null && client.id === ticket.client.id))
-
-      // } else {
-      // }
-      setAvailableTickets(ticketsData.data.filter(ticket => ticket.invoice === null))
+      setTickets(ticketsData?.data ?? [])
+      setAvailableTickets(ticketsData?.data?.filter(ticket => ticket.invoice === null) ?? [])
     }
-  }, [ticketsData.data, ticketsError, ticketsIsLoading])
+  }, [ticketsIsLoading, ticketsError])
 
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
-      
-      // console.log('clientsData.data: ', clientsData.data);
-      // console.log('meta.pagination.total: ', clientsData.meta.pagination.total);
-      // @ts-expect-error missing type
-      const clients = clientsData.data
-      // const client = clients.filter((cli: Client) => cli.documentId === clientId)[0]
-      setClients(clients)
-      // setclient(client)
+      setClients(clientsData?.data ?? [])
     }
-      // @ts-expect-error missing type
-  }, [clientsIsLoading, clientsData.data, clientsError])
+  }, [clientsIsLoading, clientsError])
         
   useEffect(() => {
     // make refresh
 
-    if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
-      // console.log('InvoiceData: ', InvoiceData);
-      setTimeout(() => window.location.reload(), 500);
+    if (InvoiceError && !InvoiceIsLoading) {
+      toast.error('Error al crear el corte')
+    } else if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
+      toast.success('Corte creado')
+      invalidateInvoices()
+      setNewInvoice(undefined)
     }
   }, [InvoiceIsLoading, InvoiceData, InvoiceError])
 
   useEffect(() => {
-    // make refresh
-
-    if (EditInvoiceData && !EditInvoiceError && !EditInvoiceIsLoading) {
-      // console.log('EditInvoiceData: ', EditInvoiceData);
-      setTimeout(() => window.location.reload(), 500);
+    if (EditInvoiceError && !EditInvoiceIsLoading) {
+      toast.error('Error al editar el corte')
+    } else if (EditInvoiceData && !EditInvoiceError && !EditInvoiceIsLoading) {
+      toast.success('Corte actualizado')
+      invalidateInvoices()
+      setNewEditInvoice(undefined)
+      sendClose()
       
 
       // setTicket(InvoiceData.data)
@@ -158,10 +147,11 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         initial_date: editInvoice.initial_date,
         invoice_send_date: editInvoice.invoice_send_date,
         payment_date: editInvoice.payment_date,
+        invoice_number: editInvoice.invoice_number,
         invoice_id: editInvoice.invoice_id,
         invoice_status: editInvoice.invoice_status,
         payment_reference: editInvoice.payment_reference,
-        tickets: editInvoice.tickets,
+        tickets: editTickets,
         resume: results
       })
       // proof_of_payment: editInvoice.proof_of_payment || {
@@ -184,7 +174,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
       // },
       // {
       //   !create && <Disclosure>
-      //     <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-neutral-200 justify-between">
+      //     <DisclosureButton className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between">
       //       Archivos
       //     </DisclosureButton>
       //     <DisclosurePanel>
@@ -226,9 +216,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   }, [editInvoice])
 
   useEffect(() => {
-    // console.log('initialFormValues: ', initialFormValues);
-    setIsOpen(true)
-    
+    if (initialFormValues) setIsOpen(true)
   }, [initialFormValues])
 
   const sendCreate = () => {
@@ -247,7 +235,8 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
       initial_date: null,
       invoice_send_date: null,
       payment_date: null,
-      invoice_id: "",
+      invoice_number: (invoice_number !== undefined && !isNaN(invoice_number) ? invoice_number : 0) + 1,
+      invoice_id: '',
       invoice_status: "por-pagar",
       payment_reference: "",
       tickets: [],
@@ -263,6 +252,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
     setResume(undefined)
     setTotals({total: 0, sub_total:0, total_taxes: 0})
     setInitialFormValues(undefined)
+    setClient(undefined)
     setIsOpen(false)
     setCreate(false)
   }
@@ -288,6 +278,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   // // Invoice form functions
 
   const sendPrint = (invoice:Invoice) => {
+    setPrintKey(k => k + 1)
     setPrintInvoice(invoice)
   }
 
@@ -297,18 +288,16 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         {currentItems &&
           currentItems?.map((invoice: Invoice, index: number) => {
           // console.log('invoice: ', invoice);
-          return <tr className="border-b border-neutral-300" key={`invoice-${index}`}>
-
-            <td className="py-2"><a href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
-            <td className="py-2">{invoice.client?.name}</td>
-            <td className="py-2">{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
-            <td className="py-2">{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
-            <td className="py-2">$ {invoice.total}</td>
-            <td className="py-2">
-              <button onClick={() => (setClient(invoice.client),setEditInvoice(invoice))}><span>edit</span></button> | <button onClick={() => sendPrint(invoice)}><span>print</span></button>
+          return <tr key={`invoice-${index}`}>
+            <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_number ?? '').padStart(5, '0')}</a></td>
+            <td>{invoice.client?.name}</td>
+            <td>{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
+            <td>{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
+            <td className="font-medium">$ {invoice.total}</td>
+            <td>
+              <div className="flex gap-1"><button className="btn-icon" onClick={() => (setClient(invoice.client),setEditInvoice(invoice))}><span className="material-symbols-outlined text-[16px]">edit</span></button><button className="btn-icon" onClick={() => sendPrint(invoice)}><span className="material-symbols-outlined text-[16px]">print</span></button></div>
             </td>
           </tr>
-          return <></>
         })}
       </>
     );
@@ -337,31 +326,35 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
     };
       return (
       <section className="w-full flex flex-col items-center">
-        <table className="w-full p-4 text-center mt-8">
+        <table className="data-table mt-6">
           <thead>
-            <tr className="border-b border-neutral-500">
+            <tr>
               <th>Folio</th>
-              <th>cliente</th>
-              <th>fecha inicial</th>
-              <th>fecha final</th>
-              <th>monto</th>
-              <th>acciones</th>
+              <th>Cliente</th>
+              <th>Fecha inicial</th>
+              <th>Fecha final</th>
+              <th>Monto</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <Items currentItems={currentItems} />
+            {invoices.length === 0
+              ? <tr><td colSpan={6} className="py-12 text-center">
+                  <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                  <p className="text-sm text-surface-400 mt-2">Sin cortes</p>
+                </td></tr>
+              : <Items currentItems={currentItems} />
+            }
           </tbody>
         </table>
         <ReactPaginate
-          className="flex gap-3 p-4 w-1/4 self-center items-center"
-          breakLabel="..."
-          pageClassName="bg-neutral-300 px-2 py-1"
-          activeClassName="bg-neutral-500 text-white"
-          nextLabel="next >"
+          className="paginator"
+          breakLabel="…"
+          nextLabel="siguiente ›"
+          previousLabel="‹ anterior"
           onPageChange={handlePageChange}
           pageRangeDisplayed={5}
           pageCount={pageCount}
-          previousLabel="< previous"
           renderOnZeroPageCount={null}
         />
       </section>
@@ -389,10 +382,12 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         setCreate={setCreate}
         tickets={tickets}
         client={client}
+        editInvoice={editInvoice}
+        apiError={InvoiceError || EditInvoiceError}
       />
     }
     <PaginatedItems itemsPerPage={10}/>
-    { printInvoice && <InvoicePrintFormat invoiceData={printInvoice} />}
+    { printInvoice && <InvoicePrintFormat key={printKey} invoiceData={printInvoice} />}
   </> 
 } 
 

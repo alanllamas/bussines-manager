@@ -13,37 +13,18 @@ export type Meta = {
 }
 export const PrintTicketFormat = (contentRef: any, ticket: any) => ({ contentRef, documentTitle: `Nota-${ticket?.ticket_number}-${ticket?.client?.name?.toLocaleUpperCase()}-${new Date(ticket?.sale_date || '').toLocaleDateString()}` })
 
-// &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
-const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
-
-
-// Promise<{ id: any }>
-async function GetTicket(
-  [url, token, id]: [string, string, number]
-) {
-  return await fetcher<{data: Ticket, meta: Meta}>(
-
-    `${url}/tickets/${id}/?populate=client&populate=products&populate=products.product&populate=products.product_variants`,
-    {
-      method: 'GET',
-      headers: {
-        'Authorization': token,
-      },
-    }
-  );
+async function GetTicket([url]: [string]) {
+  return await fetcher<{data: Ticket, meta: Meta}>(url, { method: 'GET' });
 }
 
 export default function useGetTicket(id: number) {
+  const url = id
+    ? `/api/tickets/${id}?populate=client&populate=products&populate=products.product&populate=products.product_variants`
+    : null;
+
   const { data, isLoading, error } = useSWR(
-    [
-      process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API,
-      token,
-      id
-    ],
+    url ? [url] : null,
     GetTicket,
-    //    {
-    //   revalidateOnFocus: false,
-    // }
   );
   
    const ticket = data;

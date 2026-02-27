@@ -13,7 +13,7 @@ const NewClient: React.FC = () => {
   
 
 
-  return <section className="w-full flex">
+  return <section className="w-full p-6">
    <ClientsForm />
 
 

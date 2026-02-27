@@ -1,84 +1,63 @@
 'use client'
-import React, { useEffect, useState } from "react";
-import useGetClients from "@/api/hooks/clients/getClients";
-import { useAuth } from "@/app/context/AuthUserContext";
-import Link from "next/link";
-import { Client } from "@/api/hooks/clients/getClient";
-
-// import { useAuth } from "@/context/AuthUserContext";
-// import { useRouter } from "next/navigation";
+import React from "react"
+import useGetClients from "@/api/hooks/clients/getClients"
+import Link from "next/link"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
+import { usePathname } from "next/navigation"
+import Spinner from "@/components/ui/Spinner"
 
 const ClientsSideBar: React.FC = () => {
-  // @ts-expect-error no type found
-  const { user } = useAuth();
-  const [interval, setinterval] = useState<NodeJS.Timeout>()
+  const { isLoading: authLoading } = useAuthGuard()
+  const path = usePathname()
 
+  const { clients: clientsData, error, isLoading } = useGetClients()
 
-  
-  useEffect(() => {
-    if(!user) {
+  if (authLoading) return null
 
-      const interval =
-        setInterval(() => {
-          window.location.pathname = '/'
-        }, 1000)
-        console.log(interval);
-        
-      setinterval(interval)
-    }
-  }, [])
-  // Listen for changes on loading and authUser, redirect if needed
-  useEffect(() => {
-    console.log(user);
-    console.log(interval);
-    if (!user) {
-        // window.location.pathname = '/'
+  const clients = (!error && !isLoading) ? (clientsData?.data ?? []) : []
 
-    } else {
-      clearInterval(interval)
-
-    }
-  }, [user])
-
-  const [clients, setClients] = useState<Client[] | undefined>([])
-  
-  const {
-    clients: clientsData,
-    error: clientsError,
-    isLoading: clientsIsLoading
-  } = useGetClients()
-  
-  useEffect(() => {
-    if (!clientsError && !clientsIsLoading) {
-
-
-      setClients(clientsData?.data)
-    }
-  }, [clientsIsLoading, clientsData, clientsError])
-  
-
-
-  return <section className="w-3/12 bg-neutral-200 text-neutral-900">
-      {
-        clients?.map((client, index: number) => {
+  return (
+    <aside className="w-64 shrink-0 border-r border-surface-200 bg-white h-[calc(100vh-5rem)] flex flex-col sticky top-20 overflow-hidden">
+      <div className="px-4 h-11 flex items-center border-b border-surface-200">
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Clientes</h2>
+      </div>
+      <nav className="flex-1 overflow-y-auto py-2">
+        {isLoading && <Spinner size="sm" className="w-full py-6" />}
+        {clients.length === 0 && !isLoading && (
+          <p className="px-4 py-6 text-sm text-surface-400 text-center">Sin clientes</p>
+        )}
+        {clients.map((client) => {
+          const active = path === `/clients/${client.documentId}`
           return (
             <Link
-              key={`client-${index}`}
+              key={client.documentId}
               href={`/clients/${client.documentId}`}
-              className="flex items-center justify-between shadow-md bg-neutral-200 rounded-md px-6 py-4 hover:bg-neutral-400 hover:text-neutral-700"
+              className={`flex items-center justify-between px-4 py-3 text-sm transition-colors ${
+                active
+                  ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500 font-medium'
+                  : 'text-surface-700 hover:bg-surface-50 hover:text-surface-900'
+              }`}
             >
-              <h4>{client.name}</h4> <h4>{'>'}</h4>
+              <span className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px]">person</span>
+                {client.name}
+              </span>
+              <span className="material-symbols-outlined text-[16px] text-surface-400">chevron_right</span>
             </Link>
-            
           )
-        })      
-      }
-      <Link
-        href={`/clients/new`}
-        className="flex items-center justify-between shadow-md bg-neutral-200 rounded-md px-6 py-4 hover:bg-neutral-400 hover:text-neutral-700"
-      >
-        <h4>Crear Cliente Nuevo</h4> <h4>{'+'}</h4>
-      </Link>
-    </section>
+        })}
+      </nav>
+      <div className="p-3 border-t border-surface-200">
+        <Link
+          href="/clients/new"
+          className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px]">add</span>
+          Nuevo Cliente
+        </Link>
+      </div>
+    </aside>
+  )
 }
- export default ClientsSideBar
+
+export default ClientsSideBar

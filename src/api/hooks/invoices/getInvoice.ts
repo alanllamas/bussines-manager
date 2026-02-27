@@ -4,7 +4,6 @@ import useSWR from 'swr';
 import { Invoice } from './getInvoices';
 import { Client } from '../clients/getClient';
 import { TicketProduct, Ticket } from './getTicketsByClient';
-import { useReactToPrint } from 'react-to-print';
 
 export type Meta = {
   pagination?: {
@@ -23,6 +22,7 @@ export type StrapiFile = {
 
 export type InvoiceInitialValues = {
   payment_date?: Date | null;
+  invoice_number?: number;
   invoice_id: string;
   client: string;
   tickets: string[];
@@ -41,11 +41,12 @@ export type InvoiceInitialValues = {
   proof_of_payment?: StrapiFile
   payment_supplement?: StrapiFile
   payment_reference?: string,
-  resume: {}
+  resume: Record<string, unknown>
 }
 
 export type createInvoiceReq = {
   payment_date?: Date | null;
+  invoice_number?: number;
   invoice_id: string;
   client: string[];
   tickets: string[];
@@ -112,7 +113,7 @@ export const generateResume = (filteredTickets: InvoiceInitialValues['tickets'],
 
         if (acc[prod?.product?.name || ''] && acc[prod?.product?.name || '']?.price === prod?.price) {
           // console.log('prod.product_total: ', prod.product_total);
-          acc[prod?.product?.name || ''].total += prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total,
+          acc[prod?.product?.name || ''].total += prod?.product?.taxes ? ((prod.product_total || 0) + (prod?.product_total || 0) * (prod?.product?.taxes/100)) : prod.product_total
           acc[prod?.product?.name || ''].sub_total += prod.product_total
           acc[prod?.product?.name || ''].quantity += prod.quantity
           acc[prod?.product?.name || ''].total_taxes += prod?.product?.taxes ? (prod?.product_total || 0) * (prod?.product?.taxes/100) : 0
@@ -197,41 +198,21 @@ export const generateResume = (filteredTickets: InvoiceInitialValues['tickets'],
     results
   }
 }
-// &populate[products][populate][0]=product&populate[products][populate][1]=product_variants
-const token = `Bearer ${process.env.NEXT_PUBLIC_BUSINESS_MANAGER_TOKEN}`
-
-
-// Promise<{ id: any }>
-async function GetInvoice(
-  [url, token, id]: [string, string, number]
-) {
-  return await fetcher<{data: Invoice, meta: Meta}>(
-// client&populate=products&populate=products.product&populate=products.product_variants
-    `${url}/invoices/${id}?populate=client&populate=client.taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants`,
-    {
-      method: 'GET',
-      headers: {
-        'Authorization': token,
-      },
-    }
-  );
+async function GetInvoice([url]: [string]) {
+  return await fetcher<{data: Invoice, meta: Meta}>(url, { method: 'GET' });
 }
 
 export default function useGetInvoice(id: number) {
+  const url = id
+    ? `/api/invoices/${id}?populate=client&populate=client.taxing_info&populate=tickets&populate=tickets.products&populate=tickets.products.product&populate=tickets.products.product_variants`
+    : null;
+
   const { data, isLoading, error } = useSWR(
-    [
-      process.env.NEXT_PUBLIC_BUSINESS_MANAGER_API,
-      token,
-      id
-    ],
+    url ? [url] : null,
     GetInvoice,
-    //    {
-    //   revalidateOnFocus: false,
-    // }
   );
-  console.log(data);
-  
-   const invoice = data;
+
+  const invoice = data;
 
   return {
     invoice,

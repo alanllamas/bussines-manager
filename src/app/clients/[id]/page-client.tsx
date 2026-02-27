@@ -2,6 +2,7 @@
 import useGetClient, { Client } from "@/api/hooks/clients/getClient";
 import React, { useEffect, useState } from "react";
 import ClientTabs from "../components/ClientTabs";
+import Spinner from "@/components/ui/Spinner";
 
 const ClientPage: React.FC<{id: string}> = ({ id }: {id: string}) => {
 
@@ -24,9 +25,7 @@ const ClientPage: React.FC<{id: string}> = ({ id }: {id: string}) => {
   }, [isLoading, error, clientData])
 
 
-  const LoadingScreen = () =>  <section className="w-full flex">
-    <p className="text-black">Loading...</p>
-  </section>
+  const LoadingScreen = () => <Spinner />
   
   const ErrorScreen = () =>  <section className="w-full flex">
     <p className="text-black">Error loading client</p>

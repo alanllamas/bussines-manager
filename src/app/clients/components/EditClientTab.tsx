@@ -9,7 +9,7 @@ const EditClientTab: React.FC<{client: Client | undefined}> = ({client}: {client
   return (
     <TabPanel>
       {/* <h3>Informacion Fiscal</h3> */}
-      <ClientsForm />
+      <ClientsForm client={client} />
     </TabPanel>
   )
 }

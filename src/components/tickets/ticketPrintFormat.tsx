@@ -29,7 +29,7 @@ const TicketPrintFormat: React.FC<any> = ({ticket}) => {
     }
   }, [printTicket])
 
-  return <section ref={contentRef} className="hidden print:block w-1/3 print:w-full print:shadow-none print:border-none shadow-xl my-2 px-12 pt-2 text-base text-neutral-900 border border-neutral-200">
+  return <section ref={contentRef} className="hidden print:block w-1/3 print:w-full print:shadow-none print:border-none shadow-xl my-2 px-12 pt-2 text-base text-surface-900 border border-surface-200">
       <TicketBaseFormat ticket={ticket} date={date} />
 
     </section>

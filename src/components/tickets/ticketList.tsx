@@ -8,8 +8,15 @@ import useCreateTicket from "@/api/hooks/tickets/useCreateTicket"
 import useGetTicketNumber from "@/api/hooks/tickets/getTicketNumber"
 import { isNumber } from "util"
 import TicketPrintFormat from "./ticketPrintFormat"
+import { useSWRConfig } from "swr"
+import { toast } from "sonner"
 
-const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
+const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClient}) => {
+  const { mutate } = useSWRConfig()
+  const invalidateTickets = () => mutate(
+    (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/tickets') || key[0].includes('/api/clients'))
+  )
+
   // ticket form functions
   const [initialFormValues, setInitialFormValues] = useState<TicketInitialValues>()
   const [isOpen, setIsOpen] = useState(false)
@@ -47,9 +54,13 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   useEffect(() => {
     // make refresh
 
-    if (!TicketError && !TicketIsLoading && TicketData) {
-      // console.log('TicketData: ', TicketData);
-      setTimeout(() => window.location.reload(), 500);
+    if (TicketError && !TicketIsLoading) {
+      toast.error('Error al crear la nota')
+    } else if (!TicketError && !TicketIsLoading && TicketData) {
+      toast.success('Nota creada')
+      invalidateTickets()
+      setNewTicket(undefined)
+      sendClose()
       
 
       // setTicket(TicketData.data)
@@ -58,9 +69,13 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   useEffect(() => {
     // make refresh
 
-    if (EditTicketData && !EditTicketError && !EditTicketIsLoading) {
-      // console.log('EditTicketData: ', EditTicketData);
-      setTimeout(() => window.location.reload(), 500);
+    if (EditTicketError && !EditTicketIsLoading) {
+      toast.error('Error al editar la nota')
+    } else if (EditTicketData && !EditTicketError && !EditTicketIsLoading) {
+      toast.success('Nota actualizada')
+      invalidateTickets()
+      setNewEditTicket(undefined)
+      sendClose()
       
 
       // setTicket(TicketData.data)
@@ -69,7 +84,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   useEffect(() => {
     // console.log('editTicket: ', editTicket);
     if (editTicket) {
-      
+      setNewTicket(undefined)
+      setNewEditTicket(undefined)
       setInitialFormValues({
         client: editTicket?.client?.id?.toString() || clientId?.toString() || "",
         date: new Date(editTicket?.sale_date || '').valueOf(),
@@ -78,7 +94,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
             name: product?.product?.name || '',
             product: product?.product?.id || 0,
             price: product.price || 0,
-            product_variants: product?.product_variants?.map((variant: ProductVariant) => ({id: variant.id, name: variant.name, type: variant.type})) || [],
+            product_variants: product?.product_variants?.map((variant: ProductVariant) => variant.documentId) || [],
             quantity: product.quantity || 0,
             total: product.product_total || 0, 
             unit: product?.product?.measurement_unit || '',
@@ -101,7 +117,8 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   const today: number = new Date().valueOf()
 
   const sendCreate = () => {
-    
+    setNewTicket(undefined)
+    setNewEditTicket(undefined)
     setInitialFormValues({
       date: today,
       client: clientId ? clientId : "",
@@ -120,7 +137,6 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   }
   
   const handleSubmit = async (values: TicketInitialValues) => {
-    setIsOpen(false)
     console.log(values);
     const { date, client, shipping, subtotal, products, ticket_number, total } = values
     const data = {
@@ -135,7 +151,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
           product: [product.product],
           quantity: product.quantity,
           product_total: product.total,
-          product_variants: product.product_variants.map(variant => { return Number(variant.id) }),
+          product_variants: product.product_variants,
           price: product.price
         }
       })
@@ -173,8 +189,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
   useEffect(() => {
     // console.log(interval);
     if (ticketData) {
-      console.log(ticketData);
-      setTickets(ticketData)
+      setTickets([...ticketData].sort((a, b) => b.id - a.id))
     }
   }, [ticketData])
   
@@ -184,12 +199,13 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
         {currentItems &&
           currentItems?.map((ticket: Ticket, index: number) => {
           // console.log('ticket: ', ticket);
-          return <tr className="border-b border-neutral-300" key={`ticket-${index}`}>
-            <td className="py-2"><a href={`/tickets/${ticket.documentId}`}>{ticket.ticket_number}</a></td>
-            <td className="py-2">{ticket.client?.name}</td>
-            <td className="py-2">{new Date(ticket.sale_date).toLocaleDateString()}</td>
-            <td className="py-2">$ {ticket.total}</td>
-            <td className="py-2"> <button onClick={() => setEditTicket(ticket)}><span>edit</span></button> | <button onClick={() => sendPrint(ticket)}><span>print</span></button></td>
+          return <tr key={`ticket-${index}`}>
+            <td><a className="text-primary-600 hover:underline font-medium" href={`/tickets/${ticket.documentId}`}>{String(ticket.ticket_number ?? '').padStart(5, '0')}</a></td>
+            {!hideClient && <td>{ticket.client?.name}</td>}
+            <td>{new Date(ticket.sale_date).toLocaleDateString()}</td>
+            <td className="font-medium">$ {ticket.total}</td>
+            <td>{ticket.invoice ? <span className="material-symbols-outlined text-[18px] text-primary-500">check_circle</span> : <span className="material-symbols-outlined text-[18px] text-surface-300">radio_button_unchecked</span>}</td>
+            <td><div className="flex gap-1"><button className="btn-icon" onClick={() => setEditTicket(ticket)}><span className="material-symbols-outlined text-[16px]">edit</span></button><button className="btn-icon" onClick={() => sendPrint(ticket)}><span className="material-symbols-outlined text-[16px]">print</span></button></div></td>
             
           </tr>
         })}
@@ -220,38 +236,45 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId}) => {
     };
       return (
       <section className="w-full flex flex-col items-center">
-        <table className="w-full p-4 text-center mt-8">
+        <table className="data-table mt-6">
           <thead>
-            <tr className="border-b border-neutral-500">
+            <tr>
               <th>Folio</th>
-              <th>cliente</th>
-              <th>fecha de venta</th>
-              <th>monto</th>
-              <th>acciones</th>
+              {!hideClient && <th>Cliente</th>}
+              <th>Fecha de venta</th>
+              <th>Monto</th>
+              <th>Corte</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <Items currentItems={currentItems} />
+            {tickets.length === 0
+              ? <tr><td colSpan={hideClient ? 5 : 6} className="py-12 text-center">
+                  <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                  <p className="text-sm text-surface-400 mt-2">Sin notas</p>
+                </td></tr>
+              : <Items currentItems={currentItems} />
+            }
           </tbody>
         </table>
         <ReactPaginate
-          className="flex gap-3 p-4 w-1/4 self-center items-center"
-          breakLabel="..."
-          pageClassName="bg-neutral-300 px-2 py-1"
-          activeClassName="bg-neutral-500 text-white"
-          nextLabel="next >"
+          className="paginator"
+          breakLabel="…"
+          nextLabel="siguiente ›"
+          previousLabel="‹ anterior"
           onPageChange={handlePageChange}
           pageRangeDisplayed={5}
           pageCount={pageCount}
-          previousLabel="< previous"
           renderOnZeroPageCount={null}
         />
       </section>
     );
   }
 
+  const apiError = TicketError || EditTicketError
+
   return <>
-    <TicketsForm sendCreate={sendCreate} initialFormValues={initialFormValues} handleSubmit={handleSubmit} isOpen={isOpen} sendClose={sendClose} editTicket={editTicket}/>
+    <TicketsForm sendCreate={sendCreate} initialFormValues={initialFormValues} handleSubmit={handleSubmit} isOpen={isOpen} sendClose={sendClose} editTicket={editTicket} apiError={apiError}/>
     <PaginatedItems itemsPerPage={10}/>
     { printTicket && <TicketPrintFormat ticket={printTicket} /> }
     
