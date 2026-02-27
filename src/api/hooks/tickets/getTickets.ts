@@ -7,6 +7,7 @@ import { Client } from '../clients/getClient';
 export type ProductVariant = {
   name: string;
   id: number;
+  documentId: string;
   type: string;
 }
 

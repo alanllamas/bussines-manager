@@ -49,7 +49,7 @@ export type createTicketReq = {
     product: number[]
     quantity: number
     product_total: number
-    product_variants: number[]
+    product_variants: string[]
     price: number
   }[]
 }
