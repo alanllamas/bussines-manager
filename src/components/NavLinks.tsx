@@ -16,13 +16,6 @@ export default function NavLinks() {
   return (
     <ul className="flex items-center h-20">
 
-      <Link href="/tickets">
-        <li className={navItem(path.startsWith('/tickets'))}>
-          <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-          Notas
-        </li>
-      </Link>
-
       <Link href="/invoices">
         <li className={navItem(path.startsWith('/invoices'))}>
           <span className="material-symbols-outlined text-[18px]">description</span>
@@ -38,12 +31,18 @@ export default function NavLinks() {
       </Link>
 
       <Menu as="li" className="relative h-full flex items-center">
-        <MenuButton className={navItem(path.startsWith('/products') || path.startsWith('/product-variants'))}>
+        <MenuButton className={navItem(path.startsWith('/tickets') || path.startsWith('/products') || path.startsWith('/product-variants'))}>
           <span className="material-symbols-outlined text-[18px]">inventory_2</span>
-          Productos
+          Ingresos
           <span className="material-symbols-outlined text-[16px]">expand_more</span>
         </MenuButton>
         <MenuItems anchor="bottom" className="bg-white border border-surface-200 shadow-lg z-50 min-w-[160px]">
+          <MenuItem>
+            <Link href="/tickets" className="flex items-center gap-2 px-4 py-2 text-sm text-surface-700 hover:bg-surface-50 hover:text-primary-600">
+              <span className="material-symbols-outlined text-[16px]">receipt_long</span>
+              Notas
+            </Link>
+          </MenuItem>
           <MenuItem>
             <Link href="/products" className="flex items-center gap-2 px-4 py-2 text-sm text-surface-700 hover:bg-surface-50 hover:text-primary-600">
               <span className="material-symbols-outlined text-[16px]">inventory_2</span>
@@ -59,10 +58,20 @@ export default function NavLinks() {
         </MenuItems>
       </Menu>
 
-      <li className="flex items-center gap-1 px-4 py-5 text-sm font-medium border-b-2 border-transparent text-surface-300 cursor-not-allowed">
-        <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
-        Compras
-      </li>
+      <Menu as="li" className="relative h-full flex items-center">
+        <MenuButton className={navItem(false)}>
+          <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
+          Gastos
+          <span className="material-symbols-outlined text-[16px]">expand_more</span>
+        </MenuButton>
+        <MenuItems anchor="bottom" className="bg-white border border-surface-200 shadow-lg z-50 min-w-[160px]">
+          <MenuItem disabled>
+            <span className="flex items-center gap-2 px-4 py-2 text-sm text-surface-300">
+              Próximamente
+            </span>
+          </MenuItem>
+        </MenuItems>
+      </Menu>
 
       <li className="flex items-center gap-1 px-4 py-5 text-sm font-medium border-b-2 border-transparent text-surface-300 cursor-not-allowed">
         <span className="material-symbols-outlined text-[18px]">bar_chart</span>
