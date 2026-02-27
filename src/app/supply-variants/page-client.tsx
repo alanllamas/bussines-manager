@@ -1,32 +1,25 @@
 'use client'
 import React, { useState } from "react"
-import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
-import ProductVariantForm from "@/components/forms/ProductVariantForm"
+import useGetSupplyVariants from "@/api/hooks/supply-variants/getSupplyVariants"
+import SupplyVariantForm from "@/components/forms/SupplyVariantForm"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import Spinner from "@/components/ui/Spinner"
-import { useSWRConfig } from "swr"
-import { ActionButtons } from "@/components/ui"
-import type { ProductVariant } from "@/api/hooks/getProducts"
+import type { SupplyVariant } from "@/types"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
 import ReactPaginate from "react-paginate"
+import { ActionButtons } from "@/components/ui"
 
 const TYPE_LABELS: Record<string, string> = {
   tamano: 'Tamaño', color: 'Color', empaque: 'Empaque'
 }
 
-const ProductVariantsPage: React.FC = () => {
+const SupplyVariantsPage: React.FC = () => {
   const { isLoading: authLoading } = useAuthGuard()
-  const { variants, isLoading, error } = useGetProductVariants()
-  const [showCreate, setShowCreate] = useState(false)
-  const [editing, setEditing] = useState<ProductVariant | null>(null)
-  const { mutate } = useSWRConfig()
-
-  const refresh = () => mutate(
-    (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/product-variants')
-  )
+  const { variants, isLoading } = useGetSupplyVariants()
+  const [showNew, setShowNew] = useState(false)
+  const [editing, setEditing] = useState<SupplyVariant | null>(null)
 
   if (authLoading || isLoading) return <Spinner />
-  if (error) return <p className="p-4 text-surface-700">Error al cargar variantes</p>
 
   const list = variants?.data ?? []
 
@@ -34,36 +27,35 @@ const ProductVariantsPage: React.FC = () => {
     <section className="w-full flex flex-col items-center">
       <section className="w-full py-6 px-4 sm:w-11/12 sm:py-8 sm:px-6 lg:w-7/12 lg:py-12 lg:px-8 bg-surface-50 text-surface-900">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">Variantes de Productos</h1>
-          {!showCreate && (
-            <button className="btn-primary" onClick={() => { setShowCreate(true); setEditing(null) }}>
+          <h1 className="text-xl font-bold">Variantes de Insumos</h1>
+          {!showNew && (
+            <button className="btn-primary" onClick={() => { setShowNew(true); setEditing(null) }}>
               <span className="material-symbols-outlined text-[16px]">add</span>
               Nueva variante
             </button>
           )}
         </div>
 
-        {showCreate && (
+        {showNew && (
           <div className="mb-6 p-4 border border-surface-200 rounded bg-white">
             <h2 className="text-sm font-semibold mb-3">Nueva variante</h2>
-            <ProductVariantForm
-              onSuccess={() => { refresh(); setShowCreate(false) }}
-              onCancel={() => setShowCreate(false)}
+            <SupplyVariantForm
+              onSuccess={() => setShowNew(false)}
+              onCancel={() => setShowNew(false)}
             />
           </div>
         )}
 
-        <PaginatedList list={list} editing={editing} setEditing={setEditing} refresh={refresh} />
+        <PaginatedList list={list} editing={editing} setEditing={setEditing} />
       </section>
     </section>
   )
 }
 
-function PaginatedList({ list, editing, setEditing, refresh }: {
-  list: ProductVariant[]
-  editing: ProductVariant | null
-  setEditing: (v: ProductVariant | null) => void
-  refresh: () => void
+function PaginatedList({ list, editing, setEditing }: {
+  list: SupplyVariant[]
+  editing: SupplyVariant | null
+  setEditing: (v: SupplyVariant | null) => void
 }) {
   const { currentItems, pageCount, handlePageChange } = usePaginatedData(list, 10)
 
@@ -79,9 +71,9 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
         ) : currentItems.map((v) => (
           <div key={v.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
             {editing?.documentId === v.documentId ? (
-              <ProductVariantForm
+              <SupplyVariantForm
                 variant={v}
-                onSuccess={() => { refresh(); setEditing(null) }}
+                onSuccess={() => setEditing(null)}
                 onCancel={() => setEditing(null)}
               />
             ) : (
@@ -117,9 +109,9 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
               <tr key={v.documentId}>
                 {editing?.documentId === v.documentId ? (
                   <td colSpan={3} className="py-2">
-                    <ProductVariantForm
+                    <SupplyVariantForm
                       variant={v}
-                      onSuccess={() => { refresh(); setEditing(null) }}
+                      onSuccess={() => setEditing(null)}
                       onCancel={() => setEditing(null)}
                     />
                   </td>
@@ -151,4 +143,4 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
   )
 }
 
-export default ProductVariantsPage
+export default SupplyVariantsPage

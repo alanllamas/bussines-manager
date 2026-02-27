@@ -77,16 +77,29 @@ export default function NavLinks() {
         </Menu>
 
         <Menu as="li" className="relative h-full flex items-center">
-          <MenuButton className={navItem(false)}>
+          <MenuButton className={navItem(path.startsWith('/purchases') || path.startsWith('/supplies') || path.startsWith('/supply-variants'))}>
             <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
             Gastos
             <span className="material-symbols-outlined text-[16px]">expand_more</span>
           </MenuButton>
           <MenuItems anchor="bottom" className="bg-white border border-surface-200 shadow-lg z-50 min-w-[160px]">
-            <MenuItem disabled>
-              <span className="flex items-center gap-2 px-4 py-2 text-sm text-surface-300">
-                Próximamente
-              </span>
+            <MenuItem>
+              <Link href="/purchases" className="flex items-center gap-2 px-4 py-2 text-sm text-surface-700 hover:bg-surface-50 hover:text-primary-600">
+                <span className="material-symbols-outlined text-[16px]">shopping_cart</span>
+                Compras
+              </Link>
+            </MenuItem>
+            <MenuItem>
+              <Link href="/supplies" className="flex items-center gap-2 px-4 py-2 text-sm text-surface-700 hover:bg-surface-50 hover:text-primary-600">
+                <span className="material-symbols-outlined text-[16px]">package_2</span>
+                Insumos
+              </Link>
+            </MenuItem>
+            <MenuItem>
+              <Link href="/supply-variants" className="flex items-center gap-2 px-4 py-2 text-sm text-surface-700 hover:bg-surface-50 hover:text-primary-600">
+                <span className="material-symbols-outlined text-[16px]">style</span>
+                Variantes
+              </Link>
             </MenuItem>
           </MenuItems>
         </Menu>
@@ -154,11 +167,30 @@ export default function NavLinks() {
             </li>
             {/* Gastos group */}
             <li>
-              <span className={`${mobileNavItem(false)} opacity-50 cursor-not-allowed`}>
+              <span className={mobileNavItem(path.startsWith('/purchases') || path.startsWith('/supplies') || path.startsWith('/supply-variants'))}>
                 <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
                 Gastos
-                <span className="text-xs text-surface-400 ml-auto">Próximamente</span>
               </span>
+              <ul className="bg-surface-50">
+                <li>
+                  <Link href="/purchases" className="flex items-center gap-3 pl-12 pr-6 py-3 text-sm border-b border-surface-100 text-surface-700 hover:bg-surface-100" onClick={() => setIsMobileOpen(false)}>
+                    <span className="material-symbols-outlined text-[16px]">shopping_cart</span>
+                    Compras
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/supplies" className="flex items-center gap-3 pl-12 pr-6 py-3 text-sm border-b border-surface-100 text-surface-700 hover:bg-surface-100" onClick={() => setIsMobileOpen(false)}>
+                    <span className="material-symbols-outlined text-[16px]">package_2</span>
+                    Insumos
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/supply-variants" className="flex items-center gap-3 pl-12 pr-6 py-3 text-sm border-b border-surface-100 text-surface-700 hover:bg-surface-100" onClick={() => setIsMobileOpen(false)}>
+                    <span className="material-symbols-outlined text-[16px]">style</span>
+                    Variantes
+                  </Link>
+                </li>
+              </ul>
             </li>
             <li>
               <span className="flex items-center gap-3 px-6 py-4 text-sm border-b border-surface-100 text-surface-300 cursor-not-allowed">

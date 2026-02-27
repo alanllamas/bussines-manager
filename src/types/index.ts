@@ -1,5 +1,47 @@
 // Domain types — single source of truth
 
+export type SupplyVariant = {
+  id: number
+  documentId: string
+  name: string
+  type: string
+  description?: string
+}
+
+export type Supply = {
+  id: number
+  documentId: string
+  name: string
+  quantity: number
+  measurement_unit: string
+  cost: number
+  supply_variants: SupplyVariant[]
+}
+
+export type PurchaseSupply = {
+  id?: number
+  supply?: Supply
+  quantity: number
+  price: number
+  supply_total: number
+  supply_variants?: SupplyVariant[]
+}
+
+export type Purchase = {
+  id: number
+  documentId: string
+  purchase_number: number
+  purchase_date: Date
+  shipping_cost?: number
+  total: number
+  subtotal: number
+  purchase_reason: string
+  purchase_status?: string
+  supplies: PurchaseSupply[]
+  comments?: string
+}
+
+
 export type Contact = {
   id?: string
   name: string
