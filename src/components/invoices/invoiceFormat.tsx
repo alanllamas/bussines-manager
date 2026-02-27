@@ -40,7 +40,7 @@ const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
     <div className="w-full pb-4 px-32 flex justify-end">
       <button className="px-4 py-2 bg-surface-200" onClick={() => PrintInvoice()}>Imprimir</button>
     </div>
-    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-3 shadow-xl border text-sm">
+    <section ref={contentRef} className="flex flex-col print:w-full print:shadow-none w-1/2 px-10 py-3 shadow-xl border border-gray-300 text-sm">
     { invoice && <InvoiceBaseFormat invoiceData={invoice} initial_date={initial_date} ending_date={ending_date} send_date={send_date}/>}
 
     </section>

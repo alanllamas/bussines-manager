@@ -40,7 +40,7 @@ export const emptyContact: Contact = {
   name: '',
   area: '',
   email: '',
-  extension: '',
+  extension: '0',
   job_title: '',
   phone: ''
 }
@@ -136,7 +136,8 @@ const clientSchema = Yup.object({
   contacts: Yup.array().of(
     Yup.object({
       name: Yup.string().required('Nombre requerido'),
-      email: Yup.string().email('Correo inválido').nullable(),
+      email: Yup.string().email('Correo inválido').required('Correo requerido'),
+      extension: Yup.number().min(0, 'Extensión inválida').required('Extensión requerida').transform((v, o) => o === '' ? 0 : v),
     })
   ),
 })
@@ -158,7 +159,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
       name: c.name ?? '',
       area: c.area ?? '',
       email: c.email ?? '',
-      extension: c.extension ?? '',
+      extension: c.extension ?? '0',
       job_title: c.job_title ?? '',
       phone: c.phone ?? '',
     })) ?? [],
@@ -214,7 +215,8 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
 
   return (
     <Formik initialValues={initialFormValues} onSubmit={handleSubmit} enableReinitialize validationSchema={clientSchema}>
-      {({ values, errors, touched, isValid, dirty }) => (
+      {({ values, errors, touched, isValid, dirty }) => { console.log(errors);
+       return (
         <Form className="grid grid-cols-2 gap-x-12 w-full">
 
           {/* LEFT: Nombre + Contactos */}
@@ -417,7 +419,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                 <Field as="textarea" className="field-textarea" name="taxing_info.comments" />
               </div>
             <div className="flex justify-end pt-2">
-              <button className="btn-primary disabled:opacity-50" type="submit" disabled={isSubmitting || !isValid || !dirty}>
+              <button className="btn-primary disabled:opacity-50" type="submit" disabled={isSubmitting || !dirty || !isValid}>
                 <span className="material-symbols-outlined text-[16px]">save</span>
                 {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar' : 'Crear'}
               </button>
@@ -426,7 +428,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
           </div>
 
         </Form>
-      )}
+      )}}
     </Formik>
   )
 }
