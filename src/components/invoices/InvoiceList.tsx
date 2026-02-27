@@ -93,6 +93,16 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
   }, [ticketsIsLoading, ticketsError])
 
   useEffect(() => {
+    if (editInvoice && ticketsData?.data) {
+      setAvailableTickets(
+        ticketsData.data.filter(
+          t => t.invoice === null || t.invoice?.id === editInvoice.id
+        )
+      )
+    }
+  }, [editInvoice])
+
+  useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
       setClients(clientsData?.data ?? [])
     }
@@ -285,13 +295,15 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
         {currentItems &&
           currentItems?.map((invoice: Invoice, index: number) => {
           return <tr key={`invoice-${index}`}>
-            <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_number ?? '').padStart(5, '0')}</a></td>
-            <td>{invoice.client?.name}</td>
-            <td>{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
-            <td>{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
-            <td className="font-medium">$ {invoice.total}</td>
+            <td className="whitespace-nowrap"><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_number ?? '').padStart(5, '0')}</a></td>
+            <td className="max-w-0 truncate">{invoice.client?.name}</td>
+            <td className="whitespace-nowrap">{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
+            <td className="whitespace-nowrap">{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
+            <td className="font-medium whitespace-nowrap">$ {invoice.total}</td>
             <td>
-              <ActionButtons onEdit={() => { setClient(invoice.client); setEditInvoice(invoice) }} onPrint={() => sendPrint(invoice)} />
+              <div className="flex justify-center">
+                <ActionButtons onEdit={() => { setClient(invoice.client); setEditInvoice(invoice) }} onPrint={() => sendPrint(invoice)} />
+              </div>
             </td>
           </tr>
         })}
@@ -328,15 +340,15 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
         </div>
         {/* Desktop table */}
         <div className="hidden sm:block overflow-x-auto w-full">
-          <table className="data-table mt-6 min-w-[480px]">
+          <table className="data-table mt-6 min-w-[480px] [&_th]:!text-center [&_td]:text-center">
             <thead>
               <tr>
-                <th>Folio</th>
-                <th>Cliente</th>
-                <th>Fecha inicial</th>
-                <th>Fecha final</th>
-                <th>Monto</th>
-                <th>Acciones</th>
+                <th className="w-20">Folio</th>
+                <th className="w-40">Cliente</th>
+                <th className="w-28 whitespace-nowrap">Fecha inicial</th>
+                <th className="w-28 whitespace-nowrap">Fecha final</th>
+                <th className="w-28">Monto</th>
+                <th className="w-24">Acciones</th>
               </tr>
             </thead>
             <tbody>

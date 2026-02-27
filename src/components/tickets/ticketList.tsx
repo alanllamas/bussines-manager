@@ -189,12 +189,12 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
         {currentItems &&
           currentItems?.map((ticket: Ticket, index: number) => {
           return <tr key={`ticket-${index}`}>
-            <td><a className="text-primary-600 hover:underline font-medium" href={`/tickets/${ticket.documentId}`}>{String(ticket.ticket_number ?? '').padStart(5, '0')}</a></td>
-            {!hideClient && <td>{ticket.client?.name}</td>}
-            <td>{new Date(ticket.sale_date).toLocaleDateString()}</td>
-            <td className="font-medium">$ {ticket.total}</td>
+            <td className="whitespace-nowrap"><a className="text-primary-600 hover:underline font-medium" href={`/tickets/${ticket.documentId}`}>{String(ticket.ticket_number ?? '').padStart(5, '0')}</a></td>
+            {!hideClient && <td className="max-w-0 truncate">{ticket.client?.name}</td>}
+            <td className="whitespace-nowrap">{new Date(ticket.sale_date).toLocaleDateString()}</td>
+            <td className="font-medium whitespace-nowrap">$ {ticket.total}</td>
             <td>{ticket.invoice ? <span className="material-symbols-outlined text-[18px] text-primary-500">check_circle</span> : <span className="material-symbols-outlined text-[18px] text-surface-300">radio_button_unchecked</span>}</td>
-            <td><ActionButtons onEdit={() => setEditTicket(ticket)} onPrint={() => sendPrint(ticket)} /></td>
+            <td><div className="flex justify-center"><ActionButtons onEdit={() => setEditTicket(ticket)} onPrint={() => sendPrint(ticket)} /></div></td>
             
           </tr>
         })}
@@ -237,15 +237,15 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
         </div>
         {/* Desktop table */}
         <div className="hidden sm:block overflow-x-auto w-full">
-          <table className="data-table mt-6 min-w-[480px]">
+          <table className="data-table mt-6 min-w-[480px] [&_th]:!text-center [&_td]:text-center">
             <thead>
               <tr>
-                <th>Folio</th>
-                {!hideClient && <th>Cliente</th>}
-                <th>Fecha de venta</th>
-                <th>Monto</th>
-                <th>Corte</th>
-                <th>Acciones</th>
+                <th className="w-20">Folio</th>
+                {!hideClient && <th className="w-40">Cliente</th>}
+                <th className="w-28 whitespace-nowrap">Fecha de venta</th>
+                <th className="w-28">Monto</th>
+                <th className="w-16">Corte</th>
+                <th className="w-24">Acciones</th>
               </tr>
             </thead>
             <tbody>

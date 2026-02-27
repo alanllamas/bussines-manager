@@ -24,7 +24,7 @@ const ClientTab: React.FC<{client: Client | undefined}> = ({client}: {client: Cl
   )
 
   return (
-    <TabPanel>
+    <TabPanel className="px-4 py-4 sm:px-6">
       {client?.taxing_info
         ? (
           <div>

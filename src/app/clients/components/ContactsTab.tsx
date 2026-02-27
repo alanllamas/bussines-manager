@@ -30,7 +30,7 @@ const ContactCard = ({ contact }: { contact: Contact }) => (
 
 const ContactsTab: React.FC<{client: Client | undefined}> = ({client}) => {
   return (
-    <TabPanel>
+    <TabPanel className="px-4 py-4 sm:px-6">
       {client?.contacts?.length
         ? <div className="flex flex-wrap gap-4">
             {client.contacts.map((contact: Contact, i: number) => (

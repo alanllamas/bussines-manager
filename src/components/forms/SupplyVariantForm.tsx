@@ -2,36 +2,37 @@
 import React, { useEffect, useState } from "react"
 import { Field, Form, Formik } from "formik"
 import * as Yup from "yup"
-import { ProductVariant } from "@/api/hooks/getProducts"
-import useCreateProductVariant, { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
-import useEditProductVariant from "@/api/hooks/productVariants/useEditProductVariant"
+import type { SupplyVariant } from "@/types"
+import useCreateSupplyVariant, { CreateSupplyVariantReq } from "@/api/hooks/supply-variants/useCreateSupplyVariant"
+import useEditSupplyVariant from "@/api/hooks/supply-variants/useEditSupplyVariant"
 import { useSWRConfig } from "swr"
 
-const variantSchema = Yup.object({
+const schema = Yup.object({
   name: Yup.string().required('El nombre es requerido'),
+  type: Yup.string().required('El tipo es requerido'),
 })
 
-const ProductVariantForm: React.FC<{
-  variant?: ProductVariant;
+const SupplyVariantForm: React.FC<{
+  variant?: SupplyVariant;
   onSuccess?: () => void;
   onCancel?: () => void;
 }> = ({ variant, onSuccess, onCancel }) => {
   const isEdit = !!variant
   const { mutate } = useSWRConfig()
-  const invalidateVariants = () => mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/product-variants'))
+  const invalidate = () => mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/supply-variants'))
 
-  const [newVariant, setNewVariant] = useState<CreateVariantReq>()
-  const [editPayload, setEditPayload] = useState<{ data: CreateVariantReq; documentId: string }>()
+  const [newVariant, setNewVariant] = useState<CreateSupplyVariantReq>()
+  const [editPayload, setEditPayload] = useState<{ data: CreateSupplyVariantReq; documentId: string }>()
 
-  const { variant: created, error: createError, isLoading: createLoading } = useCreateProductVariant(newVariant)
-  const { variant: edited, error: editError, isLoading: editLoading } = useEditProductVariant(editPayload)
+  const { variant: created, error: createError, isLoading: createLoading } = useCreateSupplyVariant(newVariant)
+  const { variant: edited, error: editError, isLoading: editLoading } = useEditSupplyVariant(editPayload)
 
-  const initialValues: CreateVariantReq = {
+  const initialValues: CreateSupplyVariantReq = {
     name: variant?.name ?? '',
     type: variant?.type ?? '',
   }
 
-  const handleSubmit = (values: CreateVariantReq) => {
+  const handleSubmit = (values: CreateSupplyVariantReq) => {
     if (isEdit && variant?.documentId) {
       setEditPayload({ data: values, documentId: variant.documentId })
     } else {
@@ -40,23 +41,17 @@ const ProductVariantForm: React.FC<{
   }
 
   useEffect(() => {
-    if (!createError && !createLoading && created) {
-      invalidateVariants()
-      if (onSuccess) onSuccess()
-    }
+    if (!createError && !createLoading && created) { invalidate(); if (onSuccess) onSuccess() }
   }, [createLoading, created, createError])
 
   useEffect(() => {
-    if (!editError && !editLoading && edited) {
-      invalidateVariants()
-      if (onSuccess) onSuccess()
-    }
+    if (!editError && !editLoading && edited) { invalidate(); if (onSuccess) onSuccess() }
   }, [editLoading, edited, editError])
 
   const isSubmitting = createLoading || editLoading
 
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize validationSchema={variantSchema}>
+    <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize validationSchema={schema}>
       {({ errors, touched, isValid }) => (
         <Form className="flex flex-wrap gap-2 items-start">
           <div className="flex flex-col">
@@ -68,19 +63,18 @@ const ProductVariantForm: React.FC<{
             <label className="field-label required">Tipo</label>
             <Field as="select" className="field-select" name="type">
               <option value="">-- Tipo --</option>
-              <option value="color">Color</option>
               <option value="tamano">Tamaño</option>
+              <option value="color">Color</option>
               <option value="empaque">Empaque</option>
             </Field>
+            {touched.type && errors.type && <p className="alert-field">{errors.type}</p>}
           </div>
           <div className="flex gap-2 items-end self-end pb-0.5">
             <button type="submit" disabled={isSubmitting || !isValid} className="btn-primary disabled:opacity-50">
               {isSubmitting ? '...' : isEdit ? 'Guardar' : 'Agregar'}
             </button>
             {onCancel && (
-              <button type="button" onClick={onCancel} className="btn-secondary">
-                Cancelar
-              </button>
+              <button type="button" onClick={onCancel} className="btn-secondary">Cancelar</button>
             )}
           </div>
         </Form>
@@ -89,4 +83,4 @@ const ProductVariantForm: React.FC<{
   )
 }
 
-export default ProductVariantForm
+export default SupplyVariantForm
