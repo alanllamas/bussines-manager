@@ -1,6 +1,6 @@
 # ADR-007 — Crear componentes UI reutilizables
 
-**Estado:** Pendiente
+**Estado:** Resuelto
 **Prioridad:** Alta
 **Depende de:** ADR-003 (tipos de props), ADR-006 (`DataTable` usa `usePaginatedData` internamente)
 
