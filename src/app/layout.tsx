@@ -25,7 +25,7 @@ export default function RootLayout({
 
           <nav className="flex justify-between items-center bg-white border-b border-surface-200 px-8 shadow-sm h-20">
             <Link href="/" className="flex items-center shrink-0 py-2">
-              <Image width={180} height={90} src={logo.src} alt="El Itacate logo" />
+              <Image width={162} height={81} src={logo.src} alt="El Itacate logo" />
             </Link>
             <NavLinks />
             <div className="shrink-0 pl-6">
