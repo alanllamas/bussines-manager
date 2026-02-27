@@ -29,6 +29,7 @@ const ClientTicket: React.FC<{ id: number }> = ({ id }) => {
 
   if (authLoading) return null;
 
+  if (!ticket) return null;
   return <TicketFormat ticket={ticket} />
 }
 

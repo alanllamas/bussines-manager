@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from "react"
 import TicketBaseFormat from "./ticketBaseFormat"
 import { useReactToPrint } from "react-to-print"
 import { PrintTicketFormat } from "@/api/hooks/tickets/getTicket"
+import { Ticket } from "@/types"
 
-const TicketPrintFormat: React.FC<any> = ({ticket}) => {
-  // const { signIn } = useAuth();
-  // @ts-expect-error no type found
-  const [printTicket, setPrintTicket] = useState<Ticket>(null)
+interface TicketPrintFormatProps { ticket: Ticket }
+const TicketPrintFormat: React.FC<TicketPrintFormatProps> = ({ticket}) => {
+  const [printTicket, setPrintTicket] = useState<Ticket | null>(null)
   const date = new Date(ticket?.sale_date || '').toLocaleDateString()
 
   const contentRef = useRef<HTMLDivElement>(null);

@@ -3,8 +3,10 @@ import React, { useRef } from "react"
 import { PrintTicketFormat } from "@/api/hooks/tickets/getTicket"
 import TicketBaseFormat from "./ticketBaseFormat"
 import { useReactToPrint } from "react-to-print"
+import { Ticket } from "@/types"
 
-const TicketFormat: React.FC<any> = ({ticket}) => {
+interface TicketFormatProps { ticket: Ticket }
+const TicketFormat: React.FC<TicketFormatProps> = ({ticket}) => {
  
   const date = new Date(ticket?.sale_date || '').toLocaleDateString()
   const contentRef = useRef<HTMLDivElement>(null);

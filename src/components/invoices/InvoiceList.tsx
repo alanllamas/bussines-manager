@@ -15,7 +15,8 @@ import InvoicesForm from "../forms/InvoicesForm"
 import { useSWRConfig } from "swr"
 import { toast } from "sonner"
 
-const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
+interface InvoiceListProps { itemsPerPage?: number }
+const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
   const { mutate } = useSWRConfig()
   const invalidateInvoices = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/invoices') || key[0].includes('/api/tickets'))

@@ -6,7 +6,8 @@ import InvoiceBaseFormat from "./invoiceBaseFormat";
 import { PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
 
 
-const InvoicePrintFormat: React.FC<any> = ({ invoiceData }) => {
+interface InvoicePrintFormatProps { invoiceData: Invoice }
+const InvoicePrintFormat: React.FC<InvoicePrintFormatProps> = ({ invoiceData }) => {
  
   const [invoice, setInvoice] = useState<Invoice>()
 

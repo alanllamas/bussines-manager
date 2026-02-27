@@ -16,7 +16,8 @@ import useGetInvoicesByClient from "@/api/hooks/invoices/getInvoicesByClient"
 import { useSWRConfig } from "swr"
 import { toast } from "sonner"
 
-const InvoiceListByCLient: React.FC<any> = ({itemsPerPage = 10, clientId}) => {
+interface InvoiceListByClientProps { itemsPerPage?: number; clientId: string }
+const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage = 10, clientId}) => {
   const { mutate } = useSWRConfig()
   const invalidateInvoices = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/invoices') || key[0].includes('/api/tickets'))
