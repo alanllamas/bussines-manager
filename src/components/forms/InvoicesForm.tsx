@@ -121,7 +121,7 @@ const InvoicesForm: React.FC<any> = ({
 
                     <DialogTitle className="font-bold flex justify-between items-center">
                       <img className="w-36" src={logo.src} alt="" />
-                      {values.invoice_id && <span className="text-lg text-surface-600">Folio {String(values.invoice_id).padStart(5, '0')}</span>}
+                      {values.invoice_number && <span className="text-lg text-surface-600">Folio {String(values.invoice_number).padStart(5, '0')}</span>}
                     </DialogTitle>
                     {/* <Field className="border border-surface-300 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} /> */}
                     {/* <Field className="border border-surface-300 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
@@ -487,7 +487,7 @@ const InvoicesForm: React.FC<any> = ({
                           <div className="flex">
 
                             <div className="flex flex-col w-1/3 px-2">
-                              <label className="field-label" htmlFor="invoice_id">Folio de factura</label>
+                              <label className="field-label" htmlFor="invoice_id">ID de factura</label>
                               <Field className="field-input" type="text" name="invoice_id" value={values?.invoice_id} />
                             </div>
                             <div className="flex flex-col w-1/3 px-2">

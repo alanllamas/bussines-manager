@@ -147,6 +147,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         initial_date: editInvoice.initial_date,
         invoice_send_date: editInvoice.invoice_send_date,
         payment_date: editInvoice.payment_date,
+        invoice_number: editInvoice.invoice_number,
         invoice_id: editInvoice.invoice_id,
         invoice_status: editInvoice.invoice_status,
         payment_reference: editInvoice.payment_reference,
@@ -234,7 +235,8 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
       initial_date: null,
       invoice_send_date: null,
       payment_date: null,
-      invoice_id: String((invoice_number !== undefined && !isNaN(invoice_number) ? invoice_number : 0) + 1),
+      invoice_number: (invoice_number !== undefined && !isNaN(invoice_number) ? invoice_number : 0) + 1,
+      invoice_id: '',
       invoice_status: "por-pagar",
       payment_reference: "",
       tickets: [],
@@ -287,7 +289,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
           currentItems?.map((invoice: Invoice, index: number) => {
           // console.log('invoice: ', invoice);
           return <tr key={`invoice-${index}`}>
-            <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_id ?? '').padStart(5, '0')}</a></td>
+            <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_number ?? '').padStart(5, '0')}</a></td>
             <td>{invoice.client?.name}</td>
             <td>{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
             <td>{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>

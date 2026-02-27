@@ -66,7 +66,7 @@ const InvoiceBaseFormat: React.FC<{ invoiceData: Invoice, initial_date: any, end
           </div>
           <div className="flex gap-4 border border-surface-200 px-4 justify-between">
             <p>Folio: </p>
-            <p>{String(invoice?.invoice_id ?? '').padStart(5, '0')}</p>
+            <p>{String(invoice?.invoice_number ?? '').padStart(5, '0')}</p>
           </div>
           {/* <div className="flex gap-4 border border-surface-200 px-4 justify-between ">
             <p>Status: </p>

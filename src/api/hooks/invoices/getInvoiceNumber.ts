@@ -24,9 +24,9 @@ export default function useGetInvoiceNumber() {
   );
 
   // @ts-expect-error data is array at runtime
-  const invoice_number: number | undefined = data?.data[0]?.invoice_id !== undefined
+  const invoice_number: number | undefined = data?.data[0]?.invoice_number !== undefined
     // @ts-expect-error data is array at runtime
-    ? Number(data?.data[0]?.invoice_id)
+    ? Number(data?.data[0]?.invoice_number)
     : undefined;
 
   return {
