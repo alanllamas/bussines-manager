@@ -7,6 +7,7 @@ import { auth } from '@/lib/firebase';
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
+  authError: Error | null;
   signIn: () => Promise<unknown>;
   logOut: () => Promise<void>;
 }
@@ -16,10 +17,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<Error | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser ?? null);
+      setIsLoading(false);
+    }, (error) => {
+      setAuthError(error);
       setIsLoading(false);
     });
     return () => unsubscribe();
@@ -35,7 +40,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, logOut }}>
+    <AuthContext.Provider value={{ user, isLoading, authError, signIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );
