@@ -14,7 +14,7 @@ export type Meta = {
 const TICKET_NUMBER_URL = `/api/tickets?sort[0]=createdAt:desc&pagination[limit]=1`;
 
 async function GetTicketNumber([url]: [string]) {
-  return await fetcher<{data: Ticket, meta: Meta}>(url, { method: 'GET' });
+  return await fetcher<{data: Ticket[], meta: Meta}>(url, { method: 'GET' });
 }
 
 export default function useGetTicketNumber() {
@@ -23,8 +23,7 @@ export default function useGetTicketNumber() {
     GetTicketNumber,
   );
 
-  // @ts-expect-error data is array at runtime
-  const ticket_number = data?.data[0].ticket_number;
+  const ticket_number = data?.data[0]?.ticket_number;
 
   return {
     ticket_number,
