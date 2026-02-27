@@ -97,7 +97,7 @@ const InvoicesForm: React.FC<any> = ({
   }, [ticketsData])
 
   return <>
-    <div className="flex justify-between">
+    <div className="flex justify-end">
       {/* <h2>{client?.name}</h2> */}
       <button className="btn-primary" onClick={() => sendCreate()}>
         <span className="material-symbols-outlined text-[16px]">add</span>
