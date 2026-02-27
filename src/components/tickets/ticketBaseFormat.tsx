@@ -12,7 +12,7 @@ const TicketBaseFormat: React.FC<any> = ({ticket, date}) => {
         <div className="font-bold flex flex-col mt-6 gap-4 w-1/4">
           <span className="flex justify-around">
             <span>Folio:</span>
-            <span>{ticket?.ticket_number.toString().padStart(6, "0")}</span>
+            <span>{String(ticket?.ticket_number ?? '').padStart(5, '0')}</span>
           </span>
           <span className="flex justify-between">
             <span>Fecha:</span>

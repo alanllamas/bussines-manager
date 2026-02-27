@@ -6,9 +6,11 @@ import useCreateProduct, { CreateProductReq } from "@/api/hooks/products/useCrea
 import useEditProduct from "@/api/hooks/products/useEditProduct"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useSWRConfig } from "swr"
 
 const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ product, onSuccess }) => {
   const router = useRouter()
+  const { mutate } = useSWRConfig()
   const isEdit = !!product
 
   const [newProduct, setNewProduct] = useState<CreateProductReq>()
@@ -48,6 +50,7 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
       toast.error('Error al guardar el producto')
     } else if (!editError && !editLoading && edited) {
       toast.success('Producto guardado')
+      mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/products'))
       if (onSuccess) onSuccess()
     }
   }, [editLoading, edited, editError])

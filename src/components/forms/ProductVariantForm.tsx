@@ -4,6 +4,7 @@ import { Field, Form, Formik } from "formik"
 import { ProductVariant } from "@/api/hooks/getProducts"
 import useCreateProductVariant, { CreateVariantReq } from "@/api/hooks/productVariants/useCreateProductVariant"
 import useEditProductVariant from "@/api/hooks/productVariants/useEditProductVariant"
+import { useSWRConfig } from "swr"
 
 const ProductVariantForm: React.FC<{
   variant?: ProductVariant;
@@ -11,6 +12,8 @@ const ProductVariantForm: React.FC<{
   onCancel?: () => void;
 }> = ({ variant, onSuccess, onCancel }) => {
   const isEdit = !!variant
+  const { mutate } = useSWRConfig()
+  const invalidateVariants = () => mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/product-variants'))
 
   const [newVariant, setNewVariant] = useState<CreateVariantReq>()
   const [editPayload, setEditPayload] = useState<{ data: CreateVariantReq; documentId: string }>()
@@ -33,12 +36,14 @@ const ProductVariantForm: React.FC<{
 
   useEffect(() => {
     if (!createError && !createLoading && created) {
+      invalidateVariants()
       if (onSuccess) onSuccess()
     }
   }, [createLoading, created, createError])
 
   useEffect(() => {
     if (!editError && !editLoading && edited) {
+      invalidateVariants()
       if (onSuccess) onSuccess()
     }
   }, [editLoading, edited, editError])

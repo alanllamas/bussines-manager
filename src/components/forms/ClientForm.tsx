@@ -8,6 +8,7 @@ import useCreateClient from "@/api/hooks/clients/useCreateClient"
 import useEditClient from "@/api/hooks/clients/useEditClient"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useSWRConfig } from "swr"
 
 export type EVariant = {
   name: string;
@@ -142,6 +143,7 @@ const clientSchema = Yup.object({
 
 const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ client, onSuccess }) => {
   const router = useRouter()
+  const { mutate } = useSWRConfig()
   const isEdit = !!client
 
   const [newClient, setNewClient] = useState<createClientReq>()
@@ -202,6 +204,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
       toast.error('Error al guardar el cliente')
     } else if (!editError && !editLoading && editedClient) {
       toast.success('Cliente guardado')
+      mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/clients'))
       if (onSuccess) onSuccess()
     }
   }, [editLoading, editedClient, editError])

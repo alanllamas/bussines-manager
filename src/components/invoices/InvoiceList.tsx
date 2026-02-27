@@ -6,6 +6,7 @@ import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient"
 import useGetClients from "@/api/hooks/clients/getClients"
 import useCreateInvoice from "@/api/hooks/invoices/useCreateInvoice"
 import useEditInvoice from "@/api/hooks/invoices/useEditInvoice"
+import useGetInvoiceNumber from "@/api/hooks/invoices/getInvoiceNumber"
 import { createInvoiceReq, generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
 import { Client } from "@/api/hooks/clients/getClient"
 import useGetInvoices, { Invoice } from "@/api/hooks/invoices/getInvoices"
@@ -33,6 +34,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   const [initialFormValues, setInitialFormValues] = useState<InvoiceInitialValues>()
   const [client, setClient] = useState<Client>()
   const [printInvoice, setPrintInvoice] = useState<Invoice>()
+  const [printKey, setPrintKey] = useState(0)
 
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
@@ -61,13 +63,14 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
     error: invoicesError,
     isLoading: invoicesIsLoading,
   } = useGetInvoices()
+  const { invoice_number } = useGetInvoiceNumber()
 
   useEffect(() => {
     if (!invoicesError && !invoicesIsLoading && invoicesData?.data) {
       setInvoices(invoicesData.data)
     }
-  }, [invoicesIsLoading, invoicesError])
-   
+  }, [invoicesIsLoading, invoicesError, invoicesData])
+
   useEffect(() => {
     if ((invoicesData.data)) {
       // console.log('invoicesData.data: ', invoicesData.data);
@@ -113,6 +116,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
       toast.success('Corte actualizado')
       invalidateInvoices()
       setNewEditInvoice(undefined)
+      sendClose()
       
 
       // setTicket(InvoiceData.data)
@@ -211,9 +215,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   }, [editInvoice])
 
   useEffect(() => {
-    // console.log('initialFormValues: ', initialFormValues);
-    setIsOpen(true)
-    
+    if (initialFormValues) setIsOpen(true)
   }, [initialFormValues])
 
   const sendCreate = () => {
@@ -232,7 +234,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
       initial_date: null,
       invoice_send_date: null,
       payment_date: null,
-      invoice_id: "",
+      invoice_id: String((invoice_number !== undefined && !isNaN(invoice_number) ? invoice_number : 0) + 1),
       invoice_status: "por-pagar",
       payment_reference: "",
       tickets: [],
@@ -274,6 +276,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   // // Invoice form functions
 
   const sendPrint = (invoice:Invoice) => {
+    setPrintKey(k => k + 1)
     setPrintInvoice(invoice)
   }
 
@@ -284,7 +287,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
           currentItems?.map((invoice: Invoice, index: number) => {
           // console.log('invoice: ', invoice);
           return <tr key={`invoice-${index}`}>
-            <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{invoice.id}</a></td>
+            <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_id ?? '').padStart(5, '0')}</a></td>
             <td>{invoice.client?.name}</td>
             <td>{new Date(invoice.initial_date || 0).toLocaleDateString()}</td>
             <td>{new Date(invoice.ending_date || 0).toLocaleDateString()}</td>
@@ -382,7 +385,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
       />
     }
     <PaginatedItems itemsPerPage={10}/>
-    { printInvoice && <InvoicePrintFormat invoiceData={printInvoice} />}
+    { printInvoice && <InvoicePrintFormat key={printKey} invoiceData={printInvoice} />}
   </> 
 } 
 

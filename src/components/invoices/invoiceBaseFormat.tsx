@@ -64,6 +64,10 @@ const InvoiceBaseFormat: React.FC<{ invoiceData: Invoice, initial_date: any, end
             <p>Fecha de envio: </p>
             <p>{send_date}</p>
           </div>
+          <div className="flex gap-4 border border-surface-200 px-4 justify-between">
+            <p>Folio: </p>
+            <p>{String(invoice?.invoice_id ?? '').padStart(5, '0')}</p>
+          </div>
           {/* <div className="flex gap-4 border border-surface-200 px-4 justify-between ">
             <p>Status: </p>
             <p>{invoice?.invoice_status.replace('-', ' ')}</p>
@@ -164,7 +168,7 @@ const InvoiceBaseFormat: React.FC<{ invoiceData: Invoice, initial_date: any, end
             {
               invoice?.tickets?.map((ticket: Ticket, i) => {
                 return   <tr key={`ticket-${i}`} className="border-b border-surface-200">
-                    <td className="w-1/6 text-left pl-4"># { ticket.ticket_number }</td>
+                    <td className="w-1/6 text-left pl-4">{ String(ticket.ticket_number ?? '').padStart(5, '0') }</td>
                     <td className="text-left">{ new Date(ticket.sale_date).toLocaleDateString('es-mx')}</td>
                     <td>
                       <div className="flex justify-between px-2">

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react"
+import React from "react"
 import { TabPanel } from "@headlessui/react"
 import { Product } from "@/api/hooks/getProducts"
 import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
@@ -10,7 +10,6 @@ import { toast } from "sonner"
 const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
   const { mutate } = useSWRConfig()
   const { variants, isLoading } = useGetProductVariants()
-  const [selectedId, setSelectedId] = useState('')
   const [saving, setSaving] = useState(false)
 
   const allVariants = variants?.data ?? []
@@ -37,9 +36,8 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
     }
   }
 
-  const handleAdd = () => {
-    if (!selectedId) return
-    const toAdd = allVariants.find(v => String(v.id) === selectedId)
+  const handleAdd = (id: string) => {
+    const toAdd = allVariants.find(v => String(v.id) === id)
     if (!toAdd) return
     updateVariants([...current.map(v => v.id), toAdd.id])
   }
@@ -75,27 +73,19 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
 
       {/* Add from global list */}
       {!isLoading && available.length > 0 && (
-        <div className="flex gap-2 items-center">
-          <select
-            value={selectedId}
-            onChange={e => setSelectedId(e.target.value)}
-            className="border border-neutral-400 rounded-sm px-2 py-1 text-sm bg-white"
-          >
-            <option value="">-- Seleccionar variante --</option>
-            {available.map(v => (
-              <option key={v.id} value={String(v.id)}>
-                {v.name}{v.type ? ` (${v.type})` : ''}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleAdd}
-            disabled={!selectedId || saving}
-            className="px-3 py-1 bg-neutral-300 hover:bg-neutral-400 text-sm disabled:opacity-50"
-          >
-            {saving ? '...' : 'Agregar'}
-          </button>
-        </div>
+        <select
+          value=""
+          onChange={e => { if (e.target.value) handleAdd(e.target.value) }}
+          disabled={saving}
+          className="border border-neutral-400 rounded-sm px-2 py-1 text-sm bg-white disabled:opacity-50"
+        >
+          <option value="">-- Agregar variante --</option>
+          {available.map(v => (
+            <option key={v.id} value={String(v.id)}>
+              {v.name}{v.type ? ` (${v.type})` : ''}
+            </option>
+          ))}
+        </select>
       )}
     </TabPanel>
   )

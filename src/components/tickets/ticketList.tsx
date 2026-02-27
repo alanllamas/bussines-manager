@@ -197,7 +197,7 @@ const TicketList: React.FC<any> = ({ticketData, itemsPerPage, clientId, hideClie
           currentItems?.map((ticket: Ticket, index: number) => {
           // console.log('ticket: ', ticket);
           return <tr key={`ticket-${index}`}>
-            <td><a className="text-primary-600 hover:underline font-medium" href={`/tickets/${ticket.documentId}`}>{ticket.ticket_number}</a></td>
+            <td><a className="text-primary-600 hover:underline font-medium" href={`/tickets/${ticket.documentId}`}>{String(ticket.ticket_number ?? '').padStart(5, '0')}</a></td>
             {!hideClient && <td>{ticket.client?.name}</td>}
             <td>{new Date(ticket.sale_date).toLocaleDateString()}</td>
             <td className="font-medium">$ {ticket.total}</td>

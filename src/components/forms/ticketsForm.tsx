@@ -251,7 +251,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                   <div className="flex justify-between gap-2">
                     <img className="w-52" src={logo.src} alt="" />
 
-                    <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {values.ticket_number}</span><span>Fecha: {new Date().toLocaleDateString()}</span></DialogTitle>
+                    <DialogTitle className="font-bold flex flex-col mt-6"><span>Folio: {String(values.ticket_number ?? '').padStart(5, '0')}</span><span>Fecha: {new Date().toLocaleDateString()}</span></DialogTitle>
                   </div>
                   {/* form for tickets */}
                     <Form>
@@ -293,7 +293,10 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
 
                                           <DisclosureButton className="py-2 px-2 w-full flex bg-surface-100 justify-between items-center">
                                             <span className="material-symbols-outlined text-[16px] text-surface-400">{ open ? 'expand_less' : 'expand_more' }</span>
-                                            <p className="mx-1">{values.products[index].name ? values.products[index].name : ''}</p>
+                                            <p className="mx-1 flex items-center gap-1">
+                                              {values.products[index].name ? values.products[index].name : 'Nuevo producto'}
+                                              {(touched as any).products?.[index] && (errors as any).products?.[index] && <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />}
+                                            </p>
                                             <p className="mx-1">{
                                               (() => {
                                                 const docIds = values.products[index].product_variants
@@ -397,6 +400,8 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                           Error al guardar. Por favor intenta de nuevo.
                         </div>
                       )}
+                      {touched.client && errors.client && <p className="alert-field mt-2">{errors.client as string}</p>}
+                      {(touched as any).products && typeof errors.products === 'string' && <p className="alert-field">{errors.products}</p>}
                       <div className="flex gap-4 justify-end mt-6">
                         <button className="btn-danger" onClick={() => sendClose()}>Cancelar</button>
                         <button className="btn-primary disabled:opacity-50" type="submit" disabled={!isValid || !dirty}>{ editTicket ? 'Editar' : 'Crear'}</button>

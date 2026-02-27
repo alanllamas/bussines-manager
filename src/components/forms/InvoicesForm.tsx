@@ -105,6 +105,7 @@ const InvoicesForm: React.FC<any> = ({
     </div>
     {
       initialFormValues && <Formik
+        enableReinitialize
         initialValues={initialFormValues || null}
         validationSchema={invoiceSchema}
         onSubmit={async (values: InvoiceInitialValues) => values ? handleSubmit(values): null}
@@ -118,9 +119,9 @@ const InvoicesForm: React.FC<any> = ({
                   <div className="flex-1 overflow-y-auto p-8 space-y-2">
 
 
-                    <DialogTitle className="font-bold flex flex-col">
+                    <DialogTitle className="font-bold flex justify-between items-center">
                       <img className="w-36" src={logo.src} alt="" />
-
+                      {values.invoice_id && <span className="text-lg text-surface-600">Folio {String(values.invoice_id).padStart(5, '0')}</span>}
                     </DialogTitle>
                     {/* <Field className="border border-surface-300 rounded-sm px-2 hidden" id="ticket_number" name="ticket_number" type="number" disabled value={values.ticket_number} /> */}
                     {/* <Field className="border border-surface-300 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
@@ -264,9 +265,12 @@ const InvoicesForm: React.FC<any> = ({
                         />
                       </div>
                     </div>
-                    <Disclosure as="div" open={openPanel === 'notas'}>
+                    <Disclosure as="div" defaultOpen={openPanel === 'notas'}>
                       <DisclosureButton onClick={() => togglePanel('notas')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
-                        Notas
+                        <span className="flex items-center gap-2">
+                          Notas
+                          {(touched as any).tickets && errors.tickets && <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />}
+                        </span>
                         <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'notas' ? 'expand_less' : 'expand_more'}</span>
                       </DisclosureButton>
                       <DisclosurePanel>
@@ -308,7 +312,7 @@ const InvoicesForm: React.FC<any> = ({
                                                   !!values.tickets[index] && <div className="flex gap-2">
 
                                                     <span>
-                                                      Nota:  {tickets.find((value, i) => { return value.id === Number(values.tickets[index])})?.ticket_number }
+                                                      Nota:  {String(tickets.find((value, i) => { return value.id === Number(values.tickets[index])})?.ticket_number ?? '').padStart(5, '0')}
                                                     </span>
                                                     <span>
                                                       Fecha:  {new Date(tickets.find((value, i) => { return value.id === Number(values.tickets[index])})?.sale_date || '').toLocaleDateString('es-mx', {dateStyle: 'short'})}
@@ -379,7 +383,7 @@ const InvoicesForm: React.FC<any> = ({
                         </FieldArray>
                       </DisclosurePanel>
                     </Disclosure>
-                    <Disclosure as="div" open={openPanel === 'comentarios'}>
+                    <Disclosure as="div" defaultOpen={openPanel === 'comentarios'}>
                       <DisclosureButton onClick={() => togglePanel('comentarios')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         Comentarios
                         <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'comentarios' ? 'expand_less' : 'expand_more'}</span>
@@ -399,7 +403,7 @@ const InvoicesForm: React.FC<any> = ({
                         */}
                       </DisclosurePanel>
                     </Disclosure>
-                    <Disclosure as="div" open={openPanel === 'resumen'}>
+                    <Disclosure as="div" defaultOpen={openPanel === 'resumen'}>
                       <DisclosureButton onClick={() => togglePanel('resumen')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         Resumen
                         <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'resumen' ? 'expand_less' : 'expand_more'}</span>
@@ -467,7 +471,7 @@ const InvoicesForm: React.FC<any> = ({
                         </div>
                       </DisclosurePanel>
                     </Disclosure>
-                    <Disclosure as="div" open={openPanel === 'fechas'}>
+                    <Disclosure as="div" defaultOpen={openPanel === 'fechas'}>
                       <DisclosureButton onClick={() => togglePanel('fechas')} className="py-1 px-2 min-h-8 w-full flex bg-surface-100 justify-between items-center">
                         Fechas y referencias
                         <span className="material-symbols-outlined text-[16px] text-surface-400">{openPanel === 'fechas' ? 'expand_less' : 'expand_more'}</span>
