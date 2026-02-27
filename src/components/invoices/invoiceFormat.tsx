@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react"
-import useGetInvoice, { generateResume, PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
+import useGetInvoice, { PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
 import { Invoice } from "@/api/hooks/invoices/getInvoices";
 import { useReactToPrint } from "react-to-print";
 import InvoiceBaseFormat from "./invoiceBaseFormat";
@@ -18,11 +18,6 @@ const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
   useEffect(() => {
     if (invoiceData &&!invoiceError && !invoiceIsLoading) {
       const data = invoiceData.data
-      console.log(data);
-      const { client, tickets } = data
-      
-      const { results, totals } = generateResume(tickets.map(ticket => `${ticket.id}`), tickets, client)
-      console.log(results);
       setInvoice(data)
       
     }

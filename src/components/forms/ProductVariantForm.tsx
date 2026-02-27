@@ -60,6 +60,7 @@ const ProductVariantForm: React.FC<{
       {({ errors, touched, isValid }) => (
         <Form className="flex gap-2 items-start">
           <div className="flex flex-col">
+            <label className="field-label required">Nombre</label>
             <Field className="field-input" name="name" type="text" placeholder="Nombre" />
             {touched.name && errors.name && <p className="alert-field">{errors.name}</p>}
           </div>
