@@ -21,7 +21,7 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 5 | [ADR-005](adr/ADR-005-service-layer.md) | Capa de servicios para cálculos | Alta | ✅ Completado | ADR-003 |
 | 6 | [ADR-006](adr/ADR-006-paginated-data.md) | Hook `usePaginatedData` | Alta | ✅ Completado | ADR-003 |
 | 7 | [ADR-007](adr/ADR-007-ui-components.md) | Componentes UI reutilizables | Alta | ✅ Completado | ADR-003, ADR-006 |
-| 8 | [ADR-008](adr/ADR-008-invoice-list-refactor.md) | Refactorizar `InvoiceList` | Alta | Pendiente | ADR-003, ADR-005, ADR-006, ADR-007 |
+| 8 | [ADR-008](adr/ADR-008-invoice-list-refactor.md) | Refactorizar `InvoiceList` | Alta | ❌ Cancelado | ADR-003, ADR-005, ADR-006, ADR-007 |
 | 9 | [ADR-009](adr/ADR-009-firebase-config.md) | Validación de configuración Firebase | Media | Pendiente | — |
 | 10 | [ADR-010](adr/ADR-010-logging.md) | Logging centralizado | Media | Pendiente | — |
 | 11 | [ADR-011](adr/ADR-011-memoization.md) | Memoización en listas | Media | Pendiente | ADR-008 |

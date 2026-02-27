@@ -1,6 +1,6 @@
 # ADR-008 — Refactorizar InvoiceList separando responsabilidades
 
-**Estado:** Pendiente
+**Estado:** Cancelado
 **Prioridad:** Alta
 **Depende de:** ADR-003 (tipos), ADR-005 (servicios), ADR-006 (paginación), ADR-007 (componentes UI)
 
