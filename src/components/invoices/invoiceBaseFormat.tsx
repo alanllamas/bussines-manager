@@ -11,8 +11,8 @@ const InvoiceBaseFormat: React.FC<{ invoiceData: Invoice, initial_date: any, end
   const { client, tickets } = invoiceData
   const { results: resume, totals } = generateResume(tickets.map(ticket => `${ticket.id}`), tickets, client)
 
-  const copyParam = (param: string) => {
-    navigator.clipboard.writeText(param)
+  const copyParam = (param: string | number | boolean | undefined) => {
+    navigator.clipboard.writeText(String(param ?? ''))
   }
 
   return <section>

@@ -30,7 +30,7 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
   const [create, setCreate] = useState(false)
   const [editInvoice, setEditInvoice] = useState<Invoice>()
   const [newInvoice, setNewInvoice] = useState<createInvoiceReq>()
-  const [newEditInvoice, setNewEditInvoice] = useState<{invoice: Invoice, documentId: string}>()
+  const [newEditInvoice, setNewEditInvoice] = useState<{invoice: createInvoiceReq, documentId: string}>()
   const [initialFormValues, setInitialFormValues] = useState<InvoiceInitialValues>()
   const [client, setClient] = useState<Client>()
   const [printInvoice, setPrintInvoice] = useState<Invoice>()
@@ -140,8 +140,8 @@ const InvoiceList: React.FC<any> = ({itemsPerPage = 10}) => {
         shipping: editInvoice?.shipping_price || 0,
         total: editInvoice?.total || 0,
         taxes: editInvoice.taxes,
-        comments: editInvoice.comments,
-        inner_comments: editInvoice.inner_comments,
+        comments: editInvoice.comments || '',
+        inner_comments: editInvoice.inner_comments || '',
         ending_date: editInvoice.ending_date,
         expected_payment_date: editInvoice.expected_payment_date,
         initial_date: editInvoice.initial_date,

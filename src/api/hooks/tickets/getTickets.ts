@@ -1,40 +1,8 @@
 'use-client'
 import { fetcher } from '../../fetcher';
 import useSWR from 'swr';
-import { Product } from '../getProducts';
-import { Invoice } from '../invoices/getInvoices';
-import { Client } from '../clients/getClient';
-export type ProductVariant = {
-  name: string;
-  id: number;
-  documentId: string;
-  type: string;
-}
-
-export type TicketProduct = {
-  id?: number;
-  name?: string;
-  price?: number;
-  product_variants?: ProductVariant[]
-  product_total?: number
-  quantity?: number
-  measurement_unit?: string;
-  product?: Product
-
-}
-export type Ticket = {
-  id: number;
-  name: string;
-  ticket_number: number
-  client: Client
-  sale_date: Date
-  total: number
-  documentId: string
-  products: TicketProduct[]
-  sub_total:number
-  shipping_price: number
-  invoice: Invoice
-}
+export type { ProductVariant, TicketProduct, Ticket } from '@/types'
+import type { Ticket } from '@/types'
 export type Meta = {
   pagination: {
     total: number;
