@@ -31,4 +31,4 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 15 | [ADR-015](adr/ADR-015-supabase-migration.md) | Migrar backend de Strapi a Supabase | Alta (arquitectural) | Pendiente aprobación | — |
 | 16 | [ADR-016](adr/ADR-016-cobranza-module.md) | Módulo de Cobranza (Cuentas por Cobrar) | Alta | Pendiente | ADR-003 |
 | 17 | [ADR-017](adr/ADR-017-por-pagar-module.md) | Módulo de Por Pagar — Alcance 1: pago único | Alta | Pendiente | ADR-003 |
-| 18 | ADR-018 | Módulo de Por Pagar — Alcance 2: pagos parciales | Media | Pendiente | ADR-017 |
+| 18 | [ADR-018](adr/ADR-018-por-pagar-parcial.md) | Módulo de Por Pagar — Alcance 2: pagos parciales | Media | Pendiente | ADR-017 |
