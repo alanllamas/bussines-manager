@@ -76,8 +76,6 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if ((invoicesData.data)) {
-      // console.log('invoicesData.data: ', invoicesData.data);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
       //   const dateB: number = new Date(b.sale_date).valueOf()
@@ -128,10 +126,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
 
   useEffect(() => {
     if (editInvoice) {
-      // console.log('editInvoice: ', editInvoice);
-      // console.log('editInvoice.tickets: ', editInvoice.tickets);
       const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
-      // console.log('editInvoice?.tickets.map(ticket => `${ticket.id}`): ', editInvoice?.tickets.map(ticket => `${ticket.id}`));
       setTickets(editInvoice.tickets)
       const { results, totals } = generateResume(editTickets, editInvoice.tickets, client)
       setResume(results)
@@ -262,7 +257,6 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
 
   const handleSubmit = async (values: InvoiceInitialValues) => {
     setIsOpen(false)
-    // console.log(values);
     const data = {
       ...values,
       client: [values.client],
@@ -290,7 +284,6 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
       <>
         {currentItems &&
           currentItems?.map((invoice: Invoice, index: number) => {
-          // console.log('invoice: ', invoice);
           return <tr key={`invoice-${index}`}>
             <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_number ?? '').padStart(5, '0')}</a></td>
             <td>{invoice.client?.name}</td>

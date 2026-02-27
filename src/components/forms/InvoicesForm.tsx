@@ -71,8 +71,6 @@ const InvoicesForm: React.FC<any> = ({
   }, [clientData])
   useEffect(() => {
     if (client) {
-      // console.log('client: ', client);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
       //   const dateB: number = new Date(b.sale_date).valueOf()
@@ -84,8 +82,6 @@ const InvoicesForm: React.FC<any> = ({
   }, [client])
   useEffect(() => {
     if (ticketsData) {
-      // console.log('ticketsData: ', ticketsData);
-      // console.log('meta.pagination.total: ', invoicesData.meta.pagination.total);
       // const data = invoicesData.data.sort(function(a: {sale_date: Date},b: {sale_date: Date}){
       //   const dateA: number = new Date(a.sale_date).valueOf();
       //   const dateB: number = new Date(b.sale_date).valueOf()
@@ -130,11 +126,8 @@ const InvoicesForm: React.FC<any> = ({
 
                       <Field required as="select" disabled={blockClient} className="field-select" id="client" name="client" value={values.client}
                       onChange={(e: any) => {
-                        // console.log(e.target.value);
-                        // console.log(clients);
                         
                         const cli = clients.filter((client) => client.id === Number(e.target.value))[0]
-                        // console.log('cli: ', cli);
                         
                         setFieldValue("client", e.target.value)
                         setclient(cli)
@@ -156,7 +149,6 @@ const InvoicesForm: React.FC<any> = ({
                           className="field-input"
                           disabled={!client}
                           onChange={(e: any) => {
-                            // console.log(e);
                             const initial_date = new Date(new Date(e).setHours(0, 0 , 0, 0))
                             setFieldValue("initial_date", initial_date)
                             // setFieldValue("ending_date", values.ending_date)
@@ -171,16 +163,11 @@ const InvoicesForm: React.FC<any> = ({
 
                                 const filteredTickets = tickets.filter(ticket => {
                                   const sale_date = new Date(ticket.sale_date)
-                                  // console.log('sale_date: ', sale_date);
-                                  // console.log('initial_date: ', initial_date);
-                                  // console.log('ending_date: ', ending_date);
-                                  // console.log();
                                   return sale_date > initial_date && sale_date < ending_date
                                 }).map(ticket => `${ticket.id}`)
                                 // const filteredTickets = tickets.filter(ticket => {
                                 //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
                                 // }).map(ticket => `${ticket.id}`)
-                                // console.log('filteredTickets: ', filteredTickets);
                                 setFieldValue('tickets', filteredTickets)
                                 setTimeout(() => {
                                   const { results, totals } = generateResume(filteredTickets, tickets, client)
@@ -207,10 +194,7 @@ const InvoicesForm: React.FC<any> = ({
                           className="field-input"
                           disabled={!client}
                           onChange={(e: any) => {
-                            // console.log(e);
-                            // console.log("ending date", e)
 
-                            // console.log("values.initial_date", values.initial_date)
                             const ending_date = new Date(new Date(e).setHours(23, 59 , 59, 999))
                             setFieldValue("ending_date", ending_date)
                             if (values.initial_date) {
@@ -222,10 +206,6 @@ const InvoicesForm: React.FC<any> = ({
 
                                 const filteredTickets = tickets.reduce((acc: string[], curr: Ticket) => {
                                   const sale_date = new Date(curr.sale_date)
-                                  // console.log('sale_date: ', sale_date);
-                                  // console.log('initial_date: ', initial_date);
-                                  // console.log('ending_date: ', ending_date);
-                                  // console.log();
                                   if ((sale_date > initial_date && sale_date < ending_date) && !curr.invoice) {
                                     acc = [...acc, `${curr.id}`]
                                   } 
@@ -244,7 +224,6 @@ const InvoicesForm: React.FC<any> = ({
                                 // const filteredTickets = tickets.filter(ticket => {
                                 //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
                                 // }).map(ticket => `${ticket.id}`)
-                                // console.log('filteredTickets: ', filteredTickets);
                                 setFieldValue('tickets', filteredTickets)
                                 setTimeout(() => {
                                   const { results, totals } = generateResume(filteredTickets, tickets, client)
@@ -509,11 +488,8 @@ const InvoicesForm: React.FC<any> = ({
                               <DatePicker
                                 className="field-input"
                                 onChange={(e: any) => {
-                                  // console.log(e);
                                   
                                   const invoice_send_date = new Date(e)
-                                  // console.log('client: ', client);
-                                  // console.log('client?.taxing_info: ', client?.taxing_info);
                                   
                                   if (client?.taxing_info) {
                                     // payment_period

@@ -247,7 +247,6 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
 
   const handleSubmit = async (values: InvoiceInitialValues) => {
     setIsOpen(false)
-    // console.log(values);
     const data = {
       ...values,
       client: [values.client],
@@ -275,7 +274,6 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
       <>
         {currentItems &&
           currentItems?.map((invoice: Invoice, index: number) => {
-          // console.log('invoice: ', invoice);
           return <tr key={`invoice-${index}`}>
             <td><a className="text-primary-600 hover:underline font-medium" href={`/invoices/${invoice.documentId}`}>{String(invoice.invoice_number ?? '').padStart(5, '0')}</a></td>
             <td>{invoice.client?.name}</td>

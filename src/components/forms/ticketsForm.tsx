@@ -92,8 +92,6 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
   useEffect(() => {
       if (!productsError && !productsIsLoading) {
         
-        // console.log('productsData.data: ', productsData.data);
-        // console.log('meta.pagination.total: ', productsData.meta.pagination.total);
   
         setProducts(productsData?.data)
       }
@@ -101,8 +99,6 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
       
-      // console.log('clientsData.data: ', clientsData.data);
-      // console.log('meta.pagination.total: ', clientsData.meta.pagination.total);
 
       setClients(clientsData?.data ?? [])
     }
@@ -331,7 +327,6 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                                   <Field as="select" className="field-select" value={values.products[index].product} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                     // onProductChange(e.target.value)
                                                       const product = products?.filter((product: Product) => {
-                                                        // console.log(product);
 
                                                         return Number(e.target.value) === product.id
                                                       })[0] || null

@@ -21,14 +21,12 @@ const InvoicePrintFormat: React.FC<InvoicePrintFormatProps> = ({ invoiceData }) 
 
   useEffect(() => {
     if (invoiceData) {
-      // console.log('invoiceData: ', invoiceData);
       setInvoice(invoiceData)
     }
   },[invoiceData])
 
 
   useEffect(() => {
-    // console.log(interval);
     if (invoice) {
       setTimeout(() => {
         PrintInvoice()

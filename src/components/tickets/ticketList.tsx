@@ -84,7 +84,6 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     }
   }, [EditTicketData, EditTicketError, EditTicketIsLoading])
   useEffect(() => {
-    // console.log('editTicket: ', editTicket);
     if (editTicket) {
       setNewTicket(undefined)
       setNewEditTicket(undefined)
@@ -111,7 +110,6 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     
   }, [editTicket])
   useEffect(() => {
-    // console.log('initialFormValues: ', initialFormValues);
     setIsOpen(true)
     
   }, [initialFormValues])
@@ -180,7 +178,6 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     }, 1000);
   }
   useEffect(() => {
-    // console.log(interval);
     if (ticketData) {
       setTickets([...ticketData].sort((a, b) => b.id - a.id))
     }
@@ -191,7 +188,6 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
       <>
         {currentItems &&
           currentItems?.map((ticket: Ticket, index: number) => {
-          // console.log('ticket: ', ticket);
           return <tr key={`ticket-${index}`}>
             <td><a className="text-primary-600 hover:underline font-medium" href={`/tickets/${ticket.documentId}`}>{String(ticket.ticket_number ?? '').padStart(5, '0')}</a></td>
             {!hideClient && <td>{ticket.client?.name}</td>}

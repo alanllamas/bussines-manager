@@ -14,16 +14,13 @@ const TicketPrintFormat: React.FC<TicketPrintFormatProps> = ({ticket}) => {
   const PrintTicket = useReactToPrint(PrintTicketFormat(contentRef, ticket));
   
   useEffect(() => {
-    // console.log(interval);
     if (ticket) {
-      // console.log(ticket);
       setPrintTicket(ticket)
       // PrintTicket(contentRef, printTicket)
     }
   }, [ticket])
 
   useEffect(() => {
-    // console.log(interval);
     if (printTicket) {
       PrintTicket()
     }

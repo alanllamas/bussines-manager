@@ -17,7 +17,8 @@ const eslintConfig = [
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       "react-hooks/exhaustive-deps": ["warn", { "enableDangerousAutofixThisMayCauseInfiniteLoops": true }],
-      '@typescript-eslint/no-unused-vars': 'warn'
+      '@typescript-eslint/no-unused-vars': 'warn',
+      'no-console': 'warn'
     }
   }
 ];
