@@ -260,7 +260,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                       <Field className="border border-surface-300 rounded-sm px-2 w-full hidden" id="date" name="date" type="datetime-locale" value={values.date} />
                       <div className="flex flex-col">
                         <div className="flex align-baseline">
-                        <label htmlFor="client" className="p-2">Cliente: </label>
+                        <label htmlFor="client" className="p-2">Cliente: <span className="text-red-500">*</span></label>
                         <Field required as="select" className="field-select" id="client" name="client" value={values.client}>
                           <option value="">Cliente</option>
                           {
@@ -328,7 +328,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                             <div className="flex flex-col">
                                               <div className="flex  w-full">
                                                 <div className="flex flex-col w-full">
-                                                  <label htmlFor="`products.${index}.product`">Producto</label>
+                                                  <label htmlFor="`products.${index}.product`">Producto <span className="text-red-500">*</span></label>
                                                   <Field as="select" className="field-select" value={values.products[index].product} onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                     // onProductChange(e.target.value)
                                                       const product = products?.filter((product: Product) => {
@@ -357,7 +357,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                                               </div>
                                               <div className="w-full flex">
                                                 <div className="flex flex-col w-full px-1">
-                                                  <label htmlFor={`products.${index}.quantity`}>Cantidad {values.products[index].unit ? `(${values.products[index].unit})` : ''}</label>
+                                                  <label htmlFor={`products.${index}.quantity`}>Cantidad {values.products[index].unit ? `(${values.products[index].unit})` : ''} <span className="text-red-500">*</span></label>
                                                   <Field className="field-input" name={`products.${index}.quantity`} type="number" placeholder="cantidad"
                                                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                                       const quantity = Number(e.target.value)
@@ -392,7 +392,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
                         <div className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 w-1/2">
                           <label htmlFor="subtotal" className="text-sm text-right">Subtotal</label>
                           <SubtotalField className="field-input bg-surface-100" disabled id="subtotal" name="subtotal" type="number" placeholder="subtotal" />
-                          <label htmlFor="shipping" className="text-sm text-right">Envío</label>
+                          <label htmlFor="shipping" className="text-sm text-right">Envío <span className="text-red-500">*</span></label>
                           <Field className="field-input" id="shipping" name="shipping" type="number" placeholder="Envío" />
                           {touched.shipping && errors.shipping && <p className="alert-field col-span-2 text-right">{errors.shipping as string}</p>}
                           <label htmlFor="total" className="text-sm font-semibold text-right">Total</label>

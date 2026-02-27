@@ -127,7 +127,7 @@ const InvoicesForm: React.FC<any> = ({
                     {/* <Field className="border border-surface-300 rounded-sm px-2 w-full" id="payment_date" name="payment_date" type="date-locale" value={values.payment_date} /> */}
                     <div className="flex align-baseline">
 
-                      <label htmlFor="client" className="p-2">Cliente: </label>
+                      <label htmlFor="client" className="p-2">Cliente: <span className="text-red-500">*</span></label>
 
                       <Field required as="select" disabled={blockClient} className="field-select" id="client" name="client" value={values.client}
                       onChange={(e: any) => {
@@ -152,7 +152,7 @@ const InvoicesForm: React.FC<any> = ({
 
                     <div className="flex py-2 gap-4">
                       <div className="flex flex-col flex-1">
-                        <label className="field-label">Fecha inicial</label>
+                        <label className="field-label required">Fecha inicial</label>
                         <DatePicker
                           className="field-input"
                           disabled={!client}
@@ -203,7 +203,7 @@ const InvoicesForm: React.FC<any> = ({
                         />
                       </div>
                       <div className="flex flex-col flex-1">
-                        <label className="field-label" htmlFor="">Fecha final</label>
+                        <label className="field-label required" htmlFor="">Fecha final</label>
                         <DatePicker
                           className="field-input"
                           disabled={!client}

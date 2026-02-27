@@ -70,17 +70,17 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
       {({ errors, touched, isValid }) => (
         <Form className="flex flex-col gap-4 w-full max-w-sm">
           <div className="field-group">
-            <label className="field-label">Nombre</label>
+            <label className="field-label required">Nombre</label>
             <Field className="field-input" name="name" type="text" />
             {touched.name && errors.name && <p className="alert-field">{errors.name}</p>}
           </div>
           <div className="field-group">
-            <label className="field-label">Precio</label>
+            <label className="field-label required">Precio</label>
             <Field className="field-input" name="price" type="number" step="0.01" min="0" />
             {touched.price && errors.price && <p className="alert-field">{errors.price}</p>}
           </div>
           <div className="field-group">
-            <label className="field-label">Unidad de medida</label>
+            <label className="field-label required">Unidad de medida</label>
             <Field as="select" className="field-select" name="measurement_unit">
               <option value="">-- Seleccionar --</option>
               <option value="kg">Kg</option>

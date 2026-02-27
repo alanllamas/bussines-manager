@@ -230,7 +230,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
             )}
 
             <div className="field-group">
-              <label className="field-label" htmlFor="name">Nombre</label>
+              <label className="field-label required" htmlFor="name">Nombre</label>
               <Field className="field-input" id="name" name="name" type="text" />
               {touched.name && errors.name && <p className="alert-field">{errors.name}</p>}
             </div>
@@ -386,18 +386,18 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                               <DisclosurePanel>
                                 <div className="grid grid-cols-2 gap-3 p-4 border border-t-0 border-surface-200 rounded-b">
                                   {[
-                                    { label: 'Nombre', name: `contacts.${index}.name`, key: 'name' },
-                                    { label: 'Área', name: `contacts.${index}.area`, key: 'area' },
-                                    { label: 'Correo', name: `contacts.${index}.email`, key: 'email' },
-                                    { label: 'Extensión', name: `contacts.${index}.extension`, key: 'extension' },
-                                    { label: 'Título laboral', name: `contacts.${index}.job_title`, key: 'job_title' },
-                                    { label: 'Teléfono', name: `contacts.${index}.phone`, key: 'phone' },
-                                  ].map(({ label, name, key }) => {
+                                    { label: 'Nombre', name: `contacts.${index}.name`, key: 'name', required: true },
+                                    { label: 'Área', name: `contacts.${index}.area`, key: 'area', required: false },
+                                    { label: 'Correo', name: `contacts.${index}.email`, key: 'email', required: true },
+                                    { label: 'Extensión', name: `contacts.${index}.extension`, key: 'extension', required: true },
+                                    { label: 'Título laboral', name: `contacts.${index}.job_title`, key: 'job_title', required: false },
+                                    { label: 'Teléfono', name: `contacts.${index}.phone`, key: 'phone', required: false },
+                                  ].map(({ label, name, key, required }) => {
                                     const contactTouched = (touched as any).contacts?.[index]
                                     const contactErrors = (errors as any).contacts?.[index]
                                     return (
                                       <div key={name} className="field-group">
-                                        <label className="field-label">{label}</label>
+                                        <label className={`field-label${required ? ' required' : ''}`}>{label}</label>
                                         <Field className="field-input" name={name} type="text" />
                                         {contactTouched?.[key] && contactErrors?.[key] && <p className="alert-field">{contactErrors[key]}</p>}
                                       </div>
