@@ -27,4 +27,5 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 11 | [ADR-011](adr/ADR-011-memoization.md) | Memoización en listas | Media | Pendiente | ADR-008 |
 | 12 | [ADR-012](adr/ADR-012-dead-code.md) | Limpieza de código muerto | Baja | Pendiente | ADR-008 |
 | 13 | [ADR-013](adr/ADR-013-invoice-edit-tickets.md) | Notas en formulario de cortes | Baja | Pendiente | — |
-| 14 | [ADR-014](adr/ADR-014-backend-business-logic.md) | Mover lógica de negocio al backend | Alta (arquitectural) | Pendiente aprobación | ADR-005 |
+| 14 | [ADR-014](adr/ADR-014-backend-business-logic.md) | Mover lógica de negocio al backend | Alta (arquitectural) | Bloqueado | ADR-005, ADR-015 |
+| 15 | [ADR-015](adr/ADR-015-supabase-migration.md) | Migrar backend de Strapi a Supabase | Alta (arquitectural) | Pendiente aprobación | — |

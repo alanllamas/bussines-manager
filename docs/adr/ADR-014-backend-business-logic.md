@@ -1,6 +1,6 @@
 # ADR-014 — Mover lógica de negocio al backend (Strapi)
 
-**Estado:** Pendiente aprobación
+**Estado:** Bloqueado por ADR-015
 **Prioridad:** Alta (arquitectural)
 **Depende de:** ADR-005 (la capa de servicios es el paso intermedio que facilita esta migración)
 
