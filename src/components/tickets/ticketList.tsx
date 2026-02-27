@@ -206,27 +206,59 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(tickets, itemsPerPage);
       return (
       <section className="w-full flex flex-col items-center">
-        <table className="data-table mt-6">
-          <thead>
-            <tr>
-              <th>Folio</th>
-              {!hideClient && <th>Cliente</th>}
-              <th>Fecha de venta</th>
-              <th>Monto</th>
-              <th>Corte</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tickets.length === 0
-              ? <tr><td colSpan={hideClient ? 5 : 6} className="py-12 text-center">
-                  <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                  <p className="text-sm text-surface-400 mt-2">Sin notas</p>
-                </td></tr>
-              : <Items currentItems={currentItems} />
-            }
-          </tbody>
-        </table>
+        {/* Mobile card list */}
+        <div className="sm:hidden w-full space-y-2 mt-4">
+          {tickets.length === 0
+            ? <div className="py-12 text-center">
+                <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                <p className="text-sm text-surface-400 mt-2">Sin notas</p>
+              </div>
+            : currentItems.map((ticket: Ticket) => (
+                <div key={ticket.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
+                  <div className="flex justify-between items-start">
+                    <span className="font-medium text-surface-800">
+                      #{String(ticket.ticket_number ?? '').padStart(5, '0')}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {ticket.invoice
+                        ? <span className="material-symbols-outlined text-[16px] text-primary-500">check_circle</span>
+                        : <span className="material-symbols-outlined text-[16px] text-surface-300">radio_button_unchecked</span>
+                      }
+                      <ActionButtons onEdit={() => setEditTicket(ticket)} onPrint={() => sendPrint(ticket)} />
+                    </div>
+                  </div>
+                  {!hideClient && <p className="text-surface-600 mt-1">{ticket.client?.name}</p>}
+                  <p className="text-surface-400 text-xs mt-1">
+                    {new Date(ticket.sale_date).toLocaleDateString()} · $ {ticket.total}
+                  </p>
+                </div>
+              ))
+          }
+        </div>
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto w-full">
+          <table className="data-table mt-6 min-w-[480px]">
+            <thead>
+              <tr>
+                <th>Folio</th>
+                {!hideClient && <th>Cliente</th>}
+                <th>Fecha de venta</th>
+                <th>Monto</th>
+                <th>Corte</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.length === 0
+                ? <tr><td colSpan={hideClient ? 5 : 6} className="py-12 text-center">
+                    <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                    <p className="text-sm text-surface-400 mt-2">Sin notas</p>
+                  </td></tr>
+                : <Items currentItems={currentItems} />
+              }
+            </tbody>
+          </table>
+        </div>
         <ReactPaginate
           className="paginator"
           breakLabel="…"

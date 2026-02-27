@@ -308,6 +308,9 @@ h1, h2, h3, h4, h5, h6 {
   border-color: var(--color-surface-200);
 }
 
+.scrollbar-none { scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
 .material-icons {
   font-family: 'Material Icons' !important;
   font-weight: normal;

@@ -242,7 +242,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       >
         {
           ({values, setFieldValue, errors, touched, isValid, dirty}) => (
-            <FormDialog isOpen={isOpen} onClose={() => sendClose()} panelClassName="max-w-lg space-y-4 border bg-surface-50 p-12 shadow-2xl text-surface-900">
+            <FormDialog isOpen={isOpen} onClose={() => sendClose()} panelClassName="max-w-lg w-full space-y-4 border bg-surface-50 p-4 sm:p-6 lg:p-12 shadow-2xl text-surface-900 max-h-screen overflow-y-auto">
                   
                   <div className="flex justify-between gap-2">
                     <img className="w-52" src={logo.src} alt="" />

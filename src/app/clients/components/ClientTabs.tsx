@@ -8,13 +8,13 @@ import TicketsTab from "./TicketsTab";
 import InvoicesTab from "./InvoicesTab";
 import EditClientTab from "./EditClientTab";
 
-const tabClass = "px-5 py-2.5 text-sm font-medium text-surface-500 border-b-2 border-transparent transition-colors hover:text-surface-900 data-[selected]:text-primary-600 data-[selected]:border-primary-500"
+const tabClass = "shrink-0 px-5 py-2.5 text-sm font-medium text-surface-500 border-b-2 border-transparent transition-colors hover:text-surface-900 data-[selected]:text-primary-600 data-[selected]:border-primary-500"
 
 const ClientTabs: React.FC<{client: Client | undefined}> = ({client}: {client: Client | undefined}) => {
   return (
     <div className="text-surface-700">
       <TabGroup>
-        <TabList className="flex px-6 border-b border-surface-200 h-11 items-center">
+        <TabList className="flex overflow-x-auto px-6 border-b border-surface-200 h-11 items-center scrollbar-none">
           <Tab className={tabClass}>{client?.name}</Tab>
           <Tab className={tabClass}>Contactos</Tab>
           <Tab className={tabClass}>Notas</Tab>

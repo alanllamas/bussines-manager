@@ -216,7 +216,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
   return (
     <Formik initialValues={initialFormValues} onSubmit={handleSubmit} enableReinitialize validationSchema={clientSchema}>
       {({ values, errors, touched, isValid, dirty }) => (
-        <Form className="grid grid-cols-2 gap-x-12 w-full">
+        <Form className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 w-full">
 
           {/* LEFT: Nombre + Contactos */}
           <div className="flex flex-col gap-6">
@@ -235,7 +235,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
             </div>
             <h4 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Información fiscal</h4>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               <div className="field-group">
                 <label className="field-label">Razón Social</label>
@@ -260,7 +260,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                 {(touched as any).taxing_info?.email && (errors as any).taxing_info?.email && <p className="alert-field">{(errors as any).taxing_info.email}</p>}
               </div>
 
-              <div className="field-group col-span-2">
+              <div className="field-group col-span-1 sm:col-span-2">
                 <label className="field-label">Régimen Fiscal</label>
                 <Field as="select" className="field-select" name="taxing_info.taxing_regime">
                   <option value="">-- Seleccionar --</option>
@@ -331,7 +331,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
 
              
 
-              <div className="flex items-center gap-2 col-span-2">
+              <div className="flex items-center gap-2 col-span-1 sm:col-span-2">
                 <Field name="taxing_info.shipping_invoice" type="checkbox" id="shipping_invoice" />
                 <label htmlFor="shipping_invoice" className="text-sm text-surface-700">Factura Envíos</label>
               </div>
@@ -383,7 +383,7 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                                 </button>
                               </div>
                               <DisclosurePanel>
-                                <div className="grid grid-cols-2 gap-3 p-4 border border-t-0 border-surface-200 rounded-b">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 border border-t-0 border-surface-200 rounded-b">
                                   {[
                                     { label: 'Nombre', name: `contacts.${index}.name`, key: 'name', required: true },
                                     { label: 'Área', name: `contacts.${index}.area`, key: 'area', required: false },

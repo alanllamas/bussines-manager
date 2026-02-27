@@ -109,9 +109,9 @@ const InvoicesForm: React.FC<any> = ({
       >
         {
           ({values, setFieldValue, errors, touched, isValid, dirty}) => (
-            <FormDialog isOpen={isOpen} onClose={() => sendClose()} dialogClassName="my-20" panelClassName="w-5/12 border bg-surface-50 shadow-2xl text-surface-900 flex flex-col h-[90vh]">
+            <FormDialog isOpen={isOpen} onClose={() => sendClose()} dialogClassName="my-20" panelClassName="w-full h-screen sm:w-11/12 sm:h-[95vh] md:w-8/12 md:h-[90vh] lg:w-5/12 border bg-surface-50 shadow-2xl text-surface-900 flex flex-col">
                   <Form className="flex flex-col flex-1 overflow-hidden">
-                  <div className="flex-1 overflow-y-auto p-8 space-y-2">
+                  <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-2">
 
 
                     <DialogTitle className="font-bold flex justify-between items-center">
@@ -396,7 +396,7 @@ const InvoicesForm: React.FC<any> = ({
                           <div className="my-4 w-full">
                             {
                               (resume?.products && resume?.products?.length > 0) || (resume?.envios && resume?.envios.total)
-                                ? <table className="text-sm w-full text-left font-medium">
+                                ? <div className="overflow-x-auto"><table className="text-sm w-full text-left font-medium min-w-[480px]">
                                     <thead>
                                       <tr>
                                         <th>Producto</th>
@@ -445,7 +445,7 @@ const InvoicesForm: React.FC<any> = ({
                                           : null
                                       }
                                     </tbody>
-                                  </table>
+                                  </table></div>
                                 : null
                             }
                             
@@ -462,17 +462,17 @@ const InvoicesForm: React.FC<any> = ({
                       <DisclosurePanel>
                       
                         <div className="flex flex-col gap-2">
-                          <div className="flex">
+                          <div className="flex flex-col sm:flex-row">
 
-                            <div className="flex flex-col w-1/3 px-2">
+                            <div className="flex flex-col w-full sm:w-1/3 px-2">
                               <label className="field-label" htmlFor="invoice_id">ID de factura</label>
                               <Field className="field-input" type="text" name="invoice_id" value={values?.invoice_id} />
                             </div>
-                            <div className="flex flex-col w-1/3 px-2">
+                            <div className="flex flex-col w-full sm:w-1/3 px-2">
                               <label className="field-label" htmlFor="payment_reference">Referencia de pago</label>
                               <Field className="field-input" type="text" name="payment_reference" value={values?.payment_reference} />
                             </div>
-                            <div className="flex flex-col w-1/3 px-2">
+                            <div className="flex flex-col w-full sm:w-1/3 px-2">
                               <label className="field-label" htmlFor="invoice_status">Estatus de corte</label>
                               <Field className="field-select" as="select" name="invoice_status" value={values?.invoice_status}>
                                 <option value="">Selecciona una opción</option>
@@ -482,15 +482,15 @@ const InvoicesForm: React.FC<any> = ({
                               </Field>
                             </div>
                           </div>
-                          <div className="flex">
-                            <div className="flex flex-col w-1/3 px-2">
+                          <div className="flex flex-col sm:flex-row">
+                            <div className="flex flex-col w-full sm:w-1/3 px-2">
                               <label className="field-label" htmlFor="invoice_send_date">Fecha de envio</label>
                               <DatePicker
                                 className="field-input"
                                 onChange={(e: any) => {
-                                  
+
                                   const invoice_send_date = new Date(e)
-                                  
+
                                   if (client?.taxing_info) {
                                     // payment_period
                                     setFieldValue("expected_payment_date", new Date(invoice_send_date.setDate(invoice_send_date.getDate() + client?.taxing_info.payment_period)))
@@ -504,7 +504,7 @@ const InvoicesForm: React.FC<any> = ({
                                 name="invoice_send_date"
                               />
                             </div>
-                            <div className="flex flex-col w-1/3 px-2">
+                            <div className="flex flex-col w-full sm:w-1/3 px-2">
                               <label className="field-label" htmlFor="">Fecha de pago</label>
                               <DatePicker
                                 className="field-input"
@@ -516,7 +516,7 @@ const InvoicesForm: React.FC<any> = ({
                                 selected={values.payment_date}
                               />
                             </div>
-                            <div className="flex flex-col w-1/3 px-2">
+                            <div className="flex flex-col w-full sm:w-1/3 px-2">
                               <label className="field-label" htmlFor="">Fecha vencimiento</label>
                               <DatePicker
                                 className="field-input"
@@ -529,7 +529,7 @@ const InvoicesForm: React.FC<any> = ({
                               />
                             </div>
                           </div>
-                          
+
                         </div>
                       </DisclosurePanel>
                     </Disclosure>

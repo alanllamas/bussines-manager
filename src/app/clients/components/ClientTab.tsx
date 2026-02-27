@@ -7,14 +7,14 @@ const ClientTab: React.FC<{client: Client | undefined}> = ({client}: {client: Cl
   const copyParam = (param: string) => navigator.clipboard.writeText(param)
 
   const Row = ({ label, value }: { label: string; value: any }) => (
-    <div className="grid grid-cols-[200px_1fr] items-start py-2.5 border-b border-surface-100 last:border-0">
+    <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr] lg:grid-cols-[200px_1fr] items-start py-2.5 border-b border-surface-100 last:border-0">
       <span className="text-xs font-semibold uppercase tracking-widest text-surface-400">{label}</span>
       {value !== undefined && value !== null && value !== ''
-        ? <div className="flex items-center gap-2">
-            <span className="text-sm text-surface-800 truncate">
+        ? <div className="flex items-center gap-2 min-w-0">
+            <span className="text-sm text-surface-800 truncate min-w-0 flex-1">
               {value === true ? 'Sí' : value === false ? 'No' : value}
             </span>
-            <button className="btn-icon flex-shrink-0" onClick={() => copyParam(String(value))}>
+            <button className="btn-icon flex-shrink-0 ml-auto" onClick={() => copyParam(String(value))}>
               <span className="material-symbols-outlined text-[14px]">content_copy</span>
             </button>
           </div>
@@ -28,7 +28,7 @@ const ClientTab: React.FC<{client: Client | undefined}> = ({client}: {client: Cl
       {client?.taxing_info
         ? (
           <div>
-            <div className="grid grid-cols-2 gap-x-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 lg:gap-x-12">
               <div>
                 <Row label="RFC"               value={client.taxing_info.taxing_RFC} />
                 <Row label="Razón Social"      value={client.taxing_info.taxing_company_name} />

@@ -303,27 +303,53 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(invoices, itemsPerPage);
       return (
       <section className="w-full flex flex-col items-center">
-        <table className="data-table mt-6">
-          <thead>
-            <tr>
-              <th>Folio</th>
-              <th>Cliente</th>
-              <th>Fecha inicial</th>
-              <th>Fecha final</th>
-              <th>Monto</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoices.length === 0
-              ? <tr><td colSpan={6} className="py-12 text-center">
-                  <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                  <p className="text-sm text-surface-400 mt-2">Sin cortes</p>
-                </td></tr>
-              : <Items currentItems={currentItems} />
-            }
-          </tbody>
-        </table>
+        {/* Mobile card list */}
+        <div className="sm:hidden w-full space-y-2 mt-4">
+          {invoices.length === 0
+            ? <div className="py-12 text-center">
+                <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                <p className="text-sm text-surface-400 mt-2">Sin cortes</p>
+              </div>
+            : currentItems.map((invoice: Invoice) => (
+                <div key={invoice.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
+                  <div className="flex justify-between items-start">
+                    <span className="font-medium text-surface-800">
+                      #{String(invoice.invoice_number ?? '').padStart(5, '0')}
+                    </span>
+                    <ActionButtons onEdit={() => { setClient(invoice.client); setEditInvoice(invoice) }} onPrint={() => sendPrint(invoice)} />
+                  </div>
+                  <p className="text-surface-600 mt-1">{invoice.client?.name}</p>
+                  <p className="text-surface-400 text-xs mt-1">
+                    {new Date(invoice.initial_date || 0).toLocaleDateString()} – {new Date(invoice.ending_date || 0).toLocaleDateString()} · $ {invoice.total}
+                  </p>
+                </div>
+              ))
+          }
+        </div>
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto w-full">
+          <table className="data-table mt-6 min-w-[480px]">
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>Cliente</th>
+                <th>Fecha inicial</th>
+                <th>Fecha final</th>
+                <th>Monto</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoices.length === 0
+                ? <tr><td colSpan={6} className="py-12 text-center">
+                    <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
+                    <p className="text-sm text-surface-400 mt-2">Sin cortes</p>
+                  </td></tr>
+                : <Items currentItems={currentItems} />
+              }
+            </tbody>
+          </table>
+        </div>
         <ReactPaginate
           className="paginator"
           breakLabel="…"
