@@ -1,6 +1,6 @@
 # ADR-010 — Limpiar `console.log` y crear una utilidad de logging
 
-**Estado:** Pendiente
+**Estado:** Resuelto
 **Prioridad:** Media
 **Depende de:** — (independiente, pero es más limpio hacerlo después de los refactors grandes)
 
