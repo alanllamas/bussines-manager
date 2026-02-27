@@ -1,6 +1,6 @@
 # ADR-006 — Crear custom hook `usePaginatedData`
 
-**Estado:** Pendiente
+**Estado:** Resuelto
 **Prioridad:** Alta
 **Depende de:** ADR-003 (tipado genérico)
 

@@ -19,7 +19,7 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 3 | [ADR-003](adr/ADR-003-typescript-types.md) | Tipos TypeScript globales | Alta | ✅ Completado | — |
 | 4 | [ADR-004](adr/ADR-004-error-boundary.md) | Error Boundary y manejo de errores | Alta | Pendiente | ADR-003 |
 | 5 | [ADR-005](adr/ADR-005-service-layer.md) | Capa de servicios para cálculos | Alta | ✅ Completado | ADR-003 |
-| 6 | [ADR-006](adr/ADR-006-paginated-data.md) | Hook `usePaginatedData` | Alta | Pendiente | ADR-003 |
+| 6 | [ADR-006](adr/ADR-006-paginated-data.md) | Hook `usePaginatedData` | Alta | ✅ Completado | ADR-003 |
 | 7 | [ADR-007](adr/ADR-007-ui-components.md) | Componentes UI reutilizables | Alta | Pendiente | ADR-003, ADR-006 |
 | 8 | [ADR-008](adr/ADR-008-invoice-list-refactor.md) | Refactorizar `InvoiceList` | Alta | Pendiente | ADR-003, ADR-005, ADR-006, ADR-007 |
 | 9 | [ADR-009](adr/ADR-009-firebase-config.md) | Validación de configuración Firebase | Media | Pendiente | — |
