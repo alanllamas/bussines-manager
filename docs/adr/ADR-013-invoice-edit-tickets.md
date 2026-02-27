@@ -1,6 +1,6 @@
 # ADR-013 — Corregir visualización de notas en el formulario de cortes
 
-**Estado:** Resuelto
+**Estado:** ✅ Completado
 **Prioridad:** Baja
 **Depende de:** —
 

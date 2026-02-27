@@ -93,6 +93,16 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
   }, [ticketsIsLoading, ticketsError])
 
   useEffect(() => {
+    if (editInvoice && ticketsData?.data) {
+      setAvailableTickets(
+        ticketsData.data.filter(
+          t => t.invoice === null || t.invoice?.id === editInvoice.id
+        )
+      )
+    }
+  }, [editInvoice])
+
+  useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
       setClients(clientsData?.data ?? [])
     }
