@@ -12,7 +12,7 @@
 'use client'
 import React, { ChangeEvent } from "react"
 import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
-import { FormDialog } from '@/components/ui'
+import { FormDialog, TagPill, ConfirmDialog } from '@/components/ui'
 import { Field, FieldArray, Form, Formik, useField, useFormikContext } from "formik"
 import * as Yup from "yup"
 import logo from "@/public/logo.png"
@@ -112,6 +112,7 @@ const purchaseSchema = Yup.object({
 // PurchaseForm (component named TicketsForm — see top comment about copy-paste naming).
 // editPurchase: if truthy, submit button shows "Editar" instead of "Crear".
 const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmit, isOpen, sendClose, editPurchase, apiError }) => {
+  const [pendingRemoveIdx, setPendingRemoveIdx] = React.useState<number | null>(null)
   const { supplies: suppliesData, isLoading: suppliesLoading } = useGetSupplies()
   // supplies: flattened array from the SWR response; includes supply_variants (pre-populated).
   const supplies = suppliesData?.data ?? []
@@ -163,10 +164,7 @@ const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmi
                 {selectedDocIds.map((docId, vi) => {
                   const variant = allVariants.find(v => v.documentId === docId)
                   return (
-                    <span key={vi} className="flex items-center gap-1 bg-primary-50 border border-primary-200 text-primary-700 px-2 py-0.5 rounded-full text-xs">
-                      {variant?.name ?? docId}
-                      <button type="button" onClick={() => variantRemove(vi)} className="hover:text-red-600 leading-none">×</button>
-                    </span>
+                    <TagPill key={vi} label={variant?.name ?? docId} onRemove={() => variantRemove(vi)} variant="primary" />
                   )
                 })}
               </div>
@@ -238,6 +236,15 @@ const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmi
                 <FieldArray name="supplies">
                   {({ remove, push }) => (
                     <div>
+                      <ConfirmDialog
+                        open={pendingRemoveIdx !== null}
+                        title="Eliminar insumo"
+                        message="¿Eliminar esta línea del pedido?"
+                        danger
+                        confirmLabel="Eliminar"
+                        onConfirm={() => { if (pendingRemoveIdx !== null) remove(pendingRemoveIdx); setPendingRemoveIdx(null) }}
+                        onCancel={() => setPendingRemoveIdx(null)}
+                      />
                       <div className="flex justify-between items-center p-2">
                         <h4 className="text-xs font-semibold uppercase tracking-widest text-surface-400">Insumos</h4>
                         <button type="button" className="btn-secondary" onClick={() => push(emptyPurchaseSupply)}>
@@ -267,7 +274,7 @@ const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmi
                                   <span className="mx-1 text-sm">{values.supplies[index].quantity ? `${values.supplies[index].quantity} ${values.supplies[index].unit}` : ''}</span>
                                   <span className="mx-1 text-sm">{values.supplies[index].supply_total ? `$ ${values.supplies[index].supply_total}` : ''}</span>
                                 </DisclosureButton>
-                                <button className="btn-danger" type="button" onClick={() => remove(index)}>
+                                <button className="btn-danger" type="button" onClick={() => setPendingRemoveIdx(index)}>
                                   <span className="material-symbols-outlined text-[16px]">delete</span>
                                 </button>
                               </div>

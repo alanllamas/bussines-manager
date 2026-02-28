@@ -6,6 +6,7 @@
 //   - editing: inicializado desde ?edit=1 (redirige desde SupplyForm tras crear).
 // Gestión de variantes igual que ProductDetail: añadir existente + crear inline + auto-add post-create.
 import React, { useState } from "react"
+import { TagPill, ConfirmDialog } from "@/components/ui"
 import { useSearchParams } from "next/navigation"
 import type { Supply } from "@/types"
 import { fetcher } from "@/api/fetcher"
@@ -34,6 +35,7 @@ const SupplyDetail: React.FC<{ supply: Supply }> = ({ supply }) => {
   const [editing, setEditing] = useState(searchParams.get('edit') === '1')
   const [saving, setSaving] = useState(false)
   const [selectedId, setSelectedId] = useState('')
+  const [pendingRemoveDocId, setPendingRemoveDocId] = useState<string | null>(null)
   const [showNewVariant, setShowNewVariant] = useState(false)
   const [newVariantData, setNewVariantData] = useState<CreateSupplyVariantReq>()
 
@@ -102,6 +104,15 @@ const SupplyDetail: React.FC<{ supply: Supply }> = ({ supply }) => {
 
   return (
     <div className="p-4 sm:p-6 text-surface-700">
+      <ConfirmDialog
+        open={pendingRemoveDocId !== null}
+        title="Quitar variante"
+        message="¿Quitar esta variante del insumo?"
+        danger
+        confirmLabel="Quitar"
+        onConfirm={() => { if (pendingRemoveDocId) handleRemoveVariant(pendingRemoveDocId); setPendingRemoveDocId(null) }}
+        onCancel={() => setPendingRemoveDocId(null)}
+      />
       <h2 className="font-bold text-lg mb-4">{supply.name}</h2>
 
       {/* VIEW MODE */}
@@ -127,9 +138,7 @@ const SupplyDetail: React.FC<{ supply: Supply }> = ({ supply }) => {
             <div className="flex flex-wrap gap-2">
               {current.length === 0 && <p className="text-sm text-surface-400">Sin variantes</p>}
               {current.map(v => (
-                <span key={v.documentId} className="bg-surface-100 px-3 py-1 rounded-full text-sm">
-                  {v.name}{v.type && <span className="text-surface-400 text-xs ml-1">({v.type})</span>}
-                </span>
+                <TagPill key={v.documentId} label={v.name} sublabel={v.type || undefined} />
               ))}
             </div>
           </div>
@@ -201,10 +210,7 @@ const SupplyDetail: React.FC<{ supply: Supply }> = ({ supply }) => {
             <div className="flex flex-wrap gap-2 mb-3">
               {current.length === 0 && <p className="text-sm text-surface-400">Sin variantes</p>}
               {current.map(v => (
-                <span key={v.documentId} className="flex items-center gap-1 bg-surface-100 px-3 py-1 rounded-full text-sm">
-                  {v.name}{v.type && <span className="text-surface-400 text-xs ml-1">({v.type})</span>}
-                  <button onClick={() => handleRemoveVariant(v.documentId)} disabled={saving} className="ml-1 text-surface-400 hover:text-red-600 disabled:opacity-50">×</button>
-                </span>
+                <TagPill key={v.documentId} label={v.name} sublabel={v.type || undefined} onRemove={() => setPendingRemoveDocId(v.documentId)} removeDisabled={saving} />
               ))}
             </div>
 

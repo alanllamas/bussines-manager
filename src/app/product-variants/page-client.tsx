@@ -5,7 +5,7 @@ import ProductVariantForm from "@/components/forms/ProductVariantForm"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import Spinner from "@/components/ui/Spinner"
 import { useSWRConfig } from "swr"
-import { ActionButtons } from "@/components/ui"
+import { ActionButtons, EmptyState } from "@/components/ui"
 import type { ProductVariant } from "@/api/hooks/getProducts"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
 import ReactPaginate from "react-paginate"
@@ -72,10 +72,7 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
       {/* Mobile cards */}
       <div className="sm:hidden w-full space-y-2">
         {list.length === 0 ? (
-          <div className="py-12 text-center">
-            <span className="material-symbols-outlined text-[40px] text-surface-300 block">style</span>
-            <p className="text-sm text-surface-400 mt-2">Sin variantes</p>
-          </div>
+          <EmptyState icon="style" message="Sin variantes" />
         ) : currentItems.map((v) => (
           <div key={v.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
             {editing?.documentId === v.documentId ? (
@@ -109,10 +106,7 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
           </thead>
           <tbody>
             {list.length === 0 ? (
-              <tr><td colSpan={3} className="py-12 text-center">
-                <span className="material-symbols-outlined text-[40px] text-surface-300 block">style</span>
-                <p className="text-sm text-surface-400 mt-2">Sin variantes</p>
-              </td></tr>
+              <tr><td colSpan={3}><EmptyState icon="style" message="Sin variantes" /></td></tr>
             ) : currentItems.map((v) => (
               <tr key={v.documentId}>
                 {editing?.documentId === v.documentId ? (

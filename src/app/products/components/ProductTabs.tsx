@@ -9,6 +9,7 @@
 // Nota: usa ids numéricos para variantes (v.id), a diferencia de SupplyDetail que usa documentIds.
 // `(createdVariant as any)` — pendiente ADR-003 para tipado correcto.
 import React, { useState } from "react"
+import { TagPill, ConfirmDialog } from "@/components/ui"
 import { useSearchParams } from "next/navigation"
 import { Product } from "@/api/hooks/getProducts"
 import { Field, Form, Formik } from "formik"
@@ -30,6 +31,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
   const [editing, setEditing] = useState(searchParams.get('edit') === '1')
   const [selectedId, setSelectedId] = useState('')
   const [saving, setSaving] = useState(false)
+  const [pendingRemoveId, setPendingRemoveId] = useState<number | null>(null)
   const [showNewVariant, setShowNewVariant] = useState(false)
   const [newVariantData, setNewVariantData] = useState<CreateVariantReq>()
 
@@ -98,6 +100,15 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
 
   return (
     <div className="p-4 text-surface-700">
+      <ConfirmDialog
+        open={pendingRemoveId !== null}
+        title="Quitar variante"
+        message="¿Quitar esta variante del producto?"
+        danger
+        confirmLabel="Quitar"
+        onConfirm={() => { if (pendingRemoveId !== null) handleRemove(pendingRemoveId); setPendingRemoveId(null) }}
+        onCancel={() => setPendingRemoveId(null)}
+      />
       <h2 className="font-bold text-lg mb-4">{product.name}</h2>
 
       {/* VIEW MODE */}
@@ -123,9 +134,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
             <div className="flex flex-wrap gap-2">
               {current.length === 0 && <p className="text-sm text-surface-400">Sin variantes</p>}
               {current.map(v => (
-                <span key={v.id} className="bg-surface-100 px-3 py-1 rounded-full text-sm">
-                  {v.name}{v.type && <span className="text-surface-400 text-xs ml-1">({v.type})</span>}
-                </span>
+                <TagPill key={v.id} label={v.name} sublabel={v.type || undefined} />
               ))}
             </div>
           </div>
@@ -192,10 +201,7 @@ const ProductDetail: React.FC<{ product: Product }> = ({ product }) => {
             <div className="flex flex-wrap gap-2 mb-3">
               {current.length === 0 && <p className="text-sm text-surface-400">Sin variantes</p>}
               {current.map(v => (
-                <span key={v.id} className="flex items-center gap-1 bg-surface-100 px-3 py-1 rounded-full text-sm">
-                  {v.name}{v.type && <span className="text-surface-400 text-xs ml-1">({v.type})</span>}
-                  <button onClick={() => handleRemove(v.id)} disabled={saving} className="ml-1 text-surface-400 hover:text-red-600 disabled:opacity-50">×</button>
-                </span>
+                <TagPill key={v.id} label={v.name} sublabel={v.type || undefined} onRemove={() => setPendingRemoveId(v.id)} removeDisabled={saving} />
               ))}
             </div>
 

@@ -14,7 +14,7 @@
 //   - isOpen useEffect no tiene guard (posible bug menor: se dispara en mount con undefined)
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
-import { ActionButtons } from "@/components/ui"
+import { ActionButtons, EmptyState } from "@/components/ui"
 import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import TicketsForm, { createTicketReq, emptyProduct, EProduct, TicketInitialValues } from "../forms/ticketsForm"
@@ -229,10 +229,7 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
         {/* Mobile card list */}
         <div className="sm:hidden w-full space-y-2 mt-4">
           {tickets.length === 0
-            ? <div className="py-12 text-center">
-                <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                <p className="text-sm text-surface-400 mt-2">Sin notas</p>
-              </div>
+            ? <EmptyState icon="inbox" message="Sin notas" />
             : currentItems.map((ticket: Ticket) => (
                 <div key={ticket.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
                   <div className="flex justify-between items-start">
@@ -270,10 +267,7 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
             </thead>
             <tbody>
               {tickets.length === 0
-                ? <tr><td colSpan={hideClient ? 5 : 6} className="py-12 text-center">
-                    <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                    <p className="text-sm text-surface-400 mt-2">Sin notas</p>
-                  </td></tr>
+                ? <tr><td colSpan={hideClient ? 5 : 6}><EmptyState icon="inbox" message="Sin notas" /></td></tr>
                 : <Items currentItems={currentItems} />
               }
             </tbody>

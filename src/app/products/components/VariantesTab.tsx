@@ -4,6 +4,7 @@
 // No incluye creación inline de nuevas variantes (solo agregar existentes y remover).
 // Verifica si sigue siendo referenciado antes de eliminar.
 import React, { useState } from "react"
+import { TagPill } from "@/components/ui"
 import { TabPanel } from "@headlessui/react"
 import { Product } from "@/api/hooks/getProducts"
 import useGetProductVariants from "@/api/hooks/productVariants/getProductVariants"
@@ -59,20 +60,13 @@ const VariantesTab: React.FC<{ product: Product }> = ({ product }) => {
           <p className="text-sm text-neutral-400">Sin variantes asociadas</p>
         )}
         {current.map(v => (
-          <span
+          <TagPill
             key={v.id}
-            className="flex items-center gap-1 bg-neutral-200 px-3 py-1 rounded-full text-sm"
-          >
-            {v.name}
-            {v.type && <span className="text-neutral-400 text-xs">({v.type})</span>}
-            <button
-              onClick={() => handleRemove(v.id)}
-              disabled={saving}
-              className="ml-1 text-neutral-400 hover:text-red-600 disabled:opacity-50"
-            >
-              ×
-            </button>
-          </span>
+            label={v.name}
+            sublabel={v.type || undefined}
+            onRemove={() => handleRemove(v.id)}
+            removeDisabled={saving}
+          />
         ))}
       </div>
 

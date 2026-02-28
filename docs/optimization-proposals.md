@@ -34,6 +34,7 @@ Decisiones arquitecturales de gran escala que requieren aprobación. Viven en `.
 
 | Plan | Archivo | Estado | Depende de |
 |---|---|---|---|
+| Auditoría y completado del sistema de diseño | [design-system-audit.md](../.claude/plans/design-system-audit.md) | Pendiente aprobación | — |
 | Migrar backend de Strapi a Supabase | [supabase-migration.md](../.claude/plans/supabase-migration.md) | Pendiente aprobación | — |
 | Mover lógica de negocio al backend | [backend-business-logic.md](../.claude/plans/backend-business-logic.md) | Bloqueado | supabase-migration.md |
 

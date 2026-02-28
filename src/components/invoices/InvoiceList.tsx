@@ -11,7 +11,7 @@
 'use client'
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
-import { ActionButtons } from "@/components/ui"
+import { ActionButtons, EmptyState } from "@/components/ui"
 import { Ticket } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import useGetTicketsByClient from "@/api/hooks/invoices/getTicketsByClient"
@@ -354,10 +354,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
         {/* Mobile card list */}
         <div className="sm:hidden w-full space-y-2 mt-4">
           {invoices.length === 0
-            ? <div className="py-12 text-center">
-                <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                <p className="text-sm text-surface-400 mt-2">Sin cortes</p>
-              </div>
+            ? <EmptyState icon="inbox" message="Sin cortes" />
             : currentItems.map((invoice: Invoice) => (
                 <div key={invoice.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
                   <div className="flex justify-between items-start">
@@ -389,10 +386,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
             </thead>
             <tbody>
               {invoices.length === 0
-                ? <tr><td colSpan={6} className="py-12 text-center">
-                    <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                    <p className="text-sm text-surface-400 mt-2">Sin cortes</p>
-                  </td></tr>
+                ? <tr><td colSpan={6}><EmptyState icon="inbox" message="Sin cortes" /></td></tr>
                 : <Items currentItems={currentItems} />
               }
             </tbody>
