@@ -1,4 +1,5 @@
 'use client'
+// ProductsPage — estado vacío de /products: muestra ícono + "Selecciona un producto".
 import React from "react"
 
 const ProductsPage: React.FC = () => {

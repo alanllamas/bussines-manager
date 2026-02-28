@@ -1,4 +1,6 @@
 'use client'
+// PurchasePage — vista de detalle de una compra (/purchases/[id]).
+// useGetPurchase fetcha por documentId. Tres estados: Spinner → error → PurchaseFormat.
 import React from "react"
 import PurchaseFormat from "@/components/purchases/purchaseFormat"
 import useGetPurchase from "@/api/hooks/purchases/getPurchase"

@@ -1,3 +1,4 @@
+// SuppliesLayout — Server Component layout para /supplies/*. Sidebar + main, mismo patrón que clients/products.
 import React from "react"
 import SuppliesSideBar from "./components/sidebar"
 

@@ -1,4 +1,8 @@
 'use client'
+// ProductPage — vista de detalle de un producto (/products/[id]).
+// Usa useSWR directamente con un fetcher local (no hook personalizado) — inconsistencia vs otros módulos.
+// populate=* para obtener product_variants en la misma respuesta.
+// revalidateOnFocus: false — evita refetch al volver al tab (datos raramente cambian).
 import React from "react"
 import { Product } from "@/api/hooks/getProducts"
 import { fetcher } from "@/api/fetcher"

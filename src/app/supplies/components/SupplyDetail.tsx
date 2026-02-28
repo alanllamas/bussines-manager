@@ -1,4 +1,10 @@
 'use client'
+// SupplyDetail — vista de detalle/edición de un insumo. Mismo patrón que ProductDetail pero con diferencias:
+//   - Usa documentId para variantes (no numeric id) — alineado con Strapi v5.
+//   - Tiene validación Yup (supplySchema) en el form de edición; ProductDetail no tiene.
+//   - `(createdVariant as any)` para acceder a documentId — pendiente ADR-003.
+//   - editing: inicializado desde ?edit=1 (redirige desde SupplyForm tras crear).
+// Gestión de variantes igual que ProductDetail: añadir existente + crear inline + auto-add post-create.
 import React, { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import type { Supply } from "@/types"

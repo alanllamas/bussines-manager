@@ -1,4 +1,13 @@
 'use client'
+// ProductDetail — vista de detalle/edición de un producto (importado como ProductTabs en page-client).
+// Dos modos: VIEW (campos + chips de variantes) y EDIT (Formik inline + gestión de variantes).
+// editing: inicializado desde ?edit=1 en URL (redirige desde ProductForm tras crear).
+// Gestión de variantes en edit mode:
+//   - Añadir existente: select de variantes globales no asignadas, PUT con array de ids numéricos.
+//   - Crear nueva inline: mini-Formik → setNewVariantData → useCreateProductVariant (SWR mutation).
+//   - useEffect auto-agrega la variante recién creada al producto vía updateVariants.
+// Nota: usa ids numéricos para variantes (v.id), a diferencia de SupplyDetail que usa documentIds.
+// `(createdVariant as any)` — pendiente ADR-003 para tipado correcto.
 import React, { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Product } from "@/api/hooks/getProducts"

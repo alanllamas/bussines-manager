@@ -1,4 +1,6 @@
 'use client'
+// ProductsSideBar — sidebar de /products. Mismo patrón que ClientsSideBar:
+// sticky desktop, acordeón mobile, useAuthGuard null guard, active por usePathname.
 import React, { useState } from "react"
 import useGetProducts from "@/api/hooks/getProducts"
 import Link from "next/link"

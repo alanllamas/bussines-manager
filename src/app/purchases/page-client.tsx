@@ -1,4 +1,7 @@
 'use client'
+// PurchasesPage — página /purchases: lista global de compras.
+// Fetcha todas las compras aquí y las pasa a PurchaseList (que no hace fetch propio).
+// Spinner combinado: authLoading || isLoading en un solo guard.
 import React from "react"
 import PurchaseList from "@/components/purchases/PurchaseList"
 import useGetPurchases from "@/api/hooks/purchases/getPurchases"

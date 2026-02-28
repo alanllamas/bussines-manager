@@ -1,4 +1,8 @@
 'use client'
+// VariantesTab — componente de gestión de variantes de producto (TabPanel).
+// NOTA: parece ser una versión anterior/alternativa a la gestión de variantes en ProductDetail.
+// No incluye creación inline de nuevas variantes (solo agregar existentes y remover).
+// Verifica si sigue siendo referenciado antes de eliminar.
 import React, { useState } from "react"
 import { TabPanel } from "@headlessui/react"
 import { Product } from "@/api/hooks/getProducts"

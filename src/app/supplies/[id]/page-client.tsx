@@ -1,4 +1,7 @@
 'use client'
+// SupplyPage — vista de detalle de un insumo (/supplies/[id]).
+// Usa useSWR directamente con fetcher local — mismo patrón que ProductPage (inconsistencia vs hooks).
+// populate=supply_variants (solo variantes, no populate=* como productos).
 import React from "react"
 import { fetcher } from "@/api/fetcher"
 import useSWR from "swr"
