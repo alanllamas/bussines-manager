@@ -24,9 +24,18 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 8 | [ADR-008](adr/ADR-008-invoice-list-refactor.md) | Refactorizar `InvoiceList` | Alta | ❌ Cancelado | ADR-003, ADR-005, ADR-006, ADR-007 |
 | 9 | [ADR-009](adr/ADR-009-firebase-config.md) | Validación de configuración Firebase | Media | ✅ Completado | — |
 | 10 | [ADR-010](adr/ADR-010-logging.md) | Logging centralizado | Media | ✅ Completado | — |
-| 11 | [ADR-014](adr/ADR-014-backend-business-logic.md) | Mover lógica de negocio al backend | Alta (arquitectural) | Bloqueado | ADR-005, ADR-015 |
-| 12 | [ADR-015](adr/ADR-015-supabase-migration.md) | Migrar backend de Strapi a Supabase | Alta (arquitectural) | Pendiente aprobación | — |
-| 13 | [ADR-019](adr/ADR-019-documentation-strategy.md) | Estrategia de documentación del proyecto | Media | ✅ Completado | — |
+| 11 | [ADR-019](adr/ADR-019-documentation-strategy.md) | Estrategia de documentación del proyecto | Media | ✅ Completado | — |
+
+---
+
+## Planes técnicos
+
+Decisiones arquitecturales de gran escala que requieren aprobación. Viven en `.claude/plans/`.
+
+| Plan | Archivo | Estado | Depende de |
+|---|---|---|---|
+| Migrar backend de Strapi a Supabase | [supabase-migration.md](../.claude/plans/supabase-migration.md) | Pendiente aprobación | — |
+| Mover lógica de negocio al backend | [backend-business-logic.md](../.claude/plans/backend-business-logic.md) | Bloqueado | supabase-migration.md |
 
 ---
 
