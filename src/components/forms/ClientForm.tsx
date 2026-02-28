@@ -412,9 +412,11 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
                                       <span className="text-xs text-red-500">Revisa los campos</span>
                                     )}
                                   </span>
-                                  <span className="text-surface-400 text-xs">{values.contacts[index].phone}</span>
-                                  <span className="material-symbols-outlined text-[16px] text-surface-400">
-                                    {open ? 'expand_less' : 'expand_more'}
+                                  <span className="flex items-center gap-2">
+                                    <span className="text-surface-400 text-xs">{values.contacts[index].phone}</span>
+                                    <span className="material-symbols-outlined text-[16px] text-surface-400">
+                                      {open ? 'expand_less' : 'expand_more'}
+                                    </span>
                                   </span>
                                 </DisclosureButton>
                                 <button
