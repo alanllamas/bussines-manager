@@ -1,7 +1,5 @@
 // Error classes thrown by the fetcher when a request fails.
 // Consumers (SWR hooks) receive these via the `error` field returned by useSWR.
-//
-// @ts-expect-error comments below are pending cleanup (ADR-003 — eliminate type suppressions).
 
 // ErrorProps — base shape for error constructors.
 // message is required when the error carries a user-facing string;
@@ -15,13 +13,9 @@ export type ErrorProps = {
 // code: machine-readable error identifier (e.g. Strapi's error.name string).
 // message: human-readable description forwarded from the API response body.
 export class ApiError extends Error {
-      // @ts-expect-error missing type
-  code: string;
-  message: string;
+  code?: string;  // optional — only assigned when the API includes an error code
   constructor({ code, message }: ErrorProps) {
     super(message);
-      // @ts-expect-error missing type
-    this.message = message;
     if (code) this.code = code;
   }
 

@@ -9,8 +9,6 @@
 //   Example: "JVBERi0x..."
 //   Use this when the API expects raw base64 without the data URL wrapper (e.g. Strapi upload).
 //
-// @ts-expect-error comments are pending cleanup (ADR-003) — reader.result is string|ArrayBuffer
-// and TypeScript can't narrow it after the type guard.
 export async function fileToB64(f: File, standard = false): Promise<string> {
   return new Promise((resolve, reject) => {
     // Guard against non-File inputs since this may be called with dynamic form values.
@@ -24,12 +22,12 @@ export async function fileToB64(f: File, standard = false): Promise<string> {
 
     reader.onload = () => {
       const base64String = reader.result;
+      // readAsDataURL always produces a string; guard handles the ArrayBuffer | null cases.
+      if (typeof base64String !== 'string') return reject(new Error('Formato de archivo inválido'));
       resolve(
         !standard
-      // @ts-expect-error missing type
-          ? base64String.toString()                       // full data URL
-      // @ts-expect-error missing type
-          : base64String.toString().split(',')[1]         // raw base64 only (after the comma)
+          ? base64String                       // full data URL
+          : base64String.split(',')[1]         // raw base64 only (after the comma)
       );
     };
 

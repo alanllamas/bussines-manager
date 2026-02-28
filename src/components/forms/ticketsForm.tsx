@@ -137,28 +137,22 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
   // Defined inside the parent to access products state via useFormikContext() without prop drilling.
   // Recalculates when products[] or touched.products changes (ensures update after quantity edits).
   // Renders a disabled <input> bound to Formik's 'subtotal' field.
-  // @ts-expect-error: useFormikContext() returns unknown values shape (ADR-003).
   const SubtotalField = (props: { className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
     const {
-      // @ts-expect-error missing type
       values: { products },
       touched,
       setFieldValue,
-    } = useFormikContext();
+    } = useFormikContext<TicketInitialValues>();
     const [field, meta] = useField(props);
 
     React.useEffect(() => {
       // Recalculate subtotal as sum of all product.total values (price × quantity per line).
-      if (
-        // @ts-expect-error missing type
-        products && touched.products
-      ) {
-        const subtotal = products.reduce((acc: number, product: Product) => {
+      if (products && touched.products) {
+        const subtotal = products.reduce((acc: number, product: EProduct) => {
           return acc + Number(product.total)
         }, 0)
         setFieldValue('subtotal', subtotal);
       }
-      // @ts-expect-error missing type
     }, [ products, touched.products,  setFieldValue]);
 
     return (
@@ -171,29 +165,22 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
 
   // TotalField — derived field that recalculates total as subtotal + shipping.
   // Runs on every change to subtotal or shipping so the total stays in sync.
-  // @ts-expect-error: useFormikContext() returns unknown values shape (ADR-003).
   const TotalField = (props: { required:boolean, className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
     const {
-      // @ts-expect-error missing type
       values: { subtotal, shipping },
       touched,
       setFieldValue,
-    } = useFormikContext();
+    } = useFormikContext<TicketInitialValues>();
     const [field, meta] = useField(props);
 
     React.useEffect(() => {
-      if (
-        // @ts-expect-error missing type
-        subtotal && shipping && touched.shipping
-      ) {
+      if (subtotal && shipping && touched.shipping) {
         const total = Number(subtotal) + Number(shipping)
         setFieldValue('total', total);
       } else if (subtotal) {
         // No shipping yet — total equals subtotal.
         setFieldValue('total', Number(subtotal));
-
       }
-      // @ts-expect-error missing type
     }, [ subtotal, touched.subtotal, shipping, touched.shipping,  setFieldValue, props.name]);
 
     return (

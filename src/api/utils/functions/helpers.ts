@@ -7,16 +7,14 @@ const YEAR_BASE = 2000;
 // deepMerge — recursively merges source into target, mutating target.
 // Used by the three fetcher variants to merge default headers with caller-provided RequestInit.
 // Nested objects (e.g. headers) are merged recursively; scalar values overwrite.
-// @ts-expect-error comments are pending cleanup (ADR-003 — eliminate type suppressions).
-export const deepMerge = (target: object, source: object) => {
-  for (const key in source) {
-      // @ts-expect-error missing type
-    if (source[key] instanceof Object && key in target) {
-      // @ts-expect-error missing type
-      target[key] = deepMerge(target[key], source[key]);
+export const deepMerge = <T extends object>(target: T, source: object): T => {
+  const t = target as Record<string, unknown>;
+  const s = source as Record<string, unknown>;
+  for (const key in s) {
+    if (s[key] instanceof Object && key in t) {
+      t[key] = deepMerge(t[key] as object, s[key] as object);
     } else {
-      // @ts-expect-error missing type
-      target[key] = source[key];
+      t[key] = s[key];
     }
   }
   return target;

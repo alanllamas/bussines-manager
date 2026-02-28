@@ -8,15 +8,14 @@
 //   resolve(true);   // resolves the promise from wherever you have the resolver
 //   await promise;   // suspends until resolve() is called
 //
-// @ts-expect-error below is pending cleanup (ADR-003) — resolver is assigned inside the
-// Promise constructor callback so TypeScript sees it as potentially uninitialized.
 export const createPromise = async () => {
-  let resolver: (value: boolean) => void;
+  // Definite assignment assertion (!) — resolver is guaranteed to be assigned synchronously
+  // inside the Promise constructor before it's referenced in the returned tuple.
+  let resolver!: (value: boolean) => void;
   return [
-    new Promise((resolve) => {
+    new Promise<boolean>((resolve) => {
       resolver = resolve;
     }),
-      // @ts-expect-error missing type
     resolver,
-  ];
+  ] as const;
 };
