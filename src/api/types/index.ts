@@ -1,3 +1,9 @@
+// LEGACY TYPES — carried over from a previous project.
+// These types (Formality, Campus, TaxRegime, CreditCard, CustomerBillingInfo, etc.)
+// are NOT used by the current business manager domain (tickets, invoices, clients, purchases).
+// They remain here to avoid breaking any imports that may reference them.
+// Do not add new types to this file — use src/types/index.ts for domain types (ADR-003).
+
 export type Formality = {
   formalityNumber: string;
   name: string;
