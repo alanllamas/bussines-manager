@@ -25,6 +25,8 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 9 | [ADR-009](adr/ADR-009-firebase-config.md) | Validación de configuración Firebase | Media | ✅ Completado | — |
 | 10 | [ADR-010](adr/ADR-010-logging.md) | Logging centralizado | Media | ✅ Completado | — |
 | 11 | [ADR-019](adr/ADR-019-documentation-strategy.md) | Estrategia de documentación del proyecto | Media | ✅ Completado | — |
+| 12 | [ADR-020](adr/ADR-020-plan-activation-workflow.md) | Workflow de activación de planes | Alta | ✅ Completado | — |
+| 13 | [ADR-021](adr/ADR-021-index-sync.md) | Sincronización obligatoria de índices | Alta | ✅ Completado | ADR-019, ADR-020 |
 
 ---
 
