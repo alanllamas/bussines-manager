@@ -1,3 +1,13 @@
+// InvoiceList — global invoice list used on the /invoices page.
+// Orchestrates the full invoice workflow: fetching all invoices, opening the InvoicesForm
+// dialog for create/edit, managing the print trigger, and invalidating SWR cache on mutations.
+//
+// State management pattern: all InvoicesForm state (totals, resume, client, tickets, etc.)
+// is owned here and passed down as props. The form is a controlled, stateless dialog.
+//
+// Print pattern: InvoicePrintFormat is always in the DOM when printInvoice is set,
+// and it auto-triggers the browser print dialog. printKey is incremented on each print
+// request to force a React remount, which re-fires the print useEffect for successive prints.
 'use client'
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
@@ -20,27 +30,37 @@ import { toast } from "sonner"
 interface InvoiceListProps { itemsPerPage?: number }
 const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
   const { mutate } = useSWRConfig()
+  // invalidateInvoices: refetches both /api/invoices and /api/tickets keys because
+  // creating/editing an invoice changes ticket.invoice associations (tickets gain/lose their Corte link).
   const invalidateInvoices = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/invoices') || key[0].includes('/api/tickets'))
   )
-// ticket form functions
+  // Form state — owned here, passed down as props to InvoicesForm.
   const [totals, setTotals] = useState<Totals>({total: 0, sub_total:0, total_taxes: 0})
   const [resume, setResume] = useState<Resume>()
   const [clients, setClients] = useState<Client[]>([])
   const [tickets, setTickets] = useState<Ticket[]>([])
+  // availableTickets: unassigned tickets for the selected client (invoice === null).
+  // On edit: also includes tickets already on the invoice being edited.
   const [availableTickets, setAvailableTickets] = useState<Ticket[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [create, setCreate] = useState(false)
   const [editInvoice, setEditInvoice] = useState<Invoice>()
+  // newInvoice / newEditInvoice: SWR mutation payloads — set on form submit, cleared after response.
   const [newInvoice, setNewInvoice] = useState<createInvoiceReq>()
   const [newEditInvoice, setNewEditInvoice] = useState<{invoice: createInvoiceReq, documentId: string}>()
+  // initialFormValues: when set, triggers the dialog to open (via useEffect below).
   const [initialFormValues, setInitialFormValues] = useState<InvoiceInitialValues>()
   const [client, setClient] = useState<Client>()
+  // printInvoice / printKey: print trigger state. printKey is incremented to remount
+  // InvoicePrintFormat, which re-fires its auto-print useEffect for successive prints.
   const [printInvoice, setPrintInvoice] = useState<Invoice>()
   const [printKey, setPrintKey] = useState(0)
 
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
+  // Fetch tickets for the currently selected client (undefined = no client selected, hook skips).
+  // Used to populate availableTickets for the InvoicesForm ticket selector.
   const {
     tickets: ticketsData,
     error: ticketsError,
@@ -85,6 +105,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     }
   }, [])
 
+  // Sync tickets into state when SWR loads; availableTickets excludes already-invoiced tickets.
   useEffect(() => {
     if (!ticketsError && !ticketsIsLoading) {
       setTickets(ticketsData?.data ?? [])
@@ -92,6 +113,8 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     }
   }, [ticketsIsLoading, ticketsError])
 
+  // When edit mode is triggered: expand availableTickets to include this invoice's own tickets
+  // (t.invoice?.id === editInvoice.id) so they appear pre-selected in the form.
   useEffect(() => {
     if (editInvoice && ticketsData?.data) {
       setAvailableTickets(
@@ -134,9 +157,13 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     }
   }, [EditInvoiceData, EditInvoiceError, EditInvoiceIsLoading])
 
+  // When editInvoice is set: rebuild totals/resume from the existing ticket data,
+  // and populate initialFormValues so InvoicesForm opens with pre-filled values.
+  // generateResume is called with the invoice's existing tickets (not the full client ticket list).
   useEffect(() => {
     if (editInvoice) {
       const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`)
+      // Override tickets state with just this invoice's tickets for generateResume context.
       setTickets(editInvoice.tickets)
       const { results, totals } = generateResume(editTickets, editInvoice.tickets, client)
       setResume(results)
@@ -223,10 +250,14 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     
   }, [editInvoice])
 
+  // Open the dialog as soon as initialFormValues is populated (either by sendCreate or editInvoice effect).
   useEffect(() => {
     if (initialFormValues) setIsOpen(true)
   }, [initialFormValues])
 
+  // sendCreate — initializes a blank form for a new invoice.
+  // invoice_number = last invoice number + 1 (fetched from useGetInvoiceNumber).
+  // invoice_status defaults to "por-pagar" (unpaid / accounts receivable initial state).
   const sendCreate = () => {
     setCreate(true)
 
@@ -243,6 +274,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
       initial_date: null,
       invoice_send_date: null,
       payment_date: null,
+      // Increment last invoice_number; fallback to 0 if not yet loaded.
       invoice_number: (invoice_number !== undefined && !isNaN(invoice_number) ? invoice_number : 0) + 1,
       invoice_id: '',
       invoice_status: "por-pagar",
@@ -255,6 +287,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     })
   }
 
+  // sendClose — resets all form state and closes the dialog.
   const sendClose = () => {
     setEditInvoice(undefined)
     setResume(undefined)
@@ -265,30 +298,31 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     setCreate(false)
   }
 
+  // handleSubmit — transforms InvoiceInitialValues into createInvoiceReq before firing the mutation.
+  // client is wrapped in an array (Strapi v5 relation format: client: [id]).
+  // resume is serialized to JSON string (stored as text in Strapi, parsed on read).
   const handleSubmit = async (values: InvoiceInitialValues) => {
     setIsOpen(false)
     const data = {
       ...values,
-      client: [values.client],
-      resume: JSON.stringify(values.resume) 
-    } 
+      client: [values.client],          // Strapi relation: wrap id in array
+      resume: JSON.stringify(values.resume)  // stored as JSON string in Strapi
+    }
     if (editInvoice) {
       setNewEditInvoice({ invoice: data, documentId: editInvoice.documentId || ''})
     } else {
       setNewInvoice(data)
     }
-
-    // client
-    // resume
-
   }
-  // // Invoice form functions
 
+  // sendPrint — increments printKey to remount InvoicePrintFormat and set the invoice to print.
+  // The key increment forces a React remount, which re-fires the auto-print useEffect.
   const sendPrint = (invoice:Invoice) => {
     setPrintKey(k => k + 1)
     setPrintInvoice(invoice)
   }
 
+  // Items — renders invoice rows for the current page slice (desktop table).
   function Items({ currentItems }: {currentItems: Invoice[]}) {
     return (
       <>
@@ -311,6 +345,8 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
     );
   }
 
+  // PaginatedItems — wraps Items with usePaginatedData and ReactPaginate.
+  // Renders a mobile card list (sm:hidden) and a desktop table (hidden sm:block).
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(invoices, itemsPerPage);
       return (

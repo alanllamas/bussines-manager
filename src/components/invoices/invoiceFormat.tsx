@@ -1,4 +1,10 @@
 'use client'
+// InvoiceFormat — full invoice detail view for the /invoices/[documentId] page.
+// Fetches the invoice by numeric Strapi id (not documentId) via useGetInvoice(id).
+// PrintInvoiceFormat config (defined in getInvoice.ts) provides documentTitle + filename for useReactToPrint,
+//   using client_name + date range as the suggested save filename.
+// Dates are formatted dd/mm/yy (es-MX locale) before being passed down to InvoiceBaseFormat.
+// A manual "Imprimir" button triggers PrintInvoice() — no auto-print here (see InvoicePrintFormat for that).
 import React, { useEffect, useRef, useState } from "react"
 import useGetInvoice, { PrintInvoiceFormat } from "@/api/hooks/invoices/getInvoice";
 import { Invoice } from "@/api/hooks/invoices/getInvoices";
@@ -9,6 +15,7 @@ import InvoiceBaseFormat from "./invoiceBaseFormat";
 const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
  
   const [invoice, setInvoice] = useState<Invoice>()
+  // Fetch invoice by numeric Strapi id (page route passes numeric id, not documentId).
   const {
     invoice: invoiceData,
     error: invoiceError,
@@ -25,6 +32,7 @@ const InvoiceFormat: React.FC<{ id: number }> = ({ id }) => {
 
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // Format dates as dd/mm/yy (es-MX) — passed to InvoiceBaseFormat and used as print filename suffix.
   const initial_date = new Date(invoice?.initial_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
   const ending_date = new Date(invoice?.ending_date || '').toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'})
   const send_date = invoice?.invoice_send_date ? new Date(invoice.invoice_send_date).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit'}) : ''

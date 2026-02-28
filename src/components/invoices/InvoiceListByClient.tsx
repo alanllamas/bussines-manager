@@ -1,3 +1,11 @@
+// InvoiceListByClient — invoice list scoped to a single client, used on the client detail page.
+// Functionally identical to InvoiceList but with two key differences:
+//   1. Uses useGetInvoicesByClient(clientId) instead of useGetInvoices() (filtered by client).
+//   2. blockClient={true} is passed to InvoicesForm — client selector is disabled since
+//      the client is already known from the page context.
+//   3. sendCreate() pre-fills client with the current client's numeric id.
+//   4. Invoices are sorted by id desc on load (most recent first).
+// clientId: the Strapi documentId of the client (from the page URL param).
 'use client'
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
@@ -21,10 +29,11 @@ import { toast } from "sonner"
 interface InvoiceListByClientProps { itemsPerPage?: number; clientId: string }
 const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage = 10, clientId}) => {
   const { mutate } = useSWRConfig()
+  // Same dual-key invalidation as InvoiceList (invoices + tickets both change on mutation).
   const invalidateInvoices = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/invoices') || key[0].includes('/api/tickets'))
   )
-// ticket form functions
+  // Form state — same structure as InvoiceList (see InvoiceList.tsx for full documentation).
   const [totals, setTotals] = useState<Totals>({total: 0, sub_total:0, total_taxes: 0})
   const [resume, setResume] = useState<Resume>()
   const [clients, setClients] = useState<Client[]>([])
@@ -69,12 +78,14 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
   } = useGetInvoicesByClient(clientId)
   const { invoice_number } = useGetInvoiceNumber()
 
+  // Sort invoices by numeric id desc (most recent first) on load/refresh.
   useEffect(() => {
     if (!invoicesError && !invoicesIsLoading && invoicesData?.data) {
       setInvoices([...invoicesData.data].sort((a, b) => (b.id ?? 0) - (a.id ?? 0)))
     }
   }, [invoicesIsLoading, invoicesError, invoicesData])
 
+  // Set availableTickets to unassigned tickets only (invoice === null means free to add to a corte).
   useEffect(() => {
     if (!ticketsError && !ticketsIsLoading) {
       setTickets(ticketsData?.data ?? [])
@@ -82,6 +93,7 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     }
   }, [ticketsIsLoading, ticketsError])
 
+  // When editing: expand available pool to include tickets already on this invoice (ADR-013).
   useEffect(() => {
     if (editInvoice && ticketsData?.data) {
       setAvailableTickets(
@@ -92,6 +104,7 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     }
   }, [editInvoice])
 
+  // Resolve the current client object from the global list using the URL param documentId.
   useEffect(() => {
     if (!clientsError && !clientsIsLoading) {
       const allClients = clientsData?.data ?? []
@@ -101,9 +114,8 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     }
   }, [clientsIsLoading, clientsError])
         
+  // Create mutation response: show toast, invalidate cache, clear SWR payload on success.
   useEffect(() => {
-    // make refresh
-
     if (InvoiceError && !InvoiceIsLoading) {
       toast.error('Error al crear el corte')
     } else if (!InvoiceError && !InvoiceIsLoading && InvoiceData) {
@@ -113,6 +125,7 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     }
   }, [InvoiceIsLoading, InvoiceData, InvoiceError])
 
+  // Edit mutation response: show toast, invalidate cache, clear SWR payload, close dialog on success.
   useEffect(() => {
     if (EditInvoiceError && !EditInvoiceIsLoading) {
       toast.error('Error al editar el corte')
@@ -127,6 +140,8 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     }
   }, [EditInvoiceData, EditInvoiceError, EditInvoiceIsLoading])
 
+  // When editInvoice is set: re-run generateResume and pre-populate initialFormValues
+  // so the dialog opens with all existing invoice data pre-filled (ADR-013 fix).
   useEffect(() => {
     if (editInvoice) {
       const editTickets = editInvoice?.tickets.map(ticket => `${ticket.id}`);
@@ -214,10 +229,12 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     
   }, [editInvoice])
 
+  // Open dialog once initialFormValues are ready (set by sendCreate or the editInvoice effect).
   useEffect(() => {
     if (initialFormValues) setIsOpen(true)
   }, [initialFormValues])
 
+  // Open create dialog: set create flag, pre-fill client id from context, default status "por-pagar".
   const sendCreate = () => {
     setCreate(true)
 
@@ -246,6 +263,7 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     })
   }
 
+  // Reset all dialog and form state, close the dialog.
   const sendClose = () => {
     setEditInvoice(undefined)
     setResume(undefined)
@@ -255,12 +273,13 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     setCreate(false)
   }
 
+  // Close dialog, wrap client in array (Strapi relation format), serialize resume to JSON string.
   const handleSubmit = async (values: InvoiceInitialValues) => {
     setIsOpen(false)
     const data = {
       ...values,
       client: [values.client],
-      resume: JSON.stringify(values.resume) 
+      resume: JSON.stringify(values.resume)
     } 
     if (editInvoice) {
       setNewEditInvoice({ invoice: data, documentId: editInvoice.documentId || ''})
@@ -274,11 +293,13 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
   }
   // // Invoice form functions
 
+  // Increment printKey to force InvoicePrintFormat remount before setting the new invoice to print.
   const sendPrint = (invoice:Invoice) => {
     setPrintKey(k => k + 1)
     setPrintInvoice(invoice)
   }
 
+  // Inner component: renders one table row per invoice (consumed by PaginatedItems).
   function Items({ currentItems }: {currentItems: Invoice[]}) {
     return (
       <>
@@ -297,6 +318,7 @@ const InvoiceListByCLient: React.FC<InvoiceListByClientProps> = ({itemsPerPage =
     );
   }
 
+  // Inner component: pagination shell — mobile cards + desktop table + ReactPaginate controls.
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(invoices, itemsPerPage);
       return (
