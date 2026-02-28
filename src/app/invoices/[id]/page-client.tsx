@@ -1,4 +1,6 @@
 'use client'
+// ClientInvoice — vista de detalle de un corte (/invoices/[id]).
+// useAuthGuard: retorna null mientras carga. Delega todo el fetch y render a InvoiceFormat.
 import React from "react"
 import InvoiceFormat from "@/components/invoices/invoiceFormat";
 import { useAuthGuard } from "@/hooks/useAuthGuard";

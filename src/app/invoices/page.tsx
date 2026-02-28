@@ -1,3 +1,4 @@
+// /invoices — Server shell → ClientInvoices.
 import ClientInvoices from "./page-client";
 
 

@@ -1,3 +1,4 @@
+// /tickets/[id] — Server Component: awaita params.id (documentId string) y lo pasa a ClientTicket.
 import ClientTicket from "./page-client";
 
 export default async function Ticket({ params }: { params: Promise<{ id: number }> }) {

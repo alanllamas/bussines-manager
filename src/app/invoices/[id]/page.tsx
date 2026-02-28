@@ -1,3 +1,5 @@
+// /invoices/[id] — Server Component: awaita params.id (numeric Strapi id) y lo pasa a ClientInvoice.
+// Nota: id es numérico (no documentId) — coincide con lo que espera useGetInvoice(id).
 import ClientInvoice from "./page-client";
 
 
