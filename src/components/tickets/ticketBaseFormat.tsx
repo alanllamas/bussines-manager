@@ -1,4 +1,12 @@
 'use client'
+// TicketBaseFormat — layout compartido entre TicketFormat (pantalla) y TicketPrintFormat (impresión).
+// Recibe el ticket y la fecha ya formateada como string desde el padre.
+// Props tipadas como `any` — pendiente ADR-003 para tipos estrictos.
+// Tabla de productos: siempre rellena hasta 10 filas con filas vacías (Math.max(0, 10 - products.length))
+//   para dar un aspecto de formulario impreso uniforme.
+// `print:text-sm` en la tabla + `print:border-gray-200` en celdas — ajustes visuales solo en impresión.
+// Contacto del negocio (email, teléfono) hard-codeado — no es configurable desde Strapi.
+// Totales: sub_total · envío · total (sin IVA desglosado, a diferencia de invoiceBaseFormat).
 import React from "react"
 import logo from "@/public/logo.png"
 import { ProductVariant, TicketProduct } from "@/api/hooks/tickets/getTickets"

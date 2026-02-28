@@ -1,4 +1,9 @@
 'use client'
+// TicketFormat — vista de detalle de una nota en /tickets/[documentId].
+// Recibe el ticket como prop directamente (el padre lo fetcha, no hace fetch propio).
+// PrintTicketFormat config (de getTicket.ts) configura documentTitle + nombre de archivo para useReactToPrint.
+// Fecha formateada con toLocaleDateString() (locale del sistema, no es-MX explícito — distinto a invoiceFormat).
+// Botón "imprimir" manual — sin auto-print (ver TicketPrintFormat para ese patrón).
 import React, { useRef } from "react"
 import { PrintTicketFormat } from "@/api/hooks/tickets/getTicket"
 import TicketBaseFormat from "./ticketBaseFormat"
