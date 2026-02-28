@@ -36,6 +36,7 @@ Especificaciones de features completas. Viven en `docs/modules/`.
 
 | Módulo | Archivo | Prioridad | Estado | Depende de |
 |---|---|---|---|---|
+| Cotizaciones | [modules/cotizaciones.md](modules/cotizaciones.md) | Alta | Pendiente | ADR-003 |
 | Cobranza (Cuentas por Cobrar) | [modules/cobranza.md](modules/cobranza.md) | Alta | Pendiente | ADR-003 |
 | Por Pagar — Alcance 1: pago único | [modules/por-pagar.md](modules/por-pagar.md) | Alta | Pendiente | ADR-003 |
 | Por Pagar — Alcance 2: pagos parciales | [modules/por-pagar-parcial.md](modules/por-pagar-parcial.md) | Media | Pendiente | por-pagar.md |
