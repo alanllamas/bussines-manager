@@ -54,6 +54,8 @@ Reglas:
   - `acceptance criteria` — condición verificable de que está lista
 - Las dependencias entre tareas se modelan con `blockedBy`
 
+> **Un plan no se considera terminado hasta que todas sus tareas están escritas en el task list con acceptance criteria y blockedBy configurados.** Tener solo el documento del plan sin las tareas = plan incompleto.
+
 ---
 
 ## Paso 3 — Seguimiento de items out of scope
