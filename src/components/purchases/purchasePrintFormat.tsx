@@ -1,4 +1,10 @@
 'use client'
+// PurchasePrintFormat — wrapper de auto-impresión usado por PurchaseList (via key={printKey}).
+// hidden en pantalla, print:block al imprimir.
+// Un solo useEffect con setTimeout(300ms) — más simple que InvoicePrintFormat (500ms, two-stage):
+//   no necesita two-stage porque date y PrintPurchase config se calculan del prop directamente,
+//   sin necesidad de sincronizar estado intermedio.
+// Cleanup: clearTimeout en el return del effect — evita llamar PrintPurchase tras unmount.
 import React, { useEffect, useRef } from "react"
 import { useReactToPrint } from "react-to-print"
 import type { Purchase } from "@/types"

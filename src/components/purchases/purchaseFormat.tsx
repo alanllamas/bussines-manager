@@ -1,4 +1,9 @@
 'use client'
+// PurchaseFormat — vista de detalle de una compra en /purchases/[documentId].
+// Recibe purchase como prop directamente (el padre lo fetcha, sin fetch propio).
+// PrintPurchaseFormat config (de getPurchase.ts) configura documentTitle + nombre de archivo.
+// Fecha formateada con toLocaleDateString() (locale del sistema).
+// Botón "Imprimir" manual — sin auto-print (ver PurchasePrintFormat para ese patrón).
 import React, { useRef } from "react"
 import { useReactToPrint } from "react-to-print"
 import type { Purchase } from "@/types"

@@ -1,4 +1,8 @@
 'use client'
+// PurchaseList — lista de compras con create/edit inline y auto-print.
+// Recibe purchaseData como prop (pre-fetched por el padre).
+// Print pattern: printKey (igual que InvoiceList, no el null-unmount de TicketList).
+// invalidate solo afecta /api/purchases — no hay cascada a otros recursos.
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
 import { ActionButtons } from "@/components/ui"
@@ -12,6 +16,7 @@ import useGetPurchaseNumber from "@/api/hooks/purchases/getPurchaseNumber"
 import { useSWRConfig } from "swr"
 import { toast } from "sonner"
 
+// Mapas de etiquetas para los enums de Strapi — duplicados también en purchaseBaseFormat.tsx.
 const REASON_LABELS: Record<string, string> = {
   supplies: 'Insumos', tools: 'Herramientas', food: 'Comida', drinks: 'Bebidas', other: 'Otro'
 }
@@ -23,6 +28,7 @@ interface PurchaseListProps { purchaseData?: Purchase[]; itemsPerPage?: number }
 
 const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage = 10 }) => {
   const { mutate } = useSWRConfig()
+  // Invalida solo /api/purchases — sin cascada a otros recursos.
   const invalidate = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/purchases')
   )
@@ -34,6 +40,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
   const [printPurchase, setPrintPurchase] = useState<Purchase>()
   const [printKey, setPrintKey] = useState(0)
 
+  // Incrementa printKey para forzar remount de PurchasePrintFormat antes de setear el nuevo purchase.
   const sendPrint = (purchase: Purchase) => {
     setPrintKey(k => k + 1)
     setPrintPurchase(purchase)
@@ -45,10 +52,12 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
   const { purchase: editedPurchase, error: editError, isLoading: editLoading } = useEditPurchase(newEditPurchase)
   const { purchase_number } = useGetPurchaseNumber()
 
+  // Ordena compras por id desc (más reciente primero) al actualizar purchaseData.
   useEffect(() => {
     if (purchaseData) setPurchases([...purchaseData].sort((a, b) => b.id - a.id))
   }, [purchaseData])
 
+  // Create mutation response: toast + invalidar cache + cerrar dialog en éxito.
   useEffect(() => {
     if (createError && !createLoading) {
       toast.error('Error al crear la compra')
@@ -60,6 +69,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }, [createLoading, createdPurchase, createError])
 
+  // Edit mutation response: toast + invalidar cache + cerrar dialog en éxito.
   useEffect(() => {
     if (editError && !editLoading) {
       toast.error('Error al editar la compra')
@@ -71,6 +81,8 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }, [editedPurchase, editError, editLoading])
 
+  // Cuando editPurchase se fija: construye initialFormValues mapeando
+  // PurchaseSupply → EPurchaseSupply con supply_variants como array de documentId strings.
   useEffect(() => {
     if (editPurchase) {
       setInitialFormValues({
@@ -95,10 +107,12 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }, [editPurchase])
 
+  // Abre dialog cuando initialFormValues están listos (tiene guard — no se dispara en mount).
   useEffect(() => {
     if (initialFormValues) setIsOpen(true)
   }, [initialFormValues])
 
+  // Abre dialog de creación: defaults reason='supplies', status='planned', purchase_number=lastNumber+1.
   const sendCreate = () => {
     setEditPurchase(undefined)
     setInitialFormValues({
@@ -114,12 +128,14 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     })
   }
 
+  // Resetea estado del dialog y lo cierra.
   const sendClose = () => {
     setEditPurchase(undefined)
     setInitialFormValues(undefined)
     setIsOpen(false)
   }
 
+  // Construye payload: supply en array (Strapi relation), purchase_date como Date, supplies mapeados.
   const handleSubmit = (values: PurchaseInitialValues) => {
     const data: createPurchaseReq = {
       purchase_number: values.purchase_number,
@@ -145,6 +161,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }
 
+  // Inner component: una fila por compra con labels legibles de reason/status (fallback al valor raw).
   function Items({ currentItems }: { currentItems: Purchase[] }) {
     return (
       <>
@@ -166,6 +183,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     )
   }
 
+  // Inner component: shell de paginación — cards mobile + tabla desktop + ReactPaginate.
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(purchases, itemsPerPage)
     return (
