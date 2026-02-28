@@ -511,7 +511,7 @@ const InvoicesForm: React.FC<any> = ({
                             <div className="flex flex-col w-full sm:w-1/3 px-2">
                               <label className="field-label" htmlFor="invoice_status">Estatus de corte</label>
                               <Field className="field-select" as="select" name="invoice_status" value={values?.invoice_status}>
-                                <option value="">Selecciona una opción</option>
+                                <option value="">-- Seleccionar --</option>
                                 <option value="creado">Creado</option>
                                 <option value="enviado">Enviado</option>
                                 <option value="pagado">Pagado</option>

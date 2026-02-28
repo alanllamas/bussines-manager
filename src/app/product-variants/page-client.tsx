@@ -5,7 +5,7 @@ import ProductVariantForm from "@/components/forms/ProductVariantForm"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import Spinner from "@/components/ui/Spinner"
 import { useSWRConfig } from "swr"
-import { ActionButtons, EmptyState } from "@/components/ui"
+import { ActionButtons, EmptyState, PageHeader } from "@/components/ui"
 import type { ProductVariant } from "@/api/hooks/getProducts"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
 import ReactPaginate from "react-paginate"
@@ -33,15 +33,10 @@ const ProductVariantsPage: React.FC = () => {
   return (
     <section className="w-full flex flex-col items-center">
       <section className="w-full py-6 px-4 sm:w-11/12 sm:py-8 sm:px-6 lg:w-7/12 lg:py-12 lg:px-8 bg-surface-50 text-surface-900">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">Variantes de Productos</h1>
-          {!showCreate && (
-            <button className="btn-primary" onClick={() => { setShowCreate(true); setEditing(null) }}>
-              <span className="material-symbols-outlined text-[16px]">add</span>
-              Nueva variante
-            </button>
-          )}
-        </div>
+        <PageHeader
+          title="Variantes de Productos"
+          action={{ label: 'Nueva variante', icon: 'add', onClick: () => { setShowCreate(true); setEditing(null) }, hidden: showCreate }}
+        />
 
         {showCreate && (
           <div className="mb-6 p-4 border border-surface-200 rounded bg-white">
