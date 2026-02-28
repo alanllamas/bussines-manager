@@ -68,7 +68,7 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
   const { currentItems, pageCount, handlePageChange } = usePaginatedData(list, 10)
 
   return (
-    <section className="w-full flex flex-col items-center min-h-[60vh] sm:min-h-0">
+    <section className="w-full flex flex-col items-center min-h-[60vh] sm:min-h-0 pb-16 sm:pb-0">
       {/* Mobile cards */}
       <div className="sm:hidden w-full space-y-2">
         {list.length === 0 ? (
@@ -130,17 +130,19 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
         </table>
       </div>
 
-      <div className="mt-auto sm:mt-0 w-full">
-        <ReactPaginate
-          className="paginator"
-          breakLabel="…"
-          nextLabel="siguiente ›"
-          previousLabel="‹ anterior"
-          onPageChange={handlePageChange}
-          pageRangeDisplayed={5}
-          pageCount={Math.max(pageCount, 1)}
-        />
-      </div>
+      {pageCount > 1 && (
+        <div className="paginator-bar">
+          <ReactPaginate
+            className="paginator"
+            breakLabel="…"
+            nextLabel="siguiente ›"
+            previousLabel="‹ anterior"
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={5}
+            pageCount={pageCount}
+          />
+        </div>
+      )}
     </section>
   )
 }

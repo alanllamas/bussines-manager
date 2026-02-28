@@ -193,7 +193,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(purchases, itemsPerPage)
     return (
-      <section className="w-full flex flex-col items-center">
+      <section className="w-full flex flex-col items-center pb-16 sm:pb-0">
         {/* Mobile cards */}
         <div className="sm:hidden w-full space-y-2 mt-4">
           {purchases.length === 0
@@ -240,16 +240,19 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
             </tbody>
           </table>
         </div>
-        <ReactPaginate
-          className="paginator"
-          breakLabel="…"
-          nextLabel="siguiente ›"
-          previousLabel="‹ anterior"
-          onPageChange={handlePageChange}
-          pageRangeDisplayed={5}
-          pageCount={pageCount}
-          renderOnZeroPageCount={null}
-        />
+        {pageCount > 1 && (
+          <div className="paginator-bar">
+            <ReactPaginate
+              className="paginator"
+              breakLabel="…"
+              nextLabel="siguiente ›"
+              previousLabel="‹ anterior"
+              onPageChange={handlePageChange}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+            />
+          </div>
+        )}
       </section>
     )
   }

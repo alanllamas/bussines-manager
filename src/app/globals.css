@@ -263,6 +263,29 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid var(--color-surface-100);
 }
 
+/* ── Paginator bar (mobile fixed bottom) ── */
+/* Mobile: fijo al fondo del viewport sobre el contenido. */
+/* Desktop (≥640px): vuelve al flujo normal. */
+.paginator-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: white;
+  border-top: 1px solid var(--color-surface-200);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (min-width: 640px) {
+  .paginator-bar {
+    position: static;
+    border-top: none;
+    padding-bottom: 0;
+    z-index: auto;
+  }
+}
+
 /* ── Paginator ── */
 .paginator {
   display: flex;

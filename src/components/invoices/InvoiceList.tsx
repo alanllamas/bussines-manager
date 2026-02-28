@@ -350,7 +350,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(invoices, itemsPerPage);
       return (
-      <section className="w-full flex flex-col items-center">
+      <section className="w-full flex flex-col items-center pb-16 sm:pb-0">
         {/* Mobile card list */}
         <div className="sm:hidden w-full space-y-2 mt-4">
           {invoices.length === 0
@@ -392,16 +392,19 @@ const InvoiceList: React.FC<InvoiceListProps> = ({itemsPerPage = 10}) => {
             </tbody>
           </table>
         </div>
-        <ReactPaginate
-          className="paginator"
-          breakLabel="…"
-          nextLabel="siguiente ›"
-          previousLabel="‹ anterior"
-          onPageChange={handlePageChange}
-          pageRangeDisplayed={5}
-          pageCount={pageCount}
-          renderOnZeroPageCount={null}
-        />
+        {pageCount > 1 && (
+          <div className="paginator-bar">
+            <ReactPaginate
+              className="paginator"
+              breakLabel="…"
+              nextLabel="siguiente ›"
+              previousLabel="‹ anterior"
+              onPageChange={handlePageChange}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+            />
+          </div>
+        )}
       </section>
     );
   }
