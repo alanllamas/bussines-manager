@@ -1,4 +1,4 @@
-# ADR-016 — Módulo de Cobranza (Cuentas por Cobrar)
+# Módulo: Cobranza (Cuentas por Cobrar)
 
 **Estado:** Pendiente
 **Prioridad:** Alta

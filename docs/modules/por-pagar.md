@@ -1,9 +1,9 @@
-# ADR-017 — Módulo de Por Pagar (Cuentas por Pagar) — Alcance 1: Pago único
+# Módulo: Por Pagar (Cuentas por Pagar) — Alcance 1: Pago único
 
 **Estado:** Pendiente
 **Prioridad:** Alta
 **Depende de:** ADR-003 (tipos globales)
-**Segundo alcance:** ADR-018 (pagos parciales — pendiente)
+**Segundo alcance:** [por-pagar-parcial.md](por-pagar-parcial.md) (pagos parciales — pendiente)
 
 ---
 
@@ -13,7 +13,7 @@ El flujo de gastos actual termina en la creación de una Compra (`purchase`) con
 
 Este módulo cierra ese ciclo desde el lado de los egresos: de "compra registrada" a "compra pagada".
 
-**Alcance de este ADR:** pago único por compra. Los pagos parciales se contemplan en ADR-018.
+**Alcance de este documento:** pago único por compra. Los pagos parciales se contemplan en [por-pagar-parcial.md](por-pagar-parcial.md).
 
 ---
 
@@ -56,7 +56,6 @@ Gastos ▾
   ├── Insumos         → /supplies
   └── Variantes       → /supply-variants
 ```
-
 
 ---
 
@@ -113,7 +112,7 @@ No se requieren nuevas rutas proxy.
 - El ciclo de gastos queda cubierto sin nueva colección en Strapi (solo un campo extra)
 - `purchase_status` pasa de actualización manual a acción guiada desde `/por-pagar`
 - La nav de Gastos refleja el dominio completo: registro → seguimiento → pago
-- Sienta las bases para ADR-018 (pagos parciales) sin conflicto arquitectural
+- Sienta las bases para [por-pagar-parcial.md](por-pagar-parcial.md) (pagos parciales) sin conflicto arquitectural
 
 ---
 

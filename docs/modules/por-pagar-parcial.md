@@ -1,15 +1,15 @@
-# ADR-018 — Módulo de Por Pagar — Alcance 2: Pagos Parciales
+# Módulo: Por Pagar — Alcance 2: Pagos Parciales
 
 **Estado:** Pendiente
 **Prioridad:** Media
-**Depende de:** ADR-017 (Por Pagar — pago único)
-**Nota:** Este ADR extiende y modifica ADR-017. Al implementarse, reemplaza la lógica de `purchase_status` para el seguimiento de pago por un campo dedicado `payment_status`.
+**Depende de:** [por-pagar.md](por-pagar.md) (Por Pagar — pago único)
+**Nota:** Este documento extiende y modifica [por-pagar.md](por-pagar.md). Al implementarse, reemplaza la lógica de `purchase_status` para el seguimiento de pago por un campo dedicado `payment_status`.
 
 ---
 
 ## Contexto
 
-ADR-017 cubre el caso de pago único usando `purchase_status: 'paid'`. Sin embargo, en la práctica las compras pueden pagarse en partes (anticipo, liquidación, etc.). Este alcance introduce historial de pagos sobre compras, análogo a lo que ADR-016 hace para los Cortes.
+El alcance 1 cubre el caso de pago único usando `purchase_status: 'paid'`. Sin embargo, en la práctica las compras pueden pagarse en partes (anticipo, liquidación, etc.). Este alcance introduce historial de pagos sobre compras, análogo a lo que el módulo de Cobranza hace para los Cortes.
 
 ---
 
@@ -63,13 +63,13 @@ Al registrar o eliminar un pago, recalcular y actualizar `purchase.payment_statu
 
 ### Navegación
 
-Sin cambios respecto a ADR-017 — `/por-pagar` ya está en el dropdown Gastos.
+Sin cambios respecto al alcance 1 — `/por-pagar` ya está en el dropdown Gastos.
 
 ---
 
 ### Páginas
 
-#### `/por-pagar` — cambios respecto a ADR-017
+#### `/por-pagar` — cambios respecto al alcance 1
 - Filtrar por `payment_status` ≠ `pagado` (en lugar de `purchase_status` ≠ `paid`)
 - Reemplazar botón "Marcar como pagada" por botón **Registrar pago** que abre `PaymentPayableForm`
 - Añadir columna **Pagado** y **Saldo**
@@ -94,7 +94,7 @@ Columnas historial: Fecha · Monto · % · Método · Referencia · Acciones
 | `PurchasePaymentStatusBadge.tsx` | Badge para `por-pagar` / `parcial` / `pagado` (reutilizable) |
 | `BalanceSummaryPayable.tsx` | Bloque visual: Total · Pagado · Saldo pendiente |
 
-> `PurchaseStatusBadge` de ADR-017 cubre el estado operacional — este badge cubre el estado de pago.
+> `PurchaseStatusBadge` del alcance 1 cubre el estado operacional — este badge cubre el estado de pago.
 
 ---
 
@@ -113,7 +113,7 @@ PUT  /api/payments-payable/[id]         → editar pago
 
 - El ciclo de gastos queda completamente cubierto: Compra → Seguimiento → Pago parcial/total
 - `payment_status` queda separado de `purchase_status` — operación y finanzas son dimensiones independientes
-- Simétrico con ADR-016: misma arquitectura de pagos en ambos lados del negocio (cobrar / pagar)
+- Simétrico con el módulo de Cobranza: misma arquitectura de pagos en ambos lados del negocio (cobrar / pagar)
 - Requiere nueva colección `payment_payable` en Strapi antes de iniciar el desarrollo frontend
 - Cuando se modele la entidad proveedor, solo se añade la relación a `payment_payable` sin romper lo existente
 
