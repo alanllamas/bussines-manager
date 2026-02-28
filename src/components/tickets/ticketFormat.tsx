@@ -18,7 +18,7 @@ const TicketFormat: React.FC<TicketFormatProps> = ({ticket}) => {
   const PrintTicket = useReactToPrint(PrintTicketFormat(contentRef, ticket));
 
   return <section className="flex flex-col w-full justify-center items-center">
-    <div className="w-full pb-4 px-4 sm:px-8 md:px-16 lg:px-32 flex justify-end">
+    <div className="w-full pt-4 pb-4 px-4 sm:px-8 md:px-16 lg:px-32 flex justify-end">
       <button className="btn-secondary" onClick={() => PrintTicket()}>
         <span className="material-symbols-outlined text-[16px]">print</span>
         Imprimir
