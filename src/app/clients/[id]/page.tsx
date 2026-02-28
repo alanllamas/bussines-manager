@@ -1,3 +1,4 @@
+// /clients/[id] — Server Component: awaita params.id (documentId) y lo pasa a ClientPage.
 import ClientPage from "./page-client";
 
 export default async function Client({ params }: { params: Promise<{ id: string }> }) {

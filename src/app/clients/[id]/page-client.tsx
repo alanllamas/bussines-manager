@@ -1,4 +1,8 @@
 'use client'
+// ClientPage — vista de detalle de un cliente (/clients/[id]).
+// id es el documentId (string) del cliente, recibido como prop desde el server component.
+// Tres estados de render: Spinner (cargando) → ErrorScreen → DataScreen (ClientTabs).
+// LoadingScreen / ErrorScreen / DataScreen son inner components definidos localmente.
 import useGetClient, { Client } from "@/api/hooks/clients/getClient";
 import React, { useEffect, useState } from "react";
 import ClientTabs from "../components/ClientTabs";

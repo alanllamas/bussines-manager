@@ -1,4 +1,10 @@
 'use client'
+// ClientsSideBar — sidebar de navegación del módulo /clients.
+// En desktop: sticky top-20, h-[calc(100vh-5rem)], siempre visible.
+// En mobile: acordeón colapsable controlado por isMobileOpen.
+// useAuthGuard: retorna null mientras la auth carga (evita flash de contenido no autenticado).
+// Cliente activo: detectado por usePathname comparado con /clients/[documentId].
+// "Nuevo Cliente" CTA fijo al fondo del sidebar, links a /clients/new.
 import React, { useState } from "react"
 import useGetClients from "@/api/hooks/clients/getClients"
 import Link from "next/link"

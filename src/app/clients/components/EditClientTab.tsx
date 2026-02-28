@@ -1,4 +1,6 @@
 'use client'
+// EditClientTab — panel de edición del cliente (Tab 5 en ClientTabs).
+// Thin wrapper: renderiza ClientForm pasando client prop (modo edición).
 import React from "react";
 import { TabPanel } from '@headlessui/react'
 import { Client } from "@/api/hooks/clients/getClient";
