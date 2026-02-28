@@ -34,9 +34,11 @@ Decisiones arquitecturales de gran escala que requieren aprobación. Viven en `.
 
 | Plan | Archivo | Estado | Depende de |
 |---|---|---|---|
-| Auditoría y completado del sistema de diseño | [design-system-audit.md](../.claude/plans/design-system-audit.md) | Pendiente aprobación | — |
-| Migrar backend de Strapi a Supabase | [supabase-migration.md](../.claude/plans/supabase-migration.md) | Pendiente aprobación | — |
-| Mover lógica de negocio al backend | [backend-business-logic.md](../.claude/plans/backend-business-logic.md) | Bloqueado | supabase-migration.md |
+| Auditoría y completado del sistema de diseño | [design-system-audit.md](../.claude/plans/design-system-audit.md) | ✅ Completado | — |
+| Paginador fijo en mobile | [mobile-sticky-paginator.md](../.claude/plans/mobile-sticky-paginator.md) | ✅ Completado | — |
+| Productos e Insumos — Cards + Modal | [peppy-questing-crab.md](../.claude/plans/peppy-questing-crab.md) | 🟡 Aprobado | — |
+| Migrar backend de Strapi a Supabase | [supabase-migration.md](../.claude/plans/supabase-migration.md) | ⏳ Pendiente aprobación | — |
+| Mover lógica de negocio al backend | [backend-business-logic.md](../.claude/plans/backend-business-logic.md) | 🔒 Bloqueado | supabase-migration.md |
 
 ---
 
@@ -46,10 +48,10 @@ Especificaciones de features completas. Viven en `docs/modules/`.
 
 | Módulo | Archivo | Prioridad | Estado | Depende de |
 |---|---|---|---|---|
-| Cotizaciones | [modules/cotizaciones.md](modules/cotizaciones.md) | Alta | Pendiente | ADR-003 |
-| Cobranza (Cuentas por Cobrar) | [modules/cobranza.md](modules/cobranza.md) | Alta | Pendiente | ADR-003 |
-| Por Pagar — Alcance 1: pago único | [modules/por-pagar.md](modules/por-pagar.md) | Alta | Pendiente | ADR-003 |
-| Por Pagar — Alcance 2: pagos parciales | [modules/por-pagar-parcial.md](modules/por-pagar-parcial.md) | Media | Pendiente | por-pagar.md |
+| Cotizaciones | [modules/cotizaciones.md](modules/cotizaciones.md) | Alta | ⏳ Pendiente activación | ADR-003 |
+| Cobranza (Cuentas por Cobrar) | [modules/cobranza.md](modules/cobranza.md) | Alta | ⏳ Pendiente activación | ADR-003 |
+| Por Pagar — Alcance 1: pago único | [modules/por-pagar.md](modules/por-pagar.md) | Alta | ⏳ Pendiente activación | ADR-003 |
+| Por Pagar — Alcance 2: pagos parciales | [modules/por-pagar-parcial.md](modules/por-pagar-parcial.md) | Media | ⏳ Pendiente activación | por-pagar.md |
 
 ---
 
