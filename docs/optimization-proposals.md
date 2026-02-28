@@ -26,6 +26,7 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 10 | [ADR-010](adr/ADR-010-logging.md) | Logging centralizado | Media | ✅ Completado | — |
 | 11 | [ADR-014](adr/ADR-014-backend-business-logic.md) | Mover lógica de negocio al backend | Alta (arquitectural) | Bloqueado | ADR-005, ADR-015 |
 | 12 | [ADR-015](adr/ADR-015-supabase-migration.md) | Migrar backend de Strapi a Supabase | Alta (arquitectural) | Pendiente aprobación | — |
+| 13 | [ADR-019](adr/ADR-019-documentation-strategy.md) | Estrategia de documentación del proyecto | Media | ✅ Completado | — |
 
 ---
 
