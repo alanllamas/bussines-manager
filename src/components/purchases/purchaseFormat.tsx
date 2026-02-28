@@ -18,7 +18,10 @@ const PurchaseFormat: React.FC<{ purchase: Purchase }> = ({ purchase }) => {
   return (
     <section className="flex flex-col w-full justify-center items-center">
       <div className="w-full pb-4 px-4 sm:px-8 md:px-16 lg:px-32 flex justify-end">
-        <button className="px-4 py-2 bg-surface-200" onClick={() => PrintPurchase()}>Imprimir</button>
+        <button className="btn-secondary" onClick={() => PrintPurchase()}>
+          <span className="material-symbols-outlined text-[16px]">print</span>
+          Imprimir
+        </button>
       </div>
       <section
         ref={contentRef}
