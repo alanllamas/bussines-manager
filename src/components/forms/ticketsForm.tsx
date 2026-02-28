@@ -1,3 +1,16 @@
+// ticketsForm — Formik dialog form for creating and editing a Ticket (Nota).
+// Rendered inside a FormDialog (Headless UI Dialog) — the parent page controls open/close state.
+// Props use `any` type (ADR-003: typed props are pending).
+//
+// Key behaviors:
+// - Products are added via Formik FieldArray; each product expands in a Disclosure accordion.
+// - `product_variants` in Formik state is `string[]` of documentIds (Strapi v5 relation format).
+// - SubtotalField / TotalField are custom Formik sub-components using useFormikContext()
+//   to auto-calculate totals when products or shipping change.
+// - VariantsField is a sub-component that shows selected variant chips and an "add" select.
+//   It reads from useFormikContext() to avoid stale closure issues and is defined inside the
+//   parent component so it has access to the `products` state without prop drilling.
+// - Client select uses numeric client.id (known inconsistency vs documentId — see useEditTicket).
 'use client'
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
@@ -20,16 +33,22 @@ const ticketSchema = Yup.object({
   shipping: Yup.number().min(0, 'El envío no puede ser negativo').required('Ingresa el envío (0 si no aplica)'),
 })
 
+// EProduct — local form type for a ticket product line item.
+// product: numeric id (the Strapi internal id, not documentId — known inconsistency).
+// product_variants: string[] of documentIds (Strapi v5 relation format).
+// total: price × quantity (calculated inline on quantity/product change).
 export type EProduct = {
   name: string;
   product: number;
   price: number;
   quantity: number;
   total: number
-  product_variants: string[]
+  product_variants: string[]   // documentId strings, not full objects
   unit: string;
   subtotal?: number;
 }
+// TicketInitialValues — Formik initial values shape for the ticket form.
+// client: string (the numeric id as a string from the <select> value).
 export type TicketInitialValues = {
   date: number;
   client: string;
@@ -39,6 +58,10 @@ export type TicketInitialValues = {
   subtotal: number,
   total: number
 }
+// createTicketReq — body sent to POST /api/tickets and PUT /api/tickets/[id] (via useEditTicket).
+// client: number[] — Strapi relation array (single-element array with the numeric client id).
+// products[].product: number[] — Strapi relation array (single element).
+// products[].product_variants: string[] — documentId strings for the selected variants.
 export type createTicketReq = {
   sale_date: Date
   client: number[]
@@ -55,11 +78,13 @@ export type createTicketReq = {
   }[]
 }
 
+// emptyProduct — blank product line pushed into the FieldArray when user clicks "Agregar".
+// product_variants starts as [] (no sentinel value needed — Strapi accepts empty array).
 export const emptyProduct: EProduct = {
   name: '',
   product: 0,
   price: 0,
-  product_variants: [],
+  product_variants: [],   // empty = no variants selected for this line
   quantity: 0,
   total: 0,
   unit: ''
@@ -107,6 +132,11 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
 
 
           
+  // SubtotalField — derived field that recalculates products subtotal automatically.
+  // Defined inside the parent to access products state via useFormikContext() without prop drilling.
+  // Recalculates when products[] or touched.products changes (ensures update after quantity edits).
+  // Renders a disabled <input> bound to Formik's 'subtotal' field.
+  // @ts-expect-error: useFormikContext() returns unknown values shape (ADR-003).
   const SubtotalField = (props: { className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
     const {
       // @ts-expect-error missing type
@@ -115,9 +145,9 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       setFieldValue,
     } = useFormikContext();
     const [field, meta] = useField(props);
-  
+
     React.useEffect(() => {
-      // set the value of textC, based on textA and textB
+      // Recalculate subtotal as sum of all product.total values (price × quantity per line).
       if (
         // @ts-expect-error missing type
         products && touched.products
@@ -129,7 +159,7 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       }
       // @ts-expect-error missing type
     }, [ products, touched.products,  setFieldValue]);
-  
+
     return (
       <>
         <input {...props} {...field} />
@@ -137,6 +167,10 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       </>
     );
   };
+
+  // TotalField — derived field that recalculates total as subtotal + shipping.
+  // Runs on every change to subtotal or shipping so the total stays in sync.
+  // @ts-expect-error: useFormikContext() returns unknown values shape (ADR-003).
   const TotalField = (props: { required:boolean, className: string, placeholder: string, disabled?: boolean, id:string, name:string, type: string}) => {
     const {
       // @ts-expect-error missing type
@@ -145,9 +179,8 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       setFieldValue,
     } = useFormikContext();
     const [field, meta] = useField(props);
-  
+
     React.useEffect(() => {
-      // set the value of textC, based on textA and textB
       if (
         // @ts-expect-error missing type
         subtotal && shipping && touched.shipping
@@ -155,12 +188,13 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
         const total = Number(subtotal) + Number(shipping)
         setFieldValue('total', total);
       } else if (subtotal) {
+        // No shipping yet — total equals subtotal.
         setFieldValue('total', Number(subtotal));
-  
+
       }
       // @ts-expect-error missing type
     }, [ subtotal, touched.subtotal, shipping, touched.shipping,  setFieldValue, props.name]);
-  
+
     return (
       <>
         <input {...props} {...field} />
@@ -168,13 +202,22 @@ const TicketsForm: React.FC<any> = ({sendCreate, initialFormValues, handleSubmit
       </>
     );
   };
+
+  // VariantsField — variant chip selector for a single product line.
+  // Defined inside the parent to access the `products` state via closure (avoids stale state bug
+  // that occurred when it was defined outside and received products as a prop).
+  // Reads current form values via useFormikContext to know which variants are already selected.
+  // Shows selected variants as removable chips; unselected variants in a dropdown.
+  // Pushes/removes documentId strings into the `products.${index}.product_variants` FieldArray.
   const VariantsField = ({ products: allProducts, index }: { products?: Product[], index: number }) => {
     const { values } = useFormikContext<TicketInitialValues>();
 
     const currentProduct = allProducts?.find(p => p.id === values.products[index]?.product)
     const allVariants = currentProduct?.product_variants ?? []
+    // selectedDocIds: string[] of documentIds currently stored in Formik state.
     const selectedDocIds: string[] = values.products[index]?.product_variants ?? []
     const selectedDocIdSet = new Set(selectedDocIds)
+    // availableVariants: variants not yet selected (filtered out from the dropdown).
     const availableVariants = allVariants.filter(v => v.documentId && !selectedDocIdSet.has(v.documentId))
 
     return (

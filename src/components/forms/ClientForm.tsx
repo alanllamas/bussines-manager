@@ -1,3 +1,12 @@
+// ClientForm — Formik form for creating and editing a Client (Cliente).
+// Used in /clients/new and the client detail edit panel.
+//
+// Mutation pattern: Formik onSubmit sets a state payload (newClient or editPayload),
+// which triggers the SWR mutation hook. A useEffect watches the hook result and shows
+// a toast on success/failure, invalidates SWR cache, and redirects or calls onSuccess.
+//
+// Layout: two-column grid on lg+ (left: name + fiscal info, right: contacts).
+// Contacts are managed via Formik FieldArray + Headless UI Disclosure accordion.
 'use client'
 import React, { useEffect, useState } from "react"
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
@@ -10,6 +19,8 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useSWRConfig } from "swr"
 
+// EVariant / EProduct — legacy types, not used within this file.
+// Kept for backwards compatibility with any external imports.
 export type EVariant = {
   name: string;
   type: string;
@@ -25,17 +36,21 @@ export type EProduct = {
   unit: string;
   subtotal?: number;
 }
+// ClientInitialValues — Formik initial values shape. Same as createClientReq;
+// kept as a separate type to distinguish form state from API request shape.
 export type ClientInitialValues = {
   name: string;
   taxing_info: TaxingInfo
   contacts: Contact[]
 }
+// createClientReq — body sent to POST /api/clients and PUT /api/clients/[id].
 export type createClientReq = {
   name: string;
   taxing_info: TaxingInfo
   contacts: Contact[]
 }
 
+// emptyContact — blank contact record pushed into the FieldArray when user clicks "Agregar".
 export const emptyContact: Contact = {
   name: '',
   area: '',
@@ -45,7 +60,9 @@ export const emptyContact: Contact = {
   phone: ''
 }
 
-// SAT Catálogos
+// SAT Catálogos — official Mexican tax authority (SAT) dropdown options.
+// These must match the values accepted by the CFDI generation service.
+// SAT_REGIMENES: fiscal regimes (Régimen Fiscal) per SAT catalog c_RegimenFiscal.
 const SAT_REGIMENES = [
   '601 - Régimen General de Ley Personas Morales',
   '602 - Régimen Simplificado de Ley Personas Morales',
@@ -68,6 +85,7 @@ const SAT_REGIMENES = [
   '626 - Régimen Simplificado de Confianza',
 ]
 
+// SAT_CFDI_USOS: CFDI usage codes (Uso CFDI) per SAT catalog c_UsoCFDI.
 const SAT_CFDI_USOS = [
   'G01 - Adquisición de mercancías',
   'G02 - Devoluciones, descuentos o bonificaciones',
@@ -95,11 +113,14 @@ const SAT_CFDI_USOS = [
   'CN01 - Nómina',
 ]
 
+// SAT_METODOS_PAGO: payment method codes (Método de Pago) per SAT catalog c_MetodoPago.
+// PUE = single payment, PPD = partial/deferred payments.
 const SAT_METODOS_PAGO = [
   'PUE - Pago en una sola exhibición',
   'PPD - Pago en parcialidades o diferido',
 ]
 
+// SAT_FORMAS_PAGO: payment form codes (Forma de Pago) per SAT catalog c_FormaPago.
 const SAT_FORMAS_PAGO = [
   '01 - Efectivo',
   '02 - Cheque nominativo',
@@ -113,12 +134,17 @@ const SAT_FORMAS_PAGO = [
   '99 - Por definir',
 ]
 
+// FORMAS_PAGO_INTERNAS — internal payment methods (not SAT codes).
+// Used for the business's own tracking (payment_method field), separate from SAT's forma de pago.
 const FORMAS_PAGO_INTERNAS = [
   { value: 'efectivo', label: 'Efectivo' },
   { value: 'transferencia', label: 'Transferencia' },
   { value: 'credito', label: 'Crédito' },
 ]
 
+// PERIODOS — billing/payment cycle options in days.
+// value: number of days (0 = per-ticket/cash, 7/15/30 = net terms).
+// Used for billing_period, invoice_period, and payment_period fields.
 const PERIODOS = [
   { value: 0, label: 'Por nota / Contado' },
   { value: 7, label: '7 días' },
@@ -126,6 +152,10 @@ const PERIODOS = [
   { value: 30, label: '30 días' },
 ]
 
+// clientSchema — Yup validation for the client form.
+// RFC regex accepts 3-4 uppercase letters + 6 digits + 3 alphanumeric chars (physical/moral persons).
+// zip_code uses typeError to show a friendly message when non-numeric input is entered.
+// contacts array validates name/email/extension per contact entry.
 const clientSchema = Yup.object({
   name: Yup.string().required('El nombre es requerido'),
   taxing_info: Yup.object({
@@ -142,11 +172,19 @@ const clientSchema = Yup.object({
   ),
 })
 
+// ClientsForm — create/edit form for a Client.
+// client prop: if provided, the form operates in edit mode (isEdit = true);
+//   initial values are pre-filled from the existing client record.
+// onSuccess: optional callback called after successful create (when redirect is not possible)
+//   or after successful edit to close the enclosing modal/panel.
 const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ client, onSuccess }) => {
   const router = useRouter()
   const { mutate } = useSWRConfig()
+  // isEdit: determines button label, which hook to fire, and post-save behavior.
   const isEdit = !!client
 
+  // SWR mutation state — payload is undefined until Formik submits.
+  // Setting the payload triggers the hook to fire the API request.
   const [newClient, setNewClient] = useState<createClientReq>()
   const [editPayload, setEditPayload] = useState<{ data: createClientReq; documentId: string }>()
 
@@ -189,6 +227,8 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
     }
   }
 
+  // Create result effect: on success redirect to the new client's detail page.
+  // documentId is nested in createdClient.data.documentId (Strapi v5 response shape).
   useEffect(() => {
     if (createError && !createLoading) {
       toast.error('Error al crear el cliente')
@@ -200,11 +240,14 @@ const ClientsForm: React.FC<{ client?: Client; onSuccess?: () => void }> = ({ cl
     }
   }, [createLoading, createdClient, createError])
 
+  // Edit result effect: on success, broadcast SWR cache invalidation for all /api/clients keys
+  // so any list or detail view that shows this client refreshes automatically.
   useEffect(() => {
     if (editError && !editLoading) {
       toast.error('Error al guardar el cliente')
     } else if (!editError && !editLoading && editedClient) {
       toast.success('Cliente guardado')
+      // Invalidate all SWR keys that include /api/clients (list + detail views).
       mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/clients'))
       if (onSuccess) onSuccess()
     }

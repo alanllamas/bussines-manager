@@ -1,3 +1,9 @@
+// ProductForm — create/edit form for a Product (Producto).
+// Used in /products/new and the product detail edit panel.
+// Mutation pattern: SWR mutation hooks (same as ClientForm).
+//
+// On create success: redirects to `/products/[documentId]?edit=1` so user can add variants.
+// On edit success: broadcasts SWR cache invalidation for all /api/products queries.
 'use client'
 import React, { useEffect, useState } from "react"
 import { Field, Form, Formik } from "formik"
@@ -13,14 +19,17 @@ const productSchema = Yup.object({
   name: Yup.string().required('El nombre es requerido'),
   price: Yup.number().min(0, 'El precio no puede ser negativo').required('El precio es requerido'),
   measurement_unit: Yup.string().required('La unidad de medida es requerida'),
+  // taxes: percentage (e.g. 16 = 16% IVA); 0 = tax-exempt product.
   taxes: Yup.number().min(0, 'Los impuestos no pueden ser negativos'),
 })
 
+// ProductForm — product prop present = edit mode; absent = create mode.
 const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ product, onSuccess }) => {
   const router = useRouter()
   const { mutate } = useSWRConfig()
   const isEdit = !!product
 
+  // SWR mutation state — undefined until Formik submits, triggers the hook request.
   const [newProduct, setNewProduct] = useState<CreateProductReq>()
   const [editPayload, setEditPayload] = useState<{ data: CreateProductReq; documentId: string }>()
 
@@ -42,6 +51,8 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
     }
   }
 
+  // Create result: redirect to detail page with ?edit=1 (opens variant form immediately).
+  // documentId is nested in created.data.documentId (Strapi v5 response shape).
   useEffect(() => {
     if (createError && !createLoading) {
       toast.error('Error al crear el producto')
@@ -53,6 +64,7 @@ const ProductForm: React.FC<{ product?: Product; onSuccess?: () => void }> = ({ 
     }
   }, [createLoading, created, createError])
 
+  // Edit result: invalidate all /api/products SWR queries and notify parent.
   useEffect(() => {
     if (editError && !editLoading) {
       toast.error('Error al guardar el producto')

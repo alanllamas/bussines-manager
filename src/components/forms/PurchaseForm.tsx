@@ -1,3 +1,14 @@
+// PurchaseForm — Formik dialog form for creating and editing a Purchase (Compra).
+// Note: component is named `TicketsForm` — it was copy-pasted from ticketsForm.tsx
+// and the component name was not updated. The export default name matches PurchaseForm.
+//
+// Key behaviors:
+// - Same SubtotalField / TotalField / SupplyVariantsField sub-component pattern as ticketsForm.
+// - Supply select onChange: auto-fills name, unit, and price from the selected supply's cost field.
+// - supply_total per line = price × quantity, calculated inline on quantity change.
+// - supply_variants: string[] of documentIds (Strapi v5 relation format).
+// - PURCHASE_REASONS / PURCHASE_STATUSES: fixed enum lists for dropdowns.
+// - Props are typed `any`; see PurchaseInitialValues for the actual form state shape.
 'use client'
 import React, { ChangeEvent } from "react"
 import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
@@ -8,6 +19,10 @@ import logo from "@/public/logo.png"
 import type { Supply } from "@/types"
 import useGetSupplies from "@/api/hooks/supplies/getSupplies"
 
+// EPurchaseSupply — local form type for a single supply line in a purchase.
+// supply: numeric id (Strapi internal id).
+// supply_variants: string[] of documentIds (Strapi v5 relation format).
+// supply_total: price × quantity for this line (calculated inline on quantity change).
 export type EPurchaseSupply = {
   name: string;
   supply: number;
@@ -18,6 +33,8 @@ export type EPurchaseSupply = {
   unit: string;
 }
 
+// PurchaseInitialValues — Formik initial values for the purchase form.
+// purchase_date: Unix timestamp (set by parent from new Date() or existing purchase).
 export type PurchaseInitialValues = {
   purchase_number: number;
   purchase_date: number;
@@ -30,6 +47,9 @@ export type PurchaseInitialValues = {
   comments: string;
 }
 
+// createPurchaseReq — body sent to POST /api/purchases and PUT /api/purchases/[id].
+// supplies[].supply: [number] — Strapi relation array (single-element with numeric supply id).
+// supplies[].supply_variants: string[] of documentIds.
 export type createPurchaseReq = {
   purchase_number: number;
   purchase_date: Date;
@@ -48,6 +68,7 @@ export type createPurchaseReq = {
   }[];
 }
 
+// emptyPurchaseSupply — blank supply line pushed into FieldArray when user clicks "Agregar".
 export const emptyPurchaseSupply: EPurchaseSupply = {
   name: '',
   supply: 0,
@@ -58,6 +79,7 @@ export const emptyPurchaseSupply: EPurchaseSupply = {
   unit: '',
 }
 
+// PURCHASE_REASONS — purchase category options. Determines what kind of expense the purchase covers.
 const PURCHASE_REASONS: { value: string; label: string }[] = [
   { value: 'supplies', label: 'Insumos' },
   { value: 'tools', label: 'Herramientas' },
@@ -66,6 +88,7 @@ const PURCHASE_REASONS: { value: string; label: string }[] = [
   { value: 'other', label: 'Otro' },
 ]
 
+// PURCHASE_STATUSES — lifecycle stages of a purchase order.
 const PURCHASE_STATUSES: { value: string; label: string }[] = [
   { value: 'planned', label: 'Planeada' },
   { value: 'send', label: 'Enviada' },
@@ -86,10 +109,15 @@ const purchaseSchema = Yup.object({
   shipping_cost: Yup.number().min(0, 'El envío no puede ser negativo').required('Ingresa el envío (0 si no aplica)'),
 })
 
+// PurchaseForm (component named TicketsForm — see top comment about copy-paste naming).
+// editPurchase: if truthy, submit button shows "Editar" instead of "Crear".
 const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmit, isOpen, sendClose, editPurchase, apiError }) => {
   const { supplies: suppliesData, isLoading: suppliesLoading } = useGetSupplies()
+  // supplies: flattened array from the SWR response; includes supply_variants (pre-populated).
   const supplies = suppliesData?.data ?? []
 
+  // SubtotalField — derived field; recalculates subtotal as sum of all supply_total values.
+  // Fires when supplyItems (the supplies FieldArray) or touched.supplies changes.
   const SubtotalField = (props: { className: string; placeholder: string; disabled?: boolean; id: string; name: string; type: string }) => {
     const { values: { supplies: supplyItems }, touched, setFieldValue } = useFormikContext<PurchaseInitialValues>()
     const [field, meta] = useField(props)
@@ -102,6 +130,7 @@ const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmi
     return <><input {...props} {...field} />{!!meta.touched && !!meta.error && <div>{meta.error}</div>}</>
   }
 
+  // TotalField — derived field; recalculates total as subtotal + shipping_cost on every change.
   const TotalField = (props: { required: boolean; className: string; placeholder: string; disabled?: boolean; id: string; name: string; type: string }) => {
     const { values: { subtotal, shipping_cost }, touched, setFieldValue } = useFormikContext<PurchaseInitialValues>()
     const [field, meta] = useField(props)
@@ -111,12 +140,17 @@ const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmi
     return <><input {...props} {...field} />{!!meta.touched && !!meta.error && <div>{meta.error}</div>}</>
   }
 
+  // SupplyVariantsField — variant chip selector for a single supply line.
+  // Same pattern as VariantsField in ticketsForm.tsx but for supply variants.
+  // Pushes/removes documentId strings into `supplies.${index}.supply_variants` FieldArray.
   const SupplyVariantsField = ({ supplies: allSupplies, index }: { supplies?: Supply[]; index: number }) => {
     const { values } = useFormikContext<PurchaseInitialValues>()
     const currentSupply = allSupplies?.find(s => s.id === values.supplies[index]?.supply)
     const allVariants = currentSupply?.supply_variants ?? []
+    // selectedDocIds: documentId strings currently stored in Formik state for this line.
     const selectedDocIds: string[] = values.supplies[index]?.supply_variants ?? []
     const selectedDocIdSet = new Set(selectedDocIds)
+    // availableVariants: not yet selected variants (shown in the dropdown).
     const availableVariants = allVariants.filter(v => v.documentId && !selectedDocIdSet.has(v.documentId))
 
     return (
@@ -244,6 +278,9 @@ const TicketsForm: React.FC<any> = ({ sendCreate, initialFormValues, handleSubmi
                                       <label>Insumo <span className="text-red-500">*</span></label>
                                       <Field as="select" className="field-select" value={values.supplies[index].supply}
                                         onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                          // On supply select: auto-fill name, unit, and price from supply catalog.
+                                          // price is pre-filled from supply.cost (the catalog cost, editable later).
+                                          // supply_variants is reset to [] when changing supply (old variants are invalid).
                                           const s = supplies.find(s => s.id === Number(e.target.value)) ?? null
                                           setFieldValue(`supplies.${index}.supply`, s?.id ?? 0)
                                           setFieldValue(`supplies.${index}.name`, s?.name ?? '')

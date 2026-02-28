@@ -1,3 +1,21 @@
+// InvoicesForm — Formik dialog form for creating and editing a Corte (Invoice).
+// Rendered inside a FormDialog; the parent page-client controls open/close state.
+// Props are typed `any` (ADR-003 pending); see InvoiceInitialValues for actual shape.
+//
+// Key behaviors:
+// - Date pickers (initial_date / ending_date): when both are set, auto-filters the
+//   client's tickets by sale_date range and calls generateResume to populate totals.
+//   The ending_date filter also excludes tickets already assigned to another invoice.
+// - generateResume is called in setTimeout(300) after setFieldValue to avoid reading
+//   stale Formik state (Formik batches updates asynchronously).
+// - openPanel state: only one Disclosure section open at a time (notas, comentarios, resumen, fechas).
+// - blockClient prop: disables the client selector when form is opened from a client detail page.
+// - Available tickets dropdown merges editInvoice.tickets (already associated) with
+//   availableTickets (unassigned) so edit mode pre-selects existing tickets (ADR-013 fix).
+// - Totals are displayed from the `totals` prop (parent state), not from Formik values.
+//   The parent page is responsible for holding and updating totals/resume state.
+// - invoice_send_date onChange: auto-calculates expected_payment_date by adding
+//   client.taxing_info.payment_period days.
 'use client'
 import { generateResume, InvoiceInitialValues, Resume, Totals } from "@/api/hooks/invoices/getInvoice"
 import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
@@ -14,6 +32,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const invoiceSchema = Yup.object({
   client: Yup.string().required('Selecciona un cliente'),
   initial_date: Yup.date().nullable().required('La fecha inicial es requerida'),
+  // ending_date must be after initial_date — enforced via Yup.ref.
   ending_date: Yup.date().nullable().required('La fecha final es requerida')
     .min(Yup.ref('initial_date'), 'La fecha final debe ser posterior a la inicial'),
   tickets: Yup.array().min(1, 'Agrega al menos una nota al corte'),
@@ -21,6 +40,10 @@ const invoiceSchema = Yup.object({
 
 
 
+// InvoicesForm — dialog form for Cortes (Invoices).
+// Props typed inline below; `any` used for some callbacks pending ADR-003.
+// setClient / setTotals / setResume: parent state setters, called when form values change.
+// blockClient: when true (opened from a client detail page), hides the client selector change.
 const InvoicesForm: React.FC<any> = ({
     sendCreate,
     initialFormValues,
@@ -60,9 +83,13 @@ const InvoicesForm: React.FC<any> = ({
 
   }) => {
 
+  // client (local): shadows the prop to allow the client selector to update locally.
+  // tickets (local): the full ticket list for the selected client (used by generateResume).
   const [client, setclient] = useState<Client>()
   const [tickets, setTickets] = useState<Ticket[]>([])
+  // openPanel: name of the currently open Disclosure section; null = all collapsed.
   const [openPanel, setOpenPanel] = useState<string | null>(null)
+  // togglePanel: clicking an already-open panel closes it (accordion behavior).
   const togglePanel = (name: string) => setOpenPanel(prev => prev === name ? null : name)
 
   useEffect(() => {
@@ -204,11 +231,13 @@ const InvoicesForm: React.FC<any> = ({
                                 setResume(undefined)
                                 setFieldValue('resume', {} )
 
-                                const filteredTickets = tickets.reduce((acc: string[], curr: Ticket) => {
+                                // Filter tickets by date range AND exclude tickets already assigned to
+                              // another invoice (!curr.invoice). Only unassigned tickets are included.
+                              const filteredTickets = tickets.reduce((acc: string[], curr: Ticket) => {
                                   const sale_date = new Date(curr.sale_date)
                                   if ((sale_date > initial_date && sale_date < ending_date) && !curr.invoice) {
                                     acc = [...acc, `${curr.id}`]
-                                  } 
+                                  }
                                   return acc
                                 }, [])
                                 // tickets.filter(ticket => {
@@ -225,6 +254,10 @@ const InvoicesForm: React.FC<any> = ({
                                 //   return new Date(ticket.sale_date) >= new Date(values.initial_date) && new Date(ticket.sale_date) <= new Date(e)
                                 // }).map(ticket => `${ticket.id}`)
                                 setFieldValue('tickets', filteredTickets)
+                                // setTimeout(300): generateResume reads filteredTickets from Formik
+                                // state, which hasn't been updated yet at this point in the sync
+                                // callback. The delay ensures Formik batch-applies setFieldValue
+                                // before generateResume runs.
                                 setTimeout(() => {
                                   const { results, totals } = generateResume(filteredTickets, tickets, client)
                                   setFieldValue('shipping', results.envios.sub_total || 0)
@@ -346,7 +379,10 @@ const InvoicesForm: React.FC<any> = ({
                                                   >
                                                     <option value="">Nota</option>
                                                     {
-                                                      [...(editInvoice?.tickets || []), ...availableTickets].map((ticket: Ticket, i: number) => {
+                                                      // Merge already-associated tickets (editInvoice.tickets) with
+                                      // newly available unassigned tickets. This ensures edit mode
+                                      // pre-populates existing ticket associations (ADR-013 fix).
+                                      [...(editInvoice?.tickets || []), ...availableTickets].map((ticket: Ticket, i: number) => {
                                                         return <option className="disabled:bg-surface-100" disabled={values.tickets.includes(`${ticket.id}`)} key={`ticket-${i}`} value={`${ticket.id}`}>{ticket.id} | {ticket.total} | {new Date(ticket.sale_date).toLocaleDateString()}</option>
                                                       })
                                                     }
@@ -493,7 +529,9 @@ const InvoicesForm: React.FC<any> = ({
 
                                   if (client?.taxing_info) {
                                     // payment_period
-                                    setFieldValue("expected_payment_date", new Date(invoice_send_date.setDate(invoice_send_date.getDate() + client?.taxing_info.payment_period)))
+                                    // Auto-calculate expected_payment_date = send date + payment_period days.
+                                  // payment_period is configured on the client's taxing_info.
+                                  setFieldValue("expected_payment_date", new Date(invoice_send_date.setDate(invoice_send_date.getDate() + client?.taxing_info.payment_period)))
                                     setFieldValue("invoice_send_date", e)
                                   } else {
                                     setFieldValue("invoice_send_date", e)
