@@ -1,4 +1,9 @@
 'use client'
+// ClientTickets — página /tickets: lista global de notas.
+// Fetcha todos los tickets aquí (a diferencia de InvoiceList que fetcha internamente).
+// Ordena por sale_date desc antes de pasar a TicketList (TicketList ordena internamente por id desc —
+//   aquí se usa fecha para reflejar el orden comercial real, no el de inserción en BD).
+// Spinner mientras carga; auth guard retorna null mientras valida sesión.
 import React from "react";
 import TicketList from "@/components/tickets/ticketList";
 import useGetTickets from "@/api/hooks/tickets/getTickets";

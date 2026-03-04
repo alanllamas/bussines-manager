@@ -1,4 +1,13 @@
 'use client'
+// TicketPrintFormat — wrapper de auto-impresión usado por TicketList.
+// hidden en pantalla, print:block al imprimir — igual que InvoicePrintFormat.
+// El padre desmonta/remonta el componente pasando null → ticket vía setPrintTicket + setTimeout(1000),
+//   lo que fuerza una nueva instancia para impresiones consecutivas (sin printKey explícito).
+//
+// Dos-stage useEffect (sin setTimeout — ticket ya disponible al montar):
+//   Effect 1 (ticket dep): sincroniza prop → printTicket state para disparar Effect 2.
+//   Effect 2 (printTicket dep): llama PrintTicket() directamente — no necesita setTimeout
+//     porque PrintTicketFormat recibe el ticket completo y la fecha se calcula del prop, no del state.
 import React, { useEffect, useRef, useState } from "react"
 import TicketBaseFormat from "./ticketBaseFormat"
 import { useReactToPrint } from "react-to-print"

@@ -1,4 +1,16 @@
 'use client'
+// InvoiceBaseFormat — shared invoice layout rendered by InvoiceFormat (screen) and InvoicePrintFormat (auto-print).
+// Receives pre-fetched invoiceData plus pre-formatted date strings (dd/mm/yy) from the parent.
+// generateResume is called live here (not from the stored invoice.resume field) to ensure accuracy.
+// copyParam: copies any fiscal field value to clipboard for quick paste into an external billing tool;
+//   copy buttons carry print:hidden so they disappear when printing.
+// Sections rendered:
+//   1. Header — company logo, folio, optional invoice_id, initial/ending/send dates
+//   2. Data fiscal — left: client name/razón social/RFC/CP/regimen; right: forma/método pago/CFDI/email/envios flag
+//   3. Notas — flat ticket table (ticket_number, date, sub_total, shipping, total)
+//   4. Resumen — aggregated products + envios row from live generateResume output
+//   5. Comentarios — ReactMarkdown render of invoice.comments
+//   6. Totals — sub_total, envío amount, IVA, total
 import React from "react"
 import { generateResume, Resume, Totals } from "@/api/hooks/invoices/getInvoice";
 import { Invoice } from "@/api/hooks/invoices/getInvoices";
@@ -9,8 +21,10 @@ import ReactMarkdown from 'react-markdown'
 const InvoiceBaseFormat: React.FC<{ invoiceData: Invoice, initial_date: any, ending_date: any, send_date: any }> = ({ invoiceData, initial_date, ending_date, send_date }) => {
 
   const { client, tickets } = invoiceData
+  // Live-compute resume from tickets array — not from the stored invoice.resume JSON field.
   const { results: resume, totals } = generateResume(tickets.map(ticket => `${ticket.id}`), tickets, client)
 
+  // copyParam: copies a fiscal field to clipboard; each field row has a copy button that is print:hidden.
   const copyParam = (param: string | number | boolean | undefined) => {
     navigator.clipboard.writeText(String(param ?? ''))
   }

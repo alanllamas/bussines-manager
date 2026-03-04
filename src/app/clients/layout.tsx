@@ -1,3 +1,6 @@
+// ClientsLayout — Server Component layout para todas las rutas /clients/*.
+// Estructura: sidebar fijo (lg:w-64) a la izquierda + main a la derecha (lg:flex-row).
+// En mobile apilan verticalmente (flex-col) — el sidebar se convierte en acordeón.
 import React from "react";
 import ClientsSideBar from "./components/sidebar";
 

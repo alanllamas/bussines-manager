@@ -1,4 +1,6 @@
 'use client'
+// ClientsPage — estado vacío de /clients cuando no hay cliente seleccionado.
+// Muestra ícono + mensaje "Selecciona un cliente de la barra lateral".
 import React, { useEffect, useState } from "react";
 // import { useAuth } from "@/context/AuthUserContext";
 // import { useRouter } from "next/navigation";

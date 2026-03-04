@@ -1,7 +1,11 @@
 'use client'
+// PurchaseList — lista de compras con create/edit inline y auto-print.
+// Recibe purchaseData como prop (pre-fetched por el padre).
+// Print pattern: printKey (igual que InvoiceList, no el null-unmount de TicketList).
+// invalidate solo afecta /api/purchases — no hay cascada a otros recursos.
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
-import { ActionButtons } from "@/components/ui"
+import { ActionButtons, EmptyState, StatusBadge } from "@/components/ui"
 import type { Purchase } from "@/types"
 import ReactPaginate from "react-paginate"
 import PurchaseForm, { createPurchaseReq, emptyPurchaseSupply, PurchaseInitialValues } from "../forms/PurchaseForm"
@@ -12,17 +16,22 @@ import useGetPurchaseNumber from "@/api/hooks/purchases/getPurchaseNumber"
 import { useSWRConfig } from "swr"
 import { toast } from "sonner"
 
+// Mapas de etiquetas para los enums de Strapi — duplicados también en purchaseBaseFormat.tsx.
 const REASON_LABELS: Record<string, string> = {
   supplies: 'Insumos', tools: 'Herramientas', food: 'Comida', drinks: 'Bebidas', other: 'Otro'
 }
 const STATUS_LABELS: Record<string, string> = {
   planned: 'Planeada', send: 'Enviada', paid: 'Pagada', in_progress: 'En proceso', completed: 'Completada', canceled: 'Cancelada'
 }
+const STATUS_COLORS: Record<string, 'gray' | 'blue' | 'yellow' | 'green' | 'red'> = {
+  planned: 'gray', send: 'blue', in_progress: 'yellow', paid: 'green', completed: 'green', canceled: 'red'
+}
 
 interface PurchaseListProps { purchaseData?: Purchase[]; itemsPerPage?: number }
 
 const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage = 10 }) => {
   const { mutate } = useSWRConfig()
+  // Invalida solo /api/purchases — sin cascada a otros recursos.
   const invalidate = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/purchases')
   )
@@ -34,6 +43,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
   const [printPurchase, setPrintPurchase] = useState<Purchase>()
   const [printKey, setPrintKey] = useState(0)
 
+  // Incrementa printKey para forzar remount de PurchasePrintFormat antes de setear el nuevo purchase.
   const sendPrint = (purchase: Purchase) => {
     setPrintKey(k => k + 1)
     setPrintPurchase(purchase)
@@ -45,10 +55,12 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
   const { purchase: editedPurchase, error: editError, isLoading: editLoading } = useEditPurchase(newEditPurchase)
   const { purchase_number } = useGetPurchaseNumber()
 
+  // Ordena compras por id desc (más reciente primero) al actualizar purchaseData.
   useEffect(() => {
     if (purchaseData) setPurchases([...purchaseData].sort((a, b) => b.id - a.id))
   }, [purchaseData])
 
+  // Create mutation response: toast + invalidar cache + cerrar dialog en éxito.
   useEffect(() => {
     if (createError && !createLoading) {
       toast.error('Error al crear la compra')
@@ -60,6 +72,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }, [createLoading, createdPurchase, createError])
 
+  // Edit mutation response: toast + invalidar cache + cerrar dialog en éxito.
   useEffect(() => {
     if (editError && !editLoading) {
       toast.error('Error al editar la compra')
@@ -71,6 +84,8 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }, [editedPurchase, editError, editLoading])
 
+  // Cuando editPurchase se fija: construye initialFormValues mapeando
+  // PurchaseSupply → EPurchaseSupply con supply_variants como array de documentId strings.
   useEffect(() => {
     if (editPurchase) {
       setInitialFormValues({
@@ -95,10 +110,12 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }, [editPurchase])
 
+  // Abre dialog cuando initialFormValues están listos (tiene guard — no se dispara en mount).
   useEffect(() => {
     if (initialFormValues) setIsOpen(true)
   }, [initialFormValues])
 
+  // Abre dialog de creación: defaults reason='supplies', status='planned', purchase_number=lastNumber+1.
   const sendCreate = () => {
     setEditPurchase(undefined)
     setInitialFormValues({
@@ -114,12 +131,14 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     })
   }
 
+  // Resetea estado del dialog y lo cierra.
   const sendClose = () => {
     setEditPurchase(undefined)
     setInitialFormValues(undefined)
     setIsOpen(false)
   }
 
+  // Construye payload: supply en array (Strapi relation), purchase_date como Date, supplies mapeados.
   const handleSubmit = (values: PurchaseInitialValues) => {
     const data: createPurchaseReq = {
       purchase_number: values.purchase_number,
@@ -145,6 +164,7 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     }
   }
 
+  // Inner component: una fila por compra con labels legibles de reason/status (fallback al valor raw).
   function Items({ currentItems }: { currentItems: Purchase[] }) {
     return (
       <>
@@ -157,7 +177,10 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
             </td>
             <td className="whitespace-nowrap">{new Date(purchase.purchase_date).toLocaleDateString()}</td>
             <td>{REASON_LABELS[purchase.purchase_reason] ?? purchase.purchase_reason}</td>
-            <td>{purchase.purchase_status ? STATUS_LABELS[purchase.purchase_status] ?? purchase.purchase_status : '—'}</td>
+            <td>{purchase.purchase_status
+              ? <StatusBadge label={STATUS_LABELS[purchase.purchase_status] ?? purchase.purchase_status} color={STATUS_COLORS[purchase.purchase_status] ?? 'gray'} />
+              : '—'
+            }</td>
             <td className="font-medium whitespace-nowrap">$ {purchase.total}</td>
             <td><div className="flex justify-center"><ActionButtons onEdit={() => setEditPurchase(purchase)} onPrint={() => sendPrint(purchase)} /></div></td>
           </tr>
@@ -166,17 +189,15 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
     )
   }
 
+  // Inner component: shell de paginación — cards mobile + tabla desktop + ReactPaginate.
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(purchases, itemsPerPage)
     return (
-      <section className="w-full flex flex-col items-center">
+      <section className="w-full flex flex-col items-center pb-16 sm:pb-0">
         {/* Mobile cards */}
         <div className="sm:hidden w-full space-y-2 mt-4">
           {purchases.length === 0
-            ? <div className="py-12 text-center">
-                <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                <p className="text-sm text-surface-400 mt-2">Sin compras</p>
-              </div>
+            ? <EmptyState icon="inbox" message="Sin compras" />
             : currentItems.map((purchase: Purchase) => (
                 <div key={purchase.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
                   <div className="flex justify-between items-start">
@@ -185,12 +206,12 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
                     </span>
                     <ActionButtons onEdit={() => setEditPurchase(purchase)} onPrint={() => sendPrint(purchase)} />
                   </div>
-                  <p className="text-surface-600 mt-1">
-                    {REASON_LABELS[purchase.purchase_reason] ?? purchase.purchase_reason}
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-surface-600 text-sm">{REASON_LABELS[purchase.purchase_reason] ?? purchase.purchase_reason}</span>
                     {purchase.purchase_status && (
-                      <span className="ml-2 text-xs text-surface-400">· {STATUS_LABELS[purchase.purchase_status] ?? purchase.purchase_status}</span>
+                      <StatusBadge label={STATUS_LABELS[purchase.purchase_status] ?? purchase.purchase_status} color={STATUS_COLORS[purchase.purchase_status] ?? 'gray'} />
                     )}
-                  </p>
+                  </div>
                   <p className="text-surface-400 text-xs mt-1">
                     {new Date(purchase.purchase_date).toLocaleDateString()} · $ {purchase.total}
                   </p>
@@ -213,25 +234,25 @@ const PurchaseList: React.FC<PurchaseListProps> = ({ purchaseData, itemsPerPage 
             </thead>
             <tbody>
               {purchases.length === 0
-                ? <tr><td colSpan={6} className="py-12 text-center">
-                    <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                    <p className="text-sm text-surface-400 mt-2">Sin compras</p>
-                  </td></tr>
+                ? <tr><td colSpan={6}><EmptyState icon="inbox" message="Sin compras" /></td></tr>
                 : <Items currentItems={currentItems} />
               }
             </tbody>
           </table>
         </div>
-        <ReactPaginate
-          className="paginator"
-          breakLabel="…"
-          nextLabel="siguiente ›"
-          previousLabel="‹ anterior"
-          onPageChange={handlePageChange}
-          pageRangeDisplayed={5}
-          pageCount={pageCount}
-          renderOnZeroPageCount={null}
-        />
+        {pageCount > 1 && (
+          <div className="paginator-bar">
+            <ReactPaginate
+              className="paginator"
+              breakLabel="…"
+              nextLabel="siguiente ›"
+              previousLabel="‹ anterior"
+              onPageChange={handlePageChange}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+            />
+          </div>
+        )}
       </section>
     )
   }

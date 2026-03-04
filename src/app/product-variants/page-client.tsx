@@ -5,7 +5,7 @@ import ProductVariantForm from "@/components/forms/ProductVariantForm"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import Spinner from "@/components/ui/Spinner"
 import { useSWRConfig } from "swr"
-import { ActionButtons } from "@/components/ui"
+import { ActionButtons, EmptyState, PageHeader } from "@/components/ui"
 import type { ProductVariant } from "@/api/hooks/getProducts"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
 import ReactPaginate from "react-paginate"
@@ -33,15 +33,10 @@ const ProductVariantsPage: React.FC = () => {
   return (
     <section className="w-full flex flex-col items-center">
       <section className="w-full py-6 px-4 sm:w-11/12 sm:py-8 sm:px-6 lg:w-7/12 lg:py-12 lg:px-8 bg-surface-50 text-surface-900">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">Variantes de Productos</h1>
-          {!showCreate && (
-            <button className="btn-primary" onClick={() => { setShowCreate(true); setEditing(null) }}>
-              <span className="material-symbols-outlined text-[16px]">add</span>
-              Nueva variante
-            </button>
-          )}
-        </div>
+        <PageHeader
+          title="Variantes de Productos"
+          action={{ label: 'Nueva variante', icon: 'add', onClick: () => { setShowCreate(true); setEditing(null) }, hidden: showCreate }}
+        />
 
         {showCreate && (
           <div className="mb-6 p-4 border border-surface-200 rounded bg-white">
@@ -68,14 +63,11 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
   const { currentItems, pageCount, handlePageChange } = usePaginatedData(list, 10)
 
   return (
-    <section className="w-full flex flex-col items-center min-h-[60vh] sm:min-h-0">
+    <section className="w-full flex flex-col items-center min-h-[60vh] sm:min-h-0 pb-16 sm:pb-0">
       {/* Mobile cards */}
       <div className="sm:hidden w-full space-y-2">
         {list.length === 0 ? (
-          <div className="py-12 text-center">
-            <span className="material-symbols-outlined text-[40px] text-surface-300 block">style</span>
-            <p className="text-sm text-surface-400 mt-2">Sin variantes</p>
-          </div>
+          <EmptyState icon="style" message="Sin variantes" />
         ) : currentItems.map((v) => (
           <div key={v.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
             {editing?.documentId === v.documentId ? (
@@ -109,10 +101,7 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
           </thead>
           <tbody>
             {list.length === 0 ? (
-              <tr><td colSpan={3} className="py-12 text-center">
-                <span className="material-symbols-outlined text-[40px] text-surface-300 block">style</span>
-                <p className="text-sm text-surface-400 mt-2">Sin variantes</p>
-              </td></tr>
+              <tr><td colSpan={3}><EmptyState icon="style" message="Sin variantes" /></td></tr>
             ) : currentItems.map((v) => (
               <tr key={v.documentId}>
                 {editing?.documentId === v.documentId ? (
@@ -136,17 +125,19 @@ function PaginatedList({ list, editing, setEditing, refresh }: {
         </table>
       </div>
 
-      <div className="mt-auto sm:mt-0 w-full">
-        <ReactPaginate
-          className="paginator"
-          breakLabel="…"
-          nextLabel="siguiente ›"
-          previousLabel="‹ anterior"
-          onPageChange={handlePageChange}
-          pageRangeDisplayed={5}
-          pageCount={Math.max(pageCount, 1)}
-        />
-      </div>
+      {pageCount > 1 && (
+        <div className="paginator-bar">
+          <ReactPaginate
+            className="paginator"
+            breakLabel="…"
+            nextLabel="siguiente ›"
+            previousLabel="‹ anterior"
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={5}
+            pageCount={pageCount}
+          />
+        </div>
+      )}
     </section>
   )
 }

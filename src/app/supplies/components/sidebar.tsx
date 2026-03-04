@@ -1,4 +1,5 @@
 'use client'
+// SuppliesSideBar — sidebar de /supplies. Mismo patrón que ClientsSideBar y ProductsSideBar.
 import React, { useState } from "react"
 import useGetSupplies from "@/api/hooks/supplies/getSupplies"
 import Link from "next/link"

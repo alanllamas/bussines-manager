@@ -1,4 +1,11 @@
 'use client'
+// PurchaseBaseFormat — layout compartido entre PurchaseFormat (pantalla) y PurchasePrintFormat (impresión).
+// Recibe purchase + fecha pre-formateada como string desde el padre.
+// REASON_LABELS / STATUS_LABELS duplicados aquí y en PurchaseList (no están en un módulo compartido).
+// Tabla de insumos: sin relleno de filas vacías (a diferencia de ticketBaseFormat que rellena a 10 filas).
+// Comments: texto plano (no ReactMarkdown como invoiceBaseFormat).
+// Totals: subtotal + shipping_cost + total — sin IVA desglosado.
+// print:border-gray-200 en celdas y print:text-sm en tabla — ajustes visuales solo en impresión.
 import React from "react"
 import logo from "@/public/logo.png"
 import type { Purchase, PurchaseSupply, SupplyVariant } from "@/types"

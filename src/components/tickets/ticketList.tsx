@@ -1,7 +1,20 @@
 'use client'
+// TicketList — lista de notas con create/edit inline y auto-print.
+// Recibe ticketData como prop (pre-fetched por el padre — no hace fetch propio).
+// Parámetros:
+//   ticketData   — array de Ticket ya cargado por el padre
+//   itemsPerPage — paginación (default 10)
+//   clientId     — si se pasa, pre-llena el cliente en sendCreate (usado en ClientTabs)
+//   hideClient   — oculta la columna Cliente cuando el contexto ya implica un cliente
+//
+// Diferencias clave vs InvoiceList:
+//   - invalidateTickets invalida /api/tickets Y /api/clients (los clientes exponen tickets)
+//   - Print pattern: no usa printKey; en cambio sendPrint() fija printTicket y lo nula a los 1000ms
+//     vía unsetPrintTicket() — el unmount/remount del componente hace el mismo efecto que printKey
+//   - isOpen useEffect no tiene guard (posible bug menor: se dispara en mount con undefined)
 import React, { useEffect, useState } from "react"
 import { usePaginatedData } from "@/hooks/usePaginatedData"
-import { ActionButtons } from "@/components/ui"
+import { ActionButtons, EmptyState } from "@/components/ui"
 import { ProductVariant, Ticket, TicketProduct } from "@/api/hooks/tickets/getTickets"
 import ReactPaginate from "react-paginate"
 import TicketsForm, { createTicketReq, emptyProduct, EProduct, TicketInitialValues } from "../forms/ticketsForm"
@@ -16,6 +29,7 @@ import { toast } from "sonner"
 interface TicketListProps { ticketData?: Ticket[]; itemsPerPage?: number; clientId?: string | number; hideClient?: boolean }
 const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, clientId, hideClient}) => {
   const { mutate } = useSWRConfig()
+  // Invalida /api/tickets Y /api/clients — los clientes exponen tickets en su populate.
   const invalidateTickets = () => mutate(
     (key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && (key[0].includes('/api/tickets') || key[0].includes('/api/clients'))
   )
@@ -43,19 +57,15 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     isLoading: ticketNumberIsLoading
   } = useGetTicketNumber()
 
+  // Efecto sin-op: la numeración se usaba para recargar la página, ahora solo lee ticket_number.
+  // El valor se lee directamente de useGetTicketNumber() en sendCreate().
   useEffect(() => {
-    // make refresh
-
     if (!ticketNumberError && !ticketNumberIsLoading && ticket_number) {
-      // setTimeout(() => window.location.reload(), 500);
-      
-
-      // setTicket(TicketData.data)
+      // no-op
     }
   }, [ticketNumberIsLoading, ticket_number, ticketNumberError])
+  // Create mutation response: toast + invalidar cache + cerrar dialog en éxito.
   useEffect(() => {
-    // make refresh
-
     if (TicketError && !TicketIsLoading) {
       toast.error('Error al crear la nota')
     } else if (!TicketError && !TicketIsLoading && TicketData) {
@@ -68,9 +78,8 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
       // setTicket(TicketData.data)
     }
   }, [TicketIsLoading, TicketData, TicketError])
+  // Edit mutation response: toast + invalidar cache + cerrar dialog en éxito.
   useEffect(() => {
-    // make refresh
-
     if (EditTicketError && !EditTicketIsLoading) {
       toast.error('Error al editar la nota')
     } else if (EditTicketData && !EditTicketError && !EditTicketIsLoading) {
@@ -83,6 +92,8 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
       // setTicket(TicketData.data)
     }
   }, [EditTicketData, EditTicketError, EditTicketIsLoading])
+  // Cuando editTicket se fija: limpia payloads SWR pendientes y construye initialFormValues
+  // mapeando TicketProduct → EProduct (product_variants como array de documentId strings).
   useEffect(() => {
     if (editTicket) {
       setNewTicket(undefined)
@@ -109,13 +120,14 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     } 
     
   }, [editTicket])
+  // Abre el dialog cuando cambia initialFormValues. Sin guard — se dispara en mount con undefined.
   useEffect(() => {
     setIsOpen(true)
-    
   }, [initialFormValues])
 
   const today: number = new Date().valueOf()
 
+  // Abre dialog de creación: limpia payloads SWR, pre-llena fecha=hoy y cliente si viene como prop.
   const sendCreate = () => {
     setNewTicket(undefined)
     setNewEditTicket(undefined)
@@ -130,12 +142,14 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     })
   }
 
+  // Resetea todo el estado del dialog y lo cierra.
   const sendClose = () => {
     setEditTicket(undefined)
     setInitialFormValues(undefined)
     setIsOpen(false)
   }
   
+  // Construye el payload: client en array (Strapi relation), sale_date como Date, products mapeados.
   const handleSubmit = async (values: TicketInitialValues) => {
     const { date, client, shipping, subtotal, products, ticket_number, total } = values
     const data = {
@@ -168,6 +182,8 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [printTicket, setPrintTicket] = useState<Ticket | null>()
 
+  // sendPrint: fija printTicket para montar TicketPrintFormat, luego lo nula a los 1000ms para desmontarlo.
+  // Esto garantiza un remount fresco en impresiones consecutivas (equivalente al printKey de InvoiceList).
   const sendPrint = (ticket:Ticket) => {
     setPrintTicket(ticket)
     unsetPrintTicket()
@@ -177,12 +193,15 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
       setPrintTicket(null)
     }, 1000);
   }
+  // Ordena tickets por id desc (más reciente primero) cuando el padre actualiza ticketData.
   useEffect(() => {
     if (ticketData) {
       setTickets([...ticketData].sort((a, b) => b.id - a.id))
     }
   }, [ticketData])
   
+  // Inner component: una fila por ticket. Columna Cliente condicional con hideClient.
+  // Columna "Corte": check_circle (verde) si ticket.invoice existe, radio vacío si no.
   function Items({ currentItems }: {currentItems: Ticket[]}) {
     return (
       <>
@@ -202,17 +221,15 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
     );
   }
 
+  // Inner component: shell de paginación — cards mobile + tabla desktop + ReactPaginate.
   function PaginatedItems({ itemsPerPage }: { itemsPerPage: number }) {
     const { currentItems, pageCount, handlePageChange } = usePaginatedData(tickets, itemsPerPage);
       return (
-      <section className="w-full flex flex-col items-center">
+      <section className="w-full flex flex-col items-center pb-16 sm:pb-0">
         {/* Mobile card list */}
         <div className="sm:hidden w-full space-y-2 mt-4">
           {tickets.length === 0
-            ? <div className="py-12 text-center">
-                <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                <p className="text-sm text-surface-400 mt-2">Sin notas</p>
-              </div>
+            ? <EmptyState icon="inbox" message="Sin notas" />
             : currentItems.map((ticket: Ticket) => (
                 <div key={ticket.documentId} className="border border-surface-200 rounded p-3 bg-white text-sm">
                   <div className="flex justify-between items-start">
@@ -250,25 +267,25 @@ const TicketList: React.FC<TicketListProps> = ({ticketData, itemsPerPage = 10, c
             </thead>
             <tbody>
               {tickets.length === 0
-                ? <tr><td colSpan={hideClient ? 5 : 6} className="py-12 text-center">
-                    <span className="material-symbols-outlined text-[40px] text-surface-300 block">inbox</span>
-                    <p className="text-sm text-surface-400 mt-2">Sin notas</p>
-                  </td></tr>
+                ? <tr><td colSpan={hideClient ? 5 : 6}><EmptyState icon="inbox" message="Sin notas" /></td></tr>
                 : <Items currentItems={currentItems} />
               }
             </tbody>
           </table>
         </div>
-        <ReactPaginate
-          className="paginator"
-          breakLabel="…"
-          nextLabel="siguiente ›"
-          previousLabel="‹ anterior"
-          onPageChange={handlePageChange}
-          pageRangeDisplayed={5}
-          pageCount={pageCount}
-          renderOnZeroPageCount={null}
-        />
+        {pageCount > 1 && (
+          <div className="paginator-bar">
+            <ReactPaginate
+              className="paginator"
+              breakLabel="…"
+              nextLabel="siguiente ›"
+              previousLabel="‹ anterior"
+              onPageChange={handlePageChange}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+            />
+          </div>
+        )}
       </section>
     );
   }

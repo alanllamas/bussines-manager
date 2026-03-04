@@ -1,4 +1,9 @@
 'use client'
+// PurchaseFormat — vista de detalle de una compra en /purchases/[documentId].
+// Recibe purchase como prop directamente (el padre lo fetcha, sin fetch propio).
+// PrintPurchaseFormat config (de getPurchase.ts) configura documentTitle + nombre de archivo.
+// Fecha formateada con toLocaleDateString() (locale del sistema).
+// Botón "Imprimir" manual — sin auto-print (ver PurchasePrintFormat para ese patrón).
 import React, { useRef } from "react"
 import { useReactToPrint } from "react-to-print"
 import type { Purchase } from "@/types"
@@ -12,8 +17,11 @@ const PurchaseFormat: React.FC<{ purchase: Purchase }> = ({ purchase }) => {
 
   return (
     <section className="flex flex-col w-full justify-center items-center">
-      <div className="w-full pb-4 px-4 sm:px-8 md:px-16 lg:px-32 flex justify-end">
-        <button className="px-4 py-2 bg-surface-200" onClick={() => PrintPurchase()}>Imprimir</button>
+      <div className="w-full pt-4 pb-4 px-4 sm:px-8 md:px-16 lg:px-32 flex justify-end">
+        <button className="btn-secondary" onClick={() => PrintPurchase()}>
+          <span className="material-symbols-outlined text-[16px]">print</span>
+          Imprimir
+        </button>
       </div>
       <section
         ref={contentRef}

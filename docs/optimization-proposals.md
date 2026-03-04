@@ -10,7 +10,7 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 
 ---
 
-## Resumen de prioridades y orden de ejecución
+## Decisiones Arquitecturales
 
 | Orden | ADR | Tema | Prioridad | Estado | Depende de |
 |---|---|---|---|---|---|
@@ -24,11 +24,44 @@ Cada ADR vive en su propio archivo en `docs/adr/`.
 | 8 | [ADR-008](adr/ADR-008-invoice-list-refactor.md) | Refactorizar `InvoiceList` | Alta | ❌ Cancelado | ADR-003, ADR-005, ADR-006, ADR-007 |
 | 9 | [ADR-009](adr/ADR-009-firebase-config.md) | Validación de configuración Firebase | Media | ✅ Completado | — |
 | 10 | [ADR-010](adr/ADR-010-logging.md) | Logging centralizado | Media | ✅ Completado | — |
-| 11 | [ADR-011](adr/ADR-011-memoization.md) | Memoización en listas | Media | Pendiente | ADR-008 |
-| 12 | [ADR-012](adr/ADR-012-dead-code.md) | Limpieza de código muerto | Baja | Pendiente | ADR-008 |
-| 13 | [ADR-013](adr/ADR-013-invoice-edit-tickets.md) | Notas en formulario de cortes | Baja | Pendiente | — |
-| 14 | [ADR-014](adr/ADR-014-backend-business-logic.md) | Mover lógica de negocio al backend | Alta (arquitectural) | Bloqueado | ADR-005, ADR-015 |
-| 15 | [ADR-015](adr/ADR-015-supabase-migration.md) | Migrar backend de Strapi a Supabase | Alta (arquitectural) | Pendiente aprobación | — |
-| 16 | [ADR-016](adr/ADR-016-cobranza-module.md) | Módulo de Cobranza (Cuentas por Cobrar) | Alta | Pendiente | ADR-003 |
-| 17 | [ADR-017](adr/ADR-017-por-pagar-module.md) | Módulo de Por Pagar — Alcance 1: pago único | Alta | Pendiente | ADR-003 |
-| 18 | [ADR-018](adr/ADR-018-por-pagar-parcial.md) | Módulo de Por Pagar — Alcance 2: pagos parciales | Media | Pendiente | ADR-017 |
+| 11 | [ADR-019](adr/ADR-019-documentation-strategy.md) | Estrategia de documentación del proyecto | Media | ✅ Completado | — |
+| 12 | [ADR-020](adr/ADR-020-plan-activation-workflow.md) | Workflow de activación de planes | Alta | ✅ Completado | — |
+| 13 | [ADR-021](adr/ADR-021-index-sync.md) | Sincronización obligatoria de índices | Alta | ✅ Completado | ADR-019, ADR-020 |
+
+---
+
+## Planes técnicos
+
+Decisiones arquitecturales de gran escala que requieren aprobación. Viven en `.claude/plans/`.
+
+| Plan | Archivo | Estado | Depende de |
+|---|---|---|---|
+| Auditoría y completado del sistema de diseño | [design-system-audit.md](../.claude/plans/design-system-audit.md) | ✅ Completado | — |
+| Paginador fijo en mobile | [mobile-sticky-paginator.md](../.claude/plans/mobile-sticky-paginator.md) | ✅ Completado | — |
+| Productos e Insumos — Cards + Modal | [peppy-questing-crab.md](../.claude/plans/peppy-questing-crab.md) | 🟡 Aprobado | — |
+| Migrar backend de Strapi a Supabase | [supabase-migration.md](../.claude/plans/supabase-migration.md) | ⏳ Pendiente aprobación | — |
+| Mover lógica de negocio al backend | [backend-business-logic.md](../.claude/plans/backend-business-logic.md) | 🔒 Bloqueado | supabase-migration.md |
+
+---
+
+## Módulos de negocio
+
+Especificaciones de features completas. Viven en `docs/modules/`.
+
+| Módulo | Archivo | Prioridad | Estado | Depende de |
+|---|---|---|---|---|
+| Cotizaciones | [modules/cotizaciones.md](modules/cotizaciones.md) | Alta | ⏳ Pendiente activación | ADR-003 |
+| Cobranza (Cuentas por Cobrar) | [modules/cobranza.md](modules/cobranza.md) | Alta | ⏳ Pendiente activación | ADR-003 |
+| Por Pagar — Alcance 1: pago único | [modules/por-pagar.md](modules/por-pagar.md) | Alta | ⏳ Pendiente activación | ADR-003 |
+| Por Pagar — Alcance 2: pagos parciales | [modules/por-pagar-parcial.md](modules/por-pagar-parcial.md) | Media | ⏳ Pendiente activación | por-pagar.md |
+
+---
+
+## Backlog técnico
+
+Tareas de mantenimiento sin decisión arquitectural. Ver [`docs/backlog.md`](backlog.md).
+
+| Tarea | Prioridad | Depende de |
+|---|---|---|
+| Memoización en listas | Media | ADR-008 |
+| Limpieza de código muerto | Baja | ADR-008 |

@@ -1,4 +1,11 @@
 'use client'
+// ClientTabs — Headless UI TabGroup con 5 tabs para el detalle de un cliente.
+// Tab 1 (client.name): datos fiscales → ClientTab
+// Tab 2 (Contactos): lista de contactos → ContactsTab
+// Tab 3 (Notas): TicketList con tickets pre-cargados + client.id (numeric) → TicketsTab
+// Tab 4 (Cortes): InvoiceListByClient con client.documentId (string) → InvoicesTab
+// Tab 5 (Editar): ClientForm en modo edición → EditClientTab
+// Nota: hay un <TabPanel>Content 6</TabPanel> huérfano al final — código muerto pendiente de limpieza.
 import React from "react";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { Client } from "@/api/hooks/clients/getClient";

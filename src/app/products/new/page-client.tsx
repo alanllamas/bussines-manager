@@ -1,4 +1,5 @@
 'use client'
+// NewProduct — renderiza ProductForm sin props (modo creación). useAuthGuard guard.
 import React from "react"
 import ProductForm from "@/components/forms/ProductForm"
 import { useAuthGuard } from "@/hooks/useAuthGuard"

@@ -1,4 +1,5 @@
 'use client'
+// SuppliesPage — estado vacío de /supplies: muestra ícono + "Selecciona un insumo".
 import React from "react"
 
 const SuppliesPage: React.FC = () => {

@@ -1,3 +1,4 @@
+// /purchases — Server shell → PurchasesPage.
 import PurchasesPage from "./page-client"
 
 export default async function Page() {

@@ -1,3 +1,10 @@
+// SupplyForm — create/edit form for a Supply (Insumo).
+// Unlike most other forms, this one calls `fetcher` directly instead of using SWR mutation hooks.
+// Reason: supply creation/editing was implemented before the SWR mutation pattern was established.
+// `saving` state replaces the SWR `isLoading` flag since there's no hook managing the request.
+//
+// On create success: redirects to `/supplies/[documentId]?edit=1` so the user can immediately
+// add variants on the detail page.
 'use client'
 import React, { useEffect, useState } from "react"
 import { Field, Form, Formik } from "formik"
@@ -8,6 +15,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useSWRConfig } from "swr"
 
+// CreateSupplyReq — body sent to POST /api/supplies and PUT /api/supplies/[id].
 export type CreateSupplyReq = {
   name: string;
   quantity: number;
@@ -26,8 +34,10 @@ const SupplyForm: React.FC<{ supply?: Supply; onSuccess?: () => void }> = ({ sup
   const router = useRouter()
   const { mutate } = useSWRConfig()
   const isEdit = !!supply
+  // saving: manual loading flag (replaces SWR isLoading since fetcher is called directly).
   const [saving, setSaving] = useState(false)
 
+  // invalidate — refetches all /api/supplies SWR queries after mutation.
   const invalidate = () => mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/supplies'))
 
   const initialValues: CreateSupplyReq = {
@@ -41,6 +51,7 @@ const SupplyForm: React.FC<{ supply?: Supply; onSuccess?: () => void }> = ({ sup
     setSaving(true)
     try {
       if (isEdit && supply?.documentId) {
+        // Wraps payload in { data } as required by Strapi v5 PUT body format.
         await fetcher(`/api/supplies/${supply.documentId}`, {
           method: 'PUT',
           body: JSON.stringify({ data: values }),
@@ -55,6 +66,7 @@ const SupplyForm: React.FC<{ supply?: Supply; onSuccess?: () => void }> = ({ sup
         })
         toast.success('Insumo creado')
         invalidate()
+        // Redirect to supply detail with ?edit=1 so the user can add variants immediately.
         const id = res?.data?.documentId
         if (id) router.push(`/supplies/${id}?edit=1`)
         else if (onSuccess) onSuccess()

@@ -1,5 +1,10 @@
 import React from 'react'
 
+// Spinner — indicador de carga circular.
+// size: 'sm' = w-5/border-2, 'md' (default) = w-8/border-4.
+// className sobreescribe el contenedor externo completo (default: w-full py-24 centrado).
+// Colores: anillo base surface-200, arco giratorio primary-500.
+// No exportado desde ui/index.ts — se importa directamente donde se necesita.
 const Spinner: React.FC<{ className?: string; size?: 'sm' | 'md' }> = ({ className, size = 'md' }) => {
   const ring = size === 'sm'
     ? 'w-5 h-5 border-2'

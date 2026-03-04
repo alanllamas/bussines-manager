@@ -1,3 +1,9 @@
+// RootLayout — Server Component raíz de Next.js App Router.
+// AuthProvider envuelve todo el body — el contexto Firebase está disponible en toda la app.
+// Nav: h-20 fijo, logo → /, NavLinks (rutas), ProfileAvatar oculto bajo lg.
+// main: min-h-[calc(100vh-5rem)] — ocupa el espacio restante debajo del nav.
+// Toaster: sonner bottom-right con richColors para toasts de éxito/error.
+// ErrorBoundary no está en root — se maneja por página (ADR-004).
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";

@@ -1,4 +1,6 @@
 'use client'
+// ClientInvoices — página /invoices: lista global de cortes.
+// useAuthGuard: retorna null mientras carga (evita flash). InvoiceList hace su propio fetch.
 import React from "react";
 import InvoiceList from "@/components/invoices/InvoiceList";
 import { useAuthGuard } from "@/hooks/useAuthGuard";

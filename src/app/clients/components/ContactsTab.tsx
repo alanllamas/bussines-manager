@@ -1,4 +1,8 @@
 'use client'
+// ContactsTab — panel de contactos del cliente (Tab 2 en ClientTabs).
+// ContactCard: componente interno con avatar (inicial del nombre), job_title,
+//   y campos opcionales (area, email, phone, extension) — se renderizan solo si tienen valor.
+// Los contactos vienen pre-cargados en client.contacts desde getClient populate.
 import React from "react";
 import { TabPanel } from '@headlessui/react'
 import { Client, Contact } from "@/api/hooks/clients/getClient";

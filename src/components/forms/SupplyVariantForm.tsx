@@ -1,3 +1,9 @@
+// SupplyVariantForm — inline create/edit form for a supply variant (Variante de Insumo).
+// Mirrors ProductVariantForm in structure and pattern.
+// Note: CreateSupplyVariantReq has an optional `description` field not shown in this form —
+// description can only be set via Strapi admin or a future form enhancement.
+//
+// onSuccess / onCancel: same usage as ProductVariantForm (list page inline form).
 'use client'
 import React, { useEffect, useState } from "react"
 import { Field, Form, Formik } from "formik"
@@ -19,14 +25,17 @@ const SupplyVariantForm: React.FC<{
 }> = ({ variant, onSuccess, onCancel }) => {
   const isEdit = !!variant
   const { mutate } = useSWRConfig()
+  // invalidate — refetches all /api/supply-variants SWR queries after mutation.
   const invalidate = () => mutate((key: unknown) => Array.isArray(key) && typeof key[0] === 'string' && key[0].includes('/api/supply-variants'))
 
+  // SWR mutation state — undefined until Formik submits, triggers the hook request.
   const [newVariant, setNewVariant] = useState<CreateSupplyVariantReq>()
   const [editPayload, setEditPayload] = useState<{ data: CreateSupplyVariantReq; documentId: string }>()
 
   const { variant: created, error: createError, isLoading: createLoading } = useCreateSupplyVariant(newVariant)
   const { variant: edited, error: editError, isLoading: editLoading } = useEditSupplyVariant(editPayload)
 
+  // initialValues — description is not pre-filled here (field not shown in form).
   const initialValues: CreateSupplyVariantReq = {
     name: variant?.name ?? '',
     type: variant?.type ?? '',
@@ -40,6 +49,7 @@ const SupplyVariantForm: React.FC<{
     }
   }
 
+  // After create/edit: invalidate supply-variants cache and notify parent.
   useEffect(() => {
     if (!createError && !createLoading && created) { invalidate(); if (onSuccess) onSuccess() }
   }, [createLoading, created, createError])

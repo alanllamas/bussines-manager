@@ -1,3 +1,4 @@
+// ProductsLayout — Server Component layout para /products/*. Sidebar + main, mismo patrón que clients.
 import React from "react"
 import ProductsSideBar from "./components/sidebar"
 

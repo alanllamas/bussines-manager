@@ -1,4 +1,10 @@
 'use client'
+// FormDialog — wrapper de Headless UI Dialog para formularios en modal.
+// z-50 garantiza que quede sobre todo el contenido de página.
+// Sin backdrop/overlay — el dialog flota sobre el contenido sin oscurecer el fondo.
+// panelClassName: clase del panel interior (controla tamaño y estilo del cuadro del form).
+// dialogClassName: clase adicional del Dialog exterior (raro usarlo, disponible por flexibilidad).
+// onClose: se pasa a Dialog — se dispara con Escape o click fuera del panel.
 import React from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 
